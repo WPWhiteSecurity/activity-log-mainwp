@@ -1,0 +1,49 @@
+{
+  "name": "mainwp-activity-log-extension",
+  "version": "0.1.0",
+  "description": "An add-on for MainWP to be able to view the activity logs of all child sites from the central MainWP dashboard.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WPWhiteSecurity/mainwp-activity-log-extension.git"
+  },
+  "keywords": [
+    "wsal",
+    "mainwp",
+    "mainwp-extension"
+  ],
+  "author": "WP White Security",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/WPWhiteSecurity/mainwp-activity-log-extension/issues"
+  },
+  "homepage": "https://github.com/WPWhiteSecurity/mainwp-activity-log-extension#readme",
+  "dependencies": {
+    "npm": "^6.3.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^9.1.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-preset-env": "^1.7.0",
+    "eslint": "^5.3.0",
+    "eslint-config-wordpress": "^2.0.0",
+    "eslint-plugin-wordpress": "^0.1.0",
+    "extract-text-webpack-plugin": "^4.0.0-alpha.0",
+    "gulp": "^3.9.1",
+    "gulp-notify": "^3.2.0",
+    "gulp-sort": "^2.0.0",
+    "gulp-wp-pot": "^2.3.2",
+    "gulp-zip": "^4.2.0",
+    "jquery": "^3.3.1",
+    "node-sass": "^4.9.3",
+    "postcss-loader": "^3.0.0",
+    "raw-loader": "^0.5.1",
+    "sass-loader": "^7.1.0",
+    "webpack": "^4.16.5",
+    "webpack-cli": "^3.1.0"
+  }
+}

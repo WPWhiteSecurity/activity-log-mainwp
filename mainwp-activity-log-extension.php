@@ -2,7 +2,7 @@
 /**
  * Plugin Name: MainWP Activity Log Extension
  * Plugin URI: http://www.wpsecurityauditlog.com/
- * Description: An activity log extension for MainWP sites based on WP Security Audit Log.
+ * Description: An add-on for MainWP to be able to view the activity logs of all child sites from the central MainWP dashboard.
  * Author: WP White Security
  * Version: 0.1.0
  * Text Domain: mwp-al-ext
