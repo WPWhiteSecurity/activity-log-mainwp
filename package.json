@@ -4,7 +4,8 @@
   "description": "An add-on for MainWP to be able to view the activity logs of all child sites from the central MainWP dashboard.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "webpack --mode=development",
+    "build": "webpack --mode=production"
   },
   "repository": {
     "type": "git",
