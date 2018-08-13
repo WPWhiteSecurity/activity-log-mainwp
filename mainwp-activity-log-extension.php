@@ -89,6 +89,13 @@ class Activity_Log {
 	protected $child_file;
 
 	/**
+	 * Extension View.
+	 *
+	 * @var \WSAL\MainWPExtension\Views\View
+	 */
+	public $extension_view;
+
+	/**
 	 * Returns the singular instance of the plugin.
 	 *
 	 * @return Activity_Log
@@ -112,7 +119,7 @@ class Activity_Log {
 		\AaronHolbrook\Autoload\autoload( MWPAL_BASE_DIR . 'includes' );
 
 		// Initiate the view.
-		$view = new \WSAL\MainWPExtension\Views\View( $this );
+		$this->extension_view = new \WSAL\MainWPExtension\Views\View( $this );
 		// $this->log( \WSAL\MainWPExtension\View::my_function() );
 
 		register_activation_hook( __FILE__, array( $this, 'activate_extension' ) );
@@ -176,17 +183,17 @@ class Activity_Log {
 			define( 'MWPAL_BASE_DIR', plugin_dir_path( __FILE__ ) );
 		}
 
-		// Plugin Directory Path.
+		// Plugin Extension Name.
 		if ( ! defined( 'MWPAL_EXTENSION_NAME' ) ) {
 			define( 'MWPAL_EXTENSION_NAME', 'mainwp-activity-log-extension' );
 		}
 
-		// Plugin Directory Path.
+		// Plugin Min PHP Version.
 		if ( ! defined( 'MWPAL_MIN_PHP_VERSION' ) ) {
 			define( 'MWPAL_MIN_PHP_VERSION', '5.4.0' );
 		}
 
-		// Plugin Directory Path.
+		// Plugin Options Prefix.
 		if ( ! defined( 'MWPAL_OPT_PREFIX' ) ) {
 			define( 'MWPAL_OPT_PREFIX', 'mwpal-' );
 		}
@@ -216,7 +223,7 @@ class Activity_Log {
 			'plugin'   => __FILE__,
 			'api'      => MWPAL_EXTENSION_NAME,
 			'mainwp'   => false,
-			'callback' => array( &$this, 'settings' ),
+			'callback' => array( &$this, 'display_extension' ),
 		);
 		return $plugins;
 	}
@@ -224,22 +231,8 @@ class Activity_Log {
 	/**
 	 * Extension Display on MainWP Dashboard.
 	 */
-	public function settings() {
-		// The "mainwp-pageheader-extensions" action is used to render the tabs on the Extensions screen.
-		// It's used together with mainwp-pagefooter-extensions and mainwp-getextensions.
-		do_action( 'mainwp-pageheader-extensions', __FILE__ );
-
-		if ( $this->child_enabled ) {
-			// MainWPExampleExtension::renderPage();
-			echo 'Hello World';
-		} else {
-			?>
-			<div class="mainwp_info-box-yellow">
-				<?php esc_html_e( 'The Extension has to be enabled to change the settings.', 'mwp-al-ext' ); ?>
-			</div>
-			<?php
-		}
-		do_action( 'mainwp-pagefooter-extensions', __FILE__ );
+	public function display_extension() {
+		$this->extension_view->render_view();
 	}
 
 	/**
@@ -264,6 +257,15 @@ class Activity_Log {
 		if ( 'plugins' === $current_screen->parent_base && false === $this->mainwp_main_activated ) {
 			echo '<div class="error"><p>MainWP Hello World! Extension ' . esc_html__( 'requires ', 'mwp-al-ext' ) . '<a href="http://mainwp.com/" target="_blank">MainWP</a>' . esc_html__( ' Plugin to be activated in order to work. Please install and activate', 'mwp-al-ext' ) . '<a href="http://mainwp.com/" target="_blank">MainWP</a> ' . esc_html__( 'first.', 'mwp-al-ext' ) . '</p></div>';
 		}
+	}
+
+	/**
+	 * Check if extension is enabled.
+	 *
+	 * @return mix
+	 */
+	public function is_child_enabled() {
+		return $this->child_enabled;
 	}
 
 	/**
