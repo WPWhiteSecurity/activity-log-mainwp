@@ -96,6 +96,13 @@ class Activity_Log {
 	public $extension_view;
 
 	/**
+	 * Extension Settings.
+	 *
+	 * @var \WSAL\MainWPExtension\Settings
+	 */
+	public $settings;
+
+	/**
 	 * Returns the singular instance of the plugin.
 	 *
 	 * @return Activity_Log
@@ -125,6 +132,9 @@ class Activity_Log {
 
 		// Initiate the view.
 		$this->extension_view = new \WSAL\MainWPExtension\Views\View( $this );
+		$this->settings       = new \WSAL\MainWPExtension\Settings();
+
+		// Installation routine.
 		register_activation_hook( __FILE__, array( $this, 'install_extension' ) );
 
 		// Set child file.
@@ -164,17 +174,7 @@ class Activity_Log {
 		self::get_connector()->installAll();
 
 		// Option to redirect to extensions page.
-		update_option( MWPAL_OPT_PREFIX . 'activity-extension-activated', 'yes' );
-	}
-
-	/**
-	 * Checks if extension is activated or not.
-	 *
-	 * @param string $default - Default value to return if option doesn't exist.
-	 * @return string
-	 */
-	public function is_extension_activated( $default = 'no' ) {
-		return get_option( MWPAL_OPT_PREFIX . 'activity-extension-activated', $default );
+		$this->settings->set_extension_activated( 'yes' );
 	}
 
 	/**
@@ -223,8 +223,8 @@ class Activity_Log {
 	 * @return void
 	 */
 	public function redirect_to_extensions() {
-		if ( 'yes' === $this->is_extension_activated() ) {
-			delete_option( MWPAL_OPT_PREFIX . 'activity-extension-activated' );
+		if ( 'yes' === $this->settings->is_extension_activated() ) {
+			$this->settings->delete_option( 'activity-extension-activated' );
 			wp_safe_redirect( add_query_arg( 'page', 'Extensions', admin_url( 'admin.php' ) ) );
 			return;
 		}
