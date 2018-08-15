@@ -114,15 +114,18 @@ class Activity_Log {
 		// Define plugin constants.
 		$this->define_constants();
 
+		require_once MWPAL_BASE_DIR . 'includes/helpers/class-datahelper.php';
+		require_once MWPAL_BASE_DIR . 'includes/models/class-activerecord.php';
+		require_once MWPAL_BASE_DIR . 'includes/models/class-query.php';
+		require_once MWPAL_BASE_DIR . 'includes/models/class-occurrencequery.php';
+
 		// Include autoloader.
 		require_once MWPAL_BASE_DIR . 'includes/vendors/autoload.php';
 		\AaronHolbrook\Autoload\autoload( MWPAL_BASE_DIR . 'includes' );
 
 		// Initiate the view.
 		$this->extension_view = new \WSAL\MainWPExtension\Views\View( $this );
-		// $this->log( \WSAL\MainWPExtension\View::my_function() );
-
-		register_activation_hook( __FILE__, array( $this, 'activate_extension' ) );
+		register_activation_hook( __FILE__, array( $this, 'install_extension' ) );
 
 		// Set child file.
 		$this->child_file = __FILE__;
@@ -143,9 +146,24 @@ class Activity_Log {
 	}
 
 	/**
+	 * DB connection.
+	 *
+	 * @param mixed $config - DB configuration.
+	 * @param bool  $reset  - True if reset.
+	 * @return \WSAL\MainWPExtension\Connector\ConnectorInterface
+	 */
+	public static function get_connector( $config = null, $reset = false ) {
+		return \WSAL\MainWPExtension\Connector\ConnectorFactory::getConnector( $config, $reset );
+	}
+
+	/**
 	 * Save option that extension has been activated.
 	 */
-	public function activate_extension() {
+	public function install_extension() {
+		// Ensure that the system is installed and schema is correct.
+		self::get_connector()->installAll();
+
+		// Option to redirect to extensions page.
 		update_option( MWPAL_OPT_PREFIX . 'activity-extension-activated', 'yes' );
 	}
 
@@ -232,7 +250,7 @@ class Activity_Log {
 	 * Extension Display on MainWP Dashboard.
 	 */
 	public function display_extension() {
-		$this->extension_view->render_view();
+		$this->extension_view->render_page();
 	}
 
 	/**

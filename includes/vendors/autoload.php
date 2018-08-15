@@ -58,9 +58,9 @@ if ( ! function_exists( 'AaronHolbrook\Autoload\autoload' ) ) :
 				}
 
 				// Don't load any files that are not the proper mime type.
-				if ( 'text/x-php' !== mime_content_type( $real_path ) ) {
-					continue;
-				}
+				// if ( 'text/x-php' !== mime_content_type( $real_path ) ) {
+				// 	continue;
+				// }
 
 				$filesize = filesize( $real_path );
 				// Don't include empty or negative sized files.
@@ -99,6 +99,7 @@ if ( ! function_exists( 'AaronHolbrook\Autoload\autoload' ) ) :
 					continue;
 				}
 
+				// Require the file.
 				require_once $real_path;
 			}
 		}

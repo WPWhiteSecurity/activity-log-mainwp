@@ -9,8 +9,6 @@
 
 namespace WSAL\MainWPExtension\Views;
 
-use \WSAL\MainWPExtension\Activity_Log as Activity_Log;
-
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -22,25 +20,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 class View extends Abstract_View {
 
 	/**
-	 * Render View.
-	 */
-	public function render_view() {
-		$this->render_page();
-	}
-
-	/**
 	 * Render Header.
 	 */
 	public function header() {
 		// The "mainwp-pageheader-extensions" action is used to render the tabs on the Extensions screen.
 		// It's used together with mainwp-pagefooter-extensions and mainwp-getextensions.
-		do_action( 'mainwp-pageheader-extensions', __FILE__ );
+		do_action( 'mainwp-pageheader-extensions', $this->activity_log->get_child_file() );
 	}
 
 	/**
 	 * Render Content.
 	 */
 	public function content() {
+		// Fetch all child-sites.
+		// $websites = apply_filters( 'mainwp-getsites', $this->activity_log->get_child_file(), $this->activity_log->get_child_key(), null );
+
+		// foreach ( $websites as $single_site ) {
+		// 	$information[] = apply_filters( 'mainwp_fetchurlauthed', $this->activity_log->get_child_file(), $this->activity_log->get_child_key(), $single_site['id'], 'extra_excution', array() );
+		// }
+
+		// $this->activity_log->log( $information );
+
 		if ( $this->activity_log->is_child_enabled() ) {
 			echo 'Hello World';
 		} else {
@@ -56,6 +56,6 @@ class View extends Abstract_View {
 	 * Render Footer.
 	 */
 	public function footer() {
-		do_action( 'mainwp-pagefooter-extensions', __FILE__ );
+		do_action( 'mainwp-pagefooter-extensions', $this->activity_log->get_child_file() );
 	}
 }
