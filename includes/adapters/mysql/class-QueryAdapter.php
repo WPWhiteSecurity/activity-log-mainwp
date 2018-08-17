@@ -101,8 +101,8 @@ class Query implements QueryInterface {
 		}
 		$join_clause = '';
 		if ( $query->hasMetaJoin() ) {
-			$meta = new WSAL_Adapters_MySQL_Meta( $this->connection );
-			$occurrence = new WSAL_Adapters_MySQL_Occurrence( $this->connection );
+			$meta        = new \WSAL\MainWPExtension\Adapters\MySQL\Meta( $this->connection );
+			$occurrence  = new \WSAL\MainWPExtension\Adapters\MySQL\Occurrence( $this->connection );
 			$join_clause = ' LEFT JOIN ' . $meta->GetTable() . ' AS meta ON meta.occurrence_id = ' . $occurrence->GetTable() . '.id ';
 		}
 		$fields = (empty( $columns )) ? $from_data_sets[0] . '.*' : implode( ',', $columns );
@@ -124,17 +124,17 @@ class Query implements QueryInterface {
 	/**
 	 * Get an instance of the ActiveRecord Adapter.
 	 *
-	 * @return WSAL_Adapters_MySQL_ActiveRecord
+	 * @return \WSAL\MainWPExtension\Adapters\MySQL\ActiveRecord
 	 */
 	protected function getActiveRecordAdapter() {
-		return new WSAL_Adapters_MySQL_ActiveRecord( $this->connection );
+		return new \WSAL\MainWPExtension\Adapters\MySQL\ActiveRecord( $this->connection );
 	}
 
 	/**
 	 * Execute query and return data as $ar_cls objects.
 	 *
 	 * @param object $query - Query object.
-	 * @return WSAL_Models_ActiveRecord[]
+	 * @return \WSAL\MainWPExtension\Models\ActiveRecord[]
 	 */
 	public function Execute( $query ) {
 		$args = array();
@@ -214,7 +214,7 @@ class Query implements QueryInterface {
 		foreach ( $_wpdb->get_results( $sql, ARRAY_A ) as $data ) {
 			$occ_ids[] = $data['id'];
 		}
-		$meta = new WSAL_Adapters_MySQL_Meta( $this->connection );
+		$meta = new \WSAL\MainWPExtension\Adapters\MySQL\Meta( $this->connection );
 		$meta->DeleteByOccurenceIds( $occ_ids );
 	}
 
@@ -279,8 +279,8 @@ class Query implements QueryInterface {
 			return null;
 		}
 		$search_conditions = array();
-		$meta = new WSAL_Adapters_MySQL_Meta( $this->connection );
-		$occurrence = new WSAL_Adapters_MySQL_Occurrence( $this->connection );
+		$meta              = new \WSAL\MainWPExtension\Adapters\MySQL\Meta( $this->connection );
+		$occurrence        = new \WSAL\MainWPExtension\Adapters\MySQL\Occurrence( $this->connection );
 		if ( is_numeric( $condition ) && strlen( $condition ) == 4 ) {
 			$search_conditions['sql'] = $occurrence->GetTable() . '.alert_id LIKE %s';
 		} else {

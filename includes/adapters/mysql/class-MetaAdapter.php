@@ -113,7 +113,7 @@ class Meta extends ActiveRecord implements MetaInterface {
 	 *
 	 * @param string $meta_name - Metadata name.
 	 * @param string $occurence_id - Metadata occurrence_id.
-	 * @return WSAL_Meta[]
+	 * @return \WSAL\MainWPExtension\Adapters\MySQL\Meta[]
 	 */
 	public function LoadByNameAndOccurenceId( $meta_name, $occurence_id ) {
 		return $this->Load( 'occurrence_id = %d AND name = %s', array( $occurence_id, $meta_name ) );

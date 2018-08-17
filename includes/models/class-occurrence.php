@@ -11,6 +11,7 @@
 namespace WSAL\MainWPExtension\Models;
 
 use \WSAL\MainWPExtension\Models\ActiveRecord as ActiveRecord;
+use \WSAL\MainWPExtension\Models\Meta as Meta;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -77,17 +78,17 @@ class Occurrence extends ActiveRecord {
 	/**
 	 * Returns the alert related to this occurrence.
 	 *
-	 * @see WSAL_AlertManager::GetAlert()
-	 * @return WSAL_Alert
+	 * @see \WSAL\MainWPExtension\AlertManager::GetAlert()
+	 * @return \WSAL\MainWPExtension\Alert
 	 */
 	public function GetAlert() {
-		return WpSecurityAuditLog::GetInstance()->alerts->GetAlert( $this->alert_id );
+		return \WSAL\MainWPExtension\Activity_Log::get_instance()->alerts->GetAlert( $this->alert_id );
 	}
 
 	/**
 	 * Returns the value of a meta item.
 	 *
-	 * @see WSAL_Adapters_MySQL_Occurrence::GetNamedMeta()
+	 * @see \WSAL\MainWPExtension\Adapters\MySQL\Occurrence::GetNamedMeta()
 	 * @param string $name - Name of meta item.
 	 * @param mixed  $default - Default value returned when meta does not exist.
 	 * @return mixed The value, if meta item does not exist $default returned.
@@ -96,9 +97,6 @@ class Occurrence extends ActiveRecord {
 		// Get meta adapter.
 		$meta = $this->getAdapter()->GetNamedMeta( $this, $name );
 		return maybe_unserialize( $meta['value'] );
-
-		// TO DO: re-introduce add is loaded check before running query
-		// return $meta->IsLoaded() ? $meta->value : $default;
 	}
 
 	/**
@@ -110,10 +108,10 @@ class Occurrence extends ActiveRecord {
 	public function SetMetaValue( $name, $value ) {
 		if ( ! empty( $value ) ) {
 			// Get meta adapter.
-			$model = new WSAL_Models_Meta();
+			$model                = new Meta();
 			$model->occurrence_id = $this->getId();
-			$model->name = $name;
-			$model->value = maybe_serialize( $value );
+			$model->name          = $name;
+			$model->value         = maybe_serialize( $value );
 			$model->SaveMeta();
 		}
 	}
@@ -121,28 +119,28 @@ class Occurrence extends ActiveRecord {
 	/**
 	 * Update Metadata of this occurrence by name.
 	 *
-	 * @see WSAL_Models_Meta::UpdateByNameAndOccurenceId()
+	 * @see Meta::UpdateByNameAndOccurenceId()
 	 * @param string $name - Meta name.
 	 * @param mixed  $value - Meta value.
 	 */
 	public function UpdateMetaValue( $name, $value ) {
-		$model = new WSAL_Models_Meta();
+		$model = new Meta();
 		$model->UpdateByNameAndOccurenceId( $name, $value, $this->getId() );
 	}
 
 	/**
 	 * Returns a key-value pair of meta data.
 	 *
-	 * @see WSAL_Adapters_MySQL_Occurrence::GetMultiMeta()
+	 * @see \WSAL\MainWPExtension\Adapters\MySQL\Occurrence::GetMultiMeta()
 	 * @return array
 	 */
 	public function GetMetaArray() {
 		$result = array();
-		$metas = $this->getAdapter()->GetMultiMeta( $this );
+		$metas  = $this->getAdapter()->GetMultiMeta( $this );
 		foreach ( $metas as $meta ) {
 			$result[ $meta->name ] = maybe_unserialize( $meta->value );
 		}
-		return  $result;
+		return $result;
 	}
 
 	/**
@@ -159,8 +157,8 @@ class Occurrence extends ActiveRecord {
 	/**
 	 * Gets alert message.
 	 *
-	 * @see WSAL_Alert::GetMessage()
-	 * @param callable|null $meta_formatter (Optional) Meta formatter callback.
+	 * @see \WSAL\MainWPExtension\Alert::GetMessage()
+	 * @param callable|null $meta_formatter (Optional) – Meta formatter callback.
 	 * @return string Full-formatted message.
 	 */
 	public function GetMessage( $meta_formatter = null ) {
@@ -181,7 +179,7 @@ class Occurrence extends ActiveRecord {
 	/**
 	 * Delete occurrence as well as associated meta data.
 	 *
-	 * @see WSAL_Adapters_ActiveRecordInterface::Delete()
+	 * @see \WSAL\MainWPExtension\Adapters\ActiveRecordInterface::Delete()
 	 * @return boolean True on success, false on failure.
 	 */
 	public function Delete() {
@@ -194,7 +192,7 @@ class Occurrence extends ActiveRecord {
 	/**
 	 * Gets the username.
 	 *
-	 * @see WSAL_Adapters_MySQL_Occurrence::GetFirstNamedMeta()
+	 * @see \WSAL\MainWPExtension\Adapters\MySQL\Occurrence::GetFirstNamedMeta()
 	 * @return string User's username.
 	 */
 	public function GetUsername() {
@@ -204,7 +202,7 @@ class Occurrence extends ActiveRecord {
 				case 'Username' == $meta->name:
 					return $meta->value;
 				case 'CurrentUserID' == $meta->name:
-					return ($data = get_userdata( $meta->value )) ? $data->user_login : null;
+					return ( $data = get_userdata( $meta->value ) ) ? $data->user_login : null;
 			}
 		}
 		return null;
@@ -258,7 +256,7 @@ class Occurrence extends ActiveRecord {
 	 * Finds occurences of the same type by IP and Username within specified time frame.
 	 *
 	 * @param array $args - Query args.
-	 * @return WSAL_Occurrence[]
+	 * @return \WSAL\MainWPExtension\Adapters\MySQL\Occurrence[]
 	 */
 	public function CheckKnownUsers( $args = array() ) {
 		return $this->getAdapter()->CheckKnownUsers( $args );
@@ -268,7 +266,7 @@ class Occurrence extends ActiveRecord {
 	 * Finds occurences of the same type by IP within specified time frame.
 	 *
 	 * @param array $args - Query args.
-	 * @return WSAL_Occurrence[]
+	 * @return \WSAL\MainWPExtension\Adapters\MySQL\Occurrence[]
 	 */
 	public function CheckUnKnownUsers( $args = array() ) {
 		return $this->getAdapter()->CheckUnKnownUsers( $args );
@@ -278,7 +276,7 @@ class Occurrence extends ActiveRecord {
 	 * Finds occurences of the alert 1003.
 	 *
 	 * @param array $args - Query args.
-	 * @return WSAL_Occurrence[]
+	 * @return \WSAL\MainWPExtension\Adapters\MySQL\Occurrence[]
 	 */
 	public function check_alert_1003( $args = array() ) {
 		return $this->getAdapter()->check_alert_1003( $args );
@@ -287,9 +285,9 @@ class Occurrence extends ActiveRecord {
 	/**
 	 * Gets occurrence by Post_id
 	 *
-	 * @see WSAL_Adapters_MySQL_Occurrence::GetByPostID()
+	 * @see \WSAL\MainWPExtension\Adapters\MySQL\Occurrence::GetByPostID()
 	 * @param integer $post_id - Post ID.
-	 * @return WSAL_Occurrence[]
+	 * @return \WSAL\MainWPExtension\Adapters\MySQL\Occurrence[]
 	 */
 	public function GetByPostID( $post_id ) {
 		return $this->getAdapter()->GetByPostID( $post_id );
@@ -298,9 +296,9 @@ class Occurrence extends ActiveRecord {
 	/**
 	 * Gets occurences of the same type by IP within specified time frame.
 	 *
-	 * @see WSAL_Adapters_MySQL_Occurrence::CheckAlert404()
+	 * @see \WSAL\MainWPExtension\Adapters\MySQL\Occurrence::CheckAlert404()
 	 * @param array $args - Query args.
-	 * @return WSAL_Occurrence[]
+	 * @return \WSAL\MainWPExtension\Adapters\MySQL\Occurrence[]
 	 */
 	public function CheckAlert404( $args = array() ) {
 		return $this->getAdapter()->CheckAlert404( $args );

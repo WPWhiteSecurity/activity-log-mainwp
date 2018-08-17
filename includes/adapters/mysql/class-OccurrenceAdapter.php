@@ -43,7 +43,7 @@ class Occurrence extends ActiveRecord implements OccurrenceInterface {
 	/**
 	 * Meta data.
 	 *
-	 * @var WSAL_Meta
+	 * @var \WSAL\MainWPExtension\Adapters\MySQL\Meta
 	 */
 	protected $_meta;
 
@@ -112,8 +112,8 @@ class Occurrence extends ActiveRecord implements OccurrenceInterface {
 	 * Returns metadata related to this event.
 	 *
 	 * @param object $occurence - Occurrence model instance.
-	 * @see WSAL_Adapters_MySQL_ActiveRecord::Load()
-	 * @return WSAL_Meta
+	 * @see \WSAL\MainWPExtension\Adapters\MySQL\ActiveRecord::Load()
+	 * @return \WSAL\MainWPExtension\Adapters\MySQL\Meta
 	 */
 	public function GetMeta( $occurence ) {
 		if ( ! isset( $this->_meta ) ) {
@@ -127,8 +127,8 @@ class Occurrence extends ActiveRecord implements OccurrenceInterface {
 	 * Returns allmeta data related to this event.
 	 *
 	 * @param object $occurence - Occurrence model instance.
-	 * @see WSAL_Adapters_MySQL_ActiveRecord::LoadArray()
-	 * @return WSAL_Meta[]
+	 * @see \WSAL\MainWPExtension\Adapters\MySQL\ActiveRecord::LoadArray()
+	 * @return \WSAL\MainWPExtension\Adapters\MySQL\Meta[]
 	 */
 	public function GetMultiMeta( $occurence ) {
 		if ( ! isset( $this->_meta ) ) {
@@ -143,8 +143,8 @@ class Occurrence extends ActiveRecord implements OccurrenceInterface {
 	 *
 	 * @param object $occurence - Occurrence model instance.
 	 * @param string $name - Meta name.
-	 * @see WSAL_Adapters_MySQL_ActiveRecord::Load()
-	 * @return WSAL_Meta The meta item, be sure to checked if it was loaded successfully.
+	 * @see \WSAL\MainWPExtension\Adapters\MySQL\ActiveRecord::Load()
+	 * @return \WSAL\MainWPExtension\Adapters\MySQL\Meta The meta item, be sure to checked if it was loaded successfully.
 	 */
 	public function GetNamedMeta( $occurence, $name ) {
 		$meta        = new \WSAL\MainWPExtension\Adapters\MySQL\Meta( $this->connection );
@@ -157,7 +157,7 @@ class Occurrence extends ActiveRecord implements OccurrenceInterface {
 	 *
 	 * @param object $occurence - Occurrence model instance.
 	 * @param array  $names - List of meta names.
-	 * @return WSAL_Meta The first meta item that exists.
+	 * @return \WSAL\MainWPExtension\Adapters\MySQL\Meta The first meta item that exists.
 	 */
 	public function GetFirstNamedMeta( $occurence, $names ) {
 		$meta  = new \WSAL\MainWPExtension\Adapters\MySQL\Meta( $this->connection );
@@ -173,7 +173,7 @@ class Occurrence extends ActiveRecord implements OccurrenceInterface {
 	 * Returns newest unique occurrences.
 	 *
 	 * @param integer $limit Maximum limit.
-	 * @return WSAL_Occurrence[]
+	 * @return \WSAL\MainWPExtension\Adapters\MySQL\Occurrence[]
 	 */
 	public static function GetNewestUnique( $limit = PHP_INT_MAX ) {
 		$temp = new self();
@@ -194,7 +194,7 @@ class Occurrence extends ActiveRecord implements OccurrenceInterface {
 	 * Gets occurences of the same type by IP and Username within specified time frame.
 	 *
 	 * @param array $args - User arguments.
-	 * @return WSAL_Occurrence[]
+	 * @return \WSAL\MainWPExtension\Adapters\MySQL\Occurrence[]
 	 */
 	public function CheckKnownUsers( $args = array() ) {
 		$tt2 = new \WSAL\MainWPExtension\Adapters\MySQL\Meta( $this->connection );
@@ -217,7 +217,7 @@ class Occurrence extends ActiveRecord implements OccurrenceInterface {
 	 * Gets occurences of the same type by IP within specified time frame.
 	 *
 	 * @param array $args - User arguments.
-	 * @return WSAL_Occurrence[]
+	 * @return \WSAL\MainWPExtension\Adapters\MySQL\Occurrence[]
 	 */
 	public function CheckUnKnownUsers( $args = array() ) {
 		$tt2 = new \WSAL\MainWPExtension\Adapters\MySQL\Meta( $this->connection );
@@ -236,7 +236,7 @@ class Occurrence extends ActiveRecord implements OccurrenceInterface {
 	 * Gets occurences of the alert 1003.
 	 *
 	 * @param array $args - User arguments.
-	 * @return WSAL_Occurrence[]
+	 * @return \WSAL\MainWPExtension\Adapters\MySQL\Occurrence[]
 	 */
 	public function check_alert_1003( $args = array() ) {
 		return self::LoadMultiQuery(
@@ -287,7 +287,7 @@ class Occurrence extends ActiveRecord implements OccurrenceInterface {
 	 * Gets occurrence by Post_id.
 	 *
 	 * @param int $post_id - Post ID.
-	 * @return WSAL_Occurrence[]
+	 * @return \WSAL\MainWPExtension\Adapters\MySQL\Occurrence[]
 	 */
 	public function GetByPostID( $post_id ) {
 		$tt2 = new \WSAL\MainWPExtension\Adapters\MySQL\Meta( $this->connection );
@@ -306,7 +306,7 @@ class Occurrence extends ActiveRecord implements OccurrenceInterface {
 	 * Gets occurences of the same type by IP within specified time frame.
 	 *
 	 * @param array $args - Query Arguments.
-	 * @return WSAL_Occurrence[]
+	 * @return \WSAL\MainWPExtension\Adapters\MySQL\Occurrence[]
 	 */
 	public function CheckAlert404( $args = array() ) {
 		$tt2 = new \WSAL\MainWPExtension\Adapters\MySQL\Meta( $this->connection );

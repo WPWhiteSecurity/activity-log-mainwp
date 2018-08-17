@@ -63,7 +63,7 @@ class Meta extends ActiveRecord {
 	/**
 	 * Save Metadata into Adapter.
 	 *
-	 * @see WSAL_Adapters_MySQL_ActiveRecord::Save()
+	 * @see \WSAL\MainWPExtension\Adapters\MySQL\ActiveRecord::Save()
 	 * @return integer|boolean Either the number of modified/inserted rows or false on failure.
 	 */
 	public function SaveMeta() {
@@ -80,7 +80,7 @@ class Meta extends ActiveRecord {
 	/**
 	 * Update Metadata by name and occurrence_id.
 	 *
-	 * @see WSAL_Adapters_MySQL_Meta::LoadByNameAndOccurenceId()
+	 * @see \WSAL\MainWPExtension\Adapters\MySQL\Meta::LoadByNameAndOccurenceId()
 	 * @param string  $name - Meta name.
 	 * @param mixed   $value - Meta value.
 	 * @param integer $occurrence_id - Occurrence_id.

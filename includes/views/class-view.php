@@ -50,6 +50,7 @@ class View extends Abstract_View {
 					'action' => 'check_wsal',
 				);
 
+				// Call to child sites to check if WSAL is installed on them or not.
 				$results[ $site['id'] ] = apply_filters(
 					'mainwp_fetchurlauthed',
 					$this->activity_log->get_child_file(),
@@ -92,14 +93,20 @@ class View extends Abstract_View {
 	public function content() {
 		// Fetch all child-sites.
 		$this->mainwp_sites     = apply_filters( 'mainwp-getsites', $this->activity_log->get_child_file(), $this->activity_log->get_child_key(), null );
-		$this->wsal_child_sites = $this->get_wsal_child_sites();
-
-		// foreach ( $websites as $single_site ) {
-		// 	$information[] = apply_filters( 'mainwp_fetchurlauthed', $this->activity_log->get_child_file(), $this->activity_log->get_child_key(), $single_site['id'], 'extra_excution', array() );
-		// }
+		$this->wsal_child_sites = $this->get_wsal_child_sites(); // Check child sites with WSAL.
+		$this->query_child_site_events();
 
 		if ( $this->activity_log->is_child_enabled() ) {
-			echo 'Hello World';
+			?>
+			<nav id="wsal-tabs" class="nav-tab-wrapper">
+				<a href="<?php echo esc_url( '#' ); ?>" class="nav-tab nav-tab-active">
+					<?php echo esc_html( 'Activity Log' ); ?>
+				</a>
+				<a href="<?php echo esc_url( '#' ); ?>" class="nav-tab">
+					<?php echo esc_html( 'Settings' ); ?>
+				</a>
+			</nav>
+			<?php
 		} else {
 			?>
 			<div class="mainwp_info-box-yellow">
@@ -114,5 +121,50 @@ class View extends Abstract_View {
 	 */
 	public function footer() {
 		do_action( 'mainwp-pagefooter-extensions', $this->activity_log->get_child_file() );
+	}
+
+	/**
+	 * Query events from all the child sites.
+	 *
+	 * @return void
+	 */
+	private function query_child_site_events() {
+		// Get events count from native events DB.
+		$occurrence = new \WSAL\MainWPExtension\Models\Occurrence();
+		$occ_count  = (int) $occurrence->Count();
+
+		// Check if the WSAL child sites option exists.
+		$child_sites = $this->activity_log->settings->get_option( 'wsal-child-sites' );
+
+		if ( ! empty( $child_sites ) && is_array( $child_sites ) && 0 === $occ_count ) {
+			$sites_data = array();
+
+			foreach ( $child_sites as $site_id => $child_site ) {
+				// Post data for child sites.
+				$post_data = array(
+					'action'       => 'get_events',
+					'events_count' => 100,
+				);
+
+				// Call to child sites to fetch WSAL events.
+				$sites_data[ $site_id ] = apply_filters(
+					'mainwp_fetchurlauthed',
+					$this->activity_log->get_child_file(),
+					$this->activity_log->get_child_key(),
+					$site_id,
+					'extra_excution',
+					$post_data
+				);
+			}
+
+			if ( ! empty( $sites_data ) && is_array( $sites_data ) ) {
+				foreach ( $sites_data as $site_id => $site_events ) {
+					if ( ! isset( $site_events->events ) ) {
+						continue;
+					}
+					$this->activity_log->alerts->log_events( $site_events->events, $site_id );
+				}
+			}
+		}
 	}
 }

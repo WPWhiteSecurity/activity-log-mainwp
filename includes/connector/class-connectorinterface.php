@@ -2,7 +2,7 @@
 /**
  * Class: Connection Interface
  *
- * Interface used by the WSAL_Connector.
+ * Interface used by the Connectors.
  *
  * @package mwp-al-ext
  */
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Interface used by the WSAL_Connector.
+ * Interface used by the Connectors.
  *
  * @package mwp-al-ext
  */

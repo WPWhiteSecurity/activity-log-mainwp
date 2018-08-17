@@ -103,6 +103,20 @@ class Activity_Log {
 	public $settings;
 
 	/**
+	 * Alerts Manager.
+	 *
+	 * @var \WSAL\MainWPExtension\AlertManager
+	 */
+	public $alerts;
+
+	/**
+	 * Constants Manager.
+	 *
+	 * @var \WSAL\MainWPExtension\ConstantManager
+	 */
+	public $constants;
+
+	/**
 	 * Returns the singular instance of the plugin.
 	 *
 	 * @return Activity_Log
@@ -133,6 +147,8 @@ class Activity_Log {
 		// Initiate the view.
 		$this->extension_view = new \WSAL\MainWPExtension\Views\View( $this );
 		$this->settings       = new \WSAL\MainWPExtension\Settings();
+		$this->constants      = new \WSAL\MainWPExtension\ConstantManager( $this );
+		$this->alerts         = new \WSAL\MainWPExtension\AlertManager( $this );
 
 		// Installation routine.
 		register_activation_hook( __FILE__, array( $this, 'install_extension' ) );
@@ -153,6 +169,13 @@ class Activity_Log {
 		}
 		add_action( 'admin_init', array( &$this, 'redirect_to_extensions' ) );
 		add_action( 'admin_notices', array( &$this, 'mainwp_error_notice' ) );
+	}
+
+	/**
+	 * Load extension on `plugins_loaded` action.
+	 */
+	public function load_mwpal_extension() {
+		do_action( 'mwpal_init', $this );
 	}
 
 	/**
@@ -305,6 +328,13 @@ class Activity_Log {
 	}
 
 	/**
+	 * Load events from external file: `default-events.php`.
+	 */
+	public function load_events() {
+		require_once 'default-events.php';
+	}
+
+	/**
 	 * Error Logger
 	 *
 	 * Logs given input into debug.log file in debug mode.
@@ -330,4 +360,12 @@ class Activity_Log {
 function mwpal_extension_load() {
 	return \WSAL\MainWPExtension\Activity_Log::get_instance();
 }
-mwpal_extension_load();
+
+// Initiate the plugin.
+$mwpal_extension = mwpal_extension_load();
+
+// Load MainWP Activity Log Extension.
+add_action( 'plugins_loaded', array( $mwpal_extension, 'load_mwpal_extension' ) );
+
+// Include events for extension.
+$mwpal_extension->load_events();
