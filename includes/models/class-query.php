@@ -87,6 +87,11 @@ class Query {
 	protected $useDefaultAdapter = false;
 
 	/**
+	 * Method: Constructor.
+	 */
+	public function __construct() {}
+
+	/**
 	 * Initialize a connector singleton.
 	 *
 	 * @return \WSAL\MainWPExtension\Connector\ConnectorInterface

@@ -16,6 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// require_once ABSPATH . 'wp-admin/includes/plugin.php';
+
 /**
  * View class of the extension.
  */
@@ -34,6 +36,78 @@ class View extends Abstract_View {
 	 * @var array
 	 */
 	private $wsal_child_sites = array();
+
+	/**
+	 * Extension List View.
+	 *
+	 * @var object
+	 */
+	private $list_view = null;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param Activity_Log $activity_log – Instance of Activity_Log.
+	 */
+	public function __construct( Activity_Log $activity_log ) {
+		parent::__construct( $activity_log );
+
+		add_action( 'mainwp-pageheader-extensions', array( $this, 'enqueue_styles' ), 10 );
+		add_action( 'mainwp-pagefooter-extensions', array( $this, 'enqueue_scripts' ), 10 );
+	}
+
+	/**
+	 * Enqueue Styles in Head.
+	 */
+	public function enqueue_styles() {
+		// Confirm extension page.
+		global $pagenow;
+
+		// @codingStandardsIgnoreStart
+		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false;
+		// @codingStandardsIgnoreEnd
+
+		if ( 'admin.php' !== $pagenow ) {
+			return;
+		} elseif ( 'Extensions-Mainwp-Activity-Log-Extension' !== $page ) {
+			return;
+		}
+
+		// View styles.
+		wp_enqueue_style(
+			'mwpal-view-styles',
+			trailingslashit( MWPAL_BASE_URL ) . 'assets/css/dist/styles.build.css',
+			array(),
+			filemtime( trailingslashit( MWPAL_BASE_DIR ) . 'assets/css/dist/styles.build.css' )
+		);
+	}
+
+	/**
+	 * Enqueue Scripts in Footer.
+	 */
+	public function enqueue_scripts() {
+		// Confirm extension page.
+		global $pagenow;
+
+		// @codingStandardsIgnoreStart
+		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false;
+		// @codingStandardsIgnoreEnd
+
+		if ( 'admin.php' !== $pagenow ) {
+			return;
+		} elseif ( 'Extensions-Mainwp-Activity-Log-Extension' !== $page ) {
+			return;
+		}
+
+		wp_enqueue_script( 'jquery' );
+		wp_enqueue_script(
+			'mwpal-view-script',
+			trailingslashit( MWPAL_BASE_URL ) . 'assets/js/dist/index.js',
+			array( 'jquery' ),
+			filemtime( trailingslashit( MWPAL_BASE_DIR ) . 'assets/js/dist/index.js' ),
+			true
+		);
+	}
 
 	/**
 	 * Get WSAL Child Sites.
@@ -97,15 +171,35 @@ class View extends Abstract_View {
 		$this->query_child_site_events();
 
 		if ( $this->activity_log->is_child_enabled() ) {
+			$this->get_list_view()->prepare_items();
 			?>
-			<nav id="wsal-tabs" class="nav-tab-wrapper">
-				<a href="<?php echo esc_url( '#' ); ?>" class="nav-tab nav-tab-active">
-					<?php echo esc_html( 'Activity Log' ); ?>
-				</a>
-				<a href="<?php echo esc_url( '#' ); ?>" class="nav-tab">
-					<?php echo esc_html( 'Settings' ); ?>
-				</a>
-			</nav>
+			<form id="audit-log-viewer" method="get">
+				<div id="audit-log-viewer-content">
+					<input type="hidden" id="mwpal-site-id" name="mwpal-site-id" value="0" />
+					<?php
+					/**
+					 * Action: `mwpal_auditlog_after_view`
+					 *
+					 * Do action before the view renders.
+					 *
+					 * @param ActivityLogListView $this->list_view – Events list view.
+					 */
+					do_action( 'mwpal_auditlog_before_view', $this->get_list_view() );
+
+					// Display events table.
+					$this->get_list_view()->display();
+
+					/**
+					 * Action: `mwpal_auditlog_after_view`
+					 *
+					 * Do action after the view has been rendered.
+					 *
+					 * @param ActivityLogListView $this->list_view – Events list view.
+					 */
+					do_action( 'mwpal_auditlog_after_view', $this->get_list_view() );
+					?>
+				</div>
+			</form>
 			<?php
 		} else {
 			?>
@@ -166,5 +260,17 @@ class View extends Abstract_View {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Get Extension's List Table Instance.
+	 *
+	 * @return AuditLogListView
+	 */
+	private function get_list_view() {
+		if ( is_null( $this->list_view ) ) {
+			$this->list_view = new AuditLogListView( $this->activity_log );
+		}
+		return $this->list_view;
 	}
 }

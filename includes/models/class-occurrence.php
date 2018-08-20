@@ -201,11 +201,19 @@ class Occurrence extends ActiveRecord {
 			switch ( true ) {
 				case 'Username' == $meta->name:
 					return $meta->value;
-				case 'CurrentUserID' == $meta->name:
-					return ( $data = get_userdata( $meta->value ) ) ? $data->user_login : null;
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Gets the user data.
+	 *
+	 * @see \WSAL\MainWPExtension\Adapters\MySQL\Occurrence::GetFirstNamedMeta()
+	 * @return mixed User's data.
+	 */
+	public function get_user_data() {
+		return $this->GetMetaValue( 'UserData', false );
 	}
 
 	/**

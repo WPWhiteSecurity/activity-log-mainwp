@@ -7,7 +7,7 @@
  * @package mwp-al-ext
  */
 
-namespace WSAL\MainWPExtension\Helper;
+namespace WSAL\MainWPExtension\Helpers;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {

@@ -256,36 +256,10 @@ final class AlertManager {
 				// Get meta data of event.
 				$meta_data = $event->meta_data;
 				$user_data = isset( $meta_data['UserData'] ) ? $meta_data['UserData'] : false;
-				unset( $meta_data['UserData'] ); // Remove user data array.
-
-				// Set user meta for event.
-				if ( isset( $user_data['user_id'] ) ) {
-					$meta_data['UserID'] = $user_data['user_id'];
-				}
 
 				// Username.
-				if ( isset( $user_data['username'] ) ) {
-					$meta_data['Username'] = $user_data['username'];
-				}
-
-				// First name.
-				if ( isset( $user_data['first_name'] ) ) {
-					$meta_data['FirstName'] = $user_data['first_name'];
-				}
-
-				// Last name.
-				if ( isset( $user_data['last_name'] ) ) {
-					$meta_data['LastName'] = $user_data['last_name'];
-				}
-
-				// Display name.
-				if ( isset( $user_data['display_name'] ) ) {
-					$meta_data['DisplayName'] = $user_data['display_name'];
-				}
-
-				// User email.
-				if ( isset( $user_data['user_email'] ) ) {
-					$meta_data['UserEmail'] = $user_data['user_email'];
+				if ( isset( $user_data->username ) ) {
+					$meta_data['Username'] = $user_data->username;
 				}
 
 				// Log the events in DB.
