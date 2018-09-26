@@ -118,7 +118,7 @@ class View extends Abstract_View {
 		// Check if the WSAL child sites option exists.
 		$child_sites = $this->activity_log->settings->get_option( 'wsal-child-sites' );
 
-		if ( false === $child_sites && ! empty( $this->mainwp_sites ) ) {
+		if ( empty( $child_sites ) && ! empty( $this->mainwp_sites ) ) {
 			foreach ( $this->mainwp_sites as $site ) {
 				$post_data = array(
 					'action' => 'check_wsal',
@@ -169,13 +169,14 @@ class View extends Abstract_View {
 		$this->mainwp_sites     = apply_filters( 'mainwp-getsites', $this->activity_log->get_child_file(), $this->activity_log->get_child_key(), null );
 		$this->wsal_child_sites = $this->get_wsal_child_sites(); // Check child sites with WSAL.
 		$this->query_child_site_events();
+		$site_id = $this->activity_log->settings->get_view_site_id();
 
 		if ( $this->activity_log->is_child_enabled() ) {
 			$this->get_list_view()->prepare_items();
 			?>
 			<form id="audit-log-viewer" method="get">
 				<div id="audit-log-viewer-content">
-					<input type="hidden" id="mwpal-site-id" name="mwpal-site-id" value="0" />
+					<input type="hidden" id="mwpal-site-id" name="mwpal-site-id" value="<?php echo esc_attr( $site_id ); ?>" />
 					<?php
 					/**
 					 * Action: `mwpal_auditlog_after_view`
@@ -223,17 +224,23 @@ class View extends Abstract_View {
 	 * @return void
 	 */
 	private function query_child_site_events() {
-		// Get events count from native events DB.
-		$occurrence = new \WSAL\MainWPExtension\Models\Occurrence();
-		$occ_count  = (int) $occurrence->Count();
-
 		// Check if the WSAL child sites option exists.
-		$child_sites = $this->activity_log->settings->get_option( 'wsal-child-sites' );
+		$child_sites = $this->get_wsal_child_sites();
 
-		if ( ! empty( $child_sites ) && is_array( $child_sites ) && 0 === $occ_count ) {
+		if ( ! empty( $child_sites ) && is_array( $child_sites ) ) {
 			$sites_data = array();
 
 			foreach ( $child_sites as $site_id => $child_site ) {
+				// Get events count from native events DB.
+				$occ_query = new \WSAL\MainWPExtension\Models\OccurrenceQuery();
+				$occ_query->addCondition( 'site_id = %s ', $site_id ); // Set site id.
+				$occ_count = (int) $occ_query->getAdapter()->Count( $occ_query );
+
+				// If events are already present in the DB of a site, then no need to query from child site.
+				if ( 0 !== $occ_count ) {
+					continue;
+				}
+
 				// Post data for child sites.
 				$post_data = array(
 					'action'       => 'get_events',

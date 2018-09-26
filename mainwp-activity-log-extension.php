@@ -153,6 +153,9 @@ class Activity_Log {
 		// Installation routine.
 		register_activation_hook( __FILE__, array( $this, 'install_extension' ) );
 
+		// Schedule hook for refreshing events.
+		add_action( 'mwp_events_cleanup', array( $this, 'events_cleanup' ) );
+
 		// Set child file.
 		$this->child_file = __FILE__;
 		add_filter( 'mainwp-getextensions', array( &$this, 'get_this_extension' ) );
@@ -198,6 +201,10 @@ class Activity_Log {
 
 		// Option to redirect to extensions page.
 		$this->settings->set_extension_activated( 'yes' );
+
+		// Install refresh hook (remove older one if it exists).
+		wp_clear_scheduled_hook( 'mwp_events_cleanup' );
+		wp_schedule_event( current_time( 'timestamp' ) + 600, 'hourly', 'mwp_events_cleanup' );
 	}
 
 	/**
@@ -349,6 +356,110 @@ class Activity_Log {
 				error_log( $message );
 			}
 		}
+	}
+
+	/**
+	 * Clean Up Events
+	 *
+	 * Clean up events of a site if the latest event is more
+	 * than three hours late.
+	 */
+	public function events_cleanup() {
+		// Get MainWP sites.
+		$mwp_sites = $this->settings->get_mwp_child_sites();
+
+		foreach ( $mwp_sites as $site ) {
+			$event = $this->get_latest_event_by_siteid( $site['id'] );
+
+			if ( $event ) {
+				$hrs_diff = $this->settings->get_hours_since_last_alert( $event->created_on );
+
+				// If the hours difference is more than 3.
+				if ( $hrs_diff > 3 ) {
+					// Get latest event from child site.
+					$live_event = $this->get_live_event_by_siteid( $site['id'] );
+
+					// If the latest event on the dashboard matches the timestamp of the latest event on child site, then skip.
+					if ( $live_event && $event->created_on === $live_event->created_on ) {
+						continue;
+					}
+
+					// Delete events by site id.
+					$delete_query = new \WSAL\MainWPExtension\Models\OccurrenceQuery();
+					$delete_query->addCondition( 'site_id = %s ', $site['id'] );
+					// $result       = $delete_query->getAdapter()->GetSqlDelete( $delete_query );
+					$delete_count = $delete_query->getAdapter()->Delete( $delete_query );
+
+					// Nothing to delete.
+					if ( 0 == $delete_count ) {
+						return;
+					}
+
+					// Keep track of what we're doing.
+					// $this->alerts->Trigger(
+					// 	0003, array(
+					// 		'Message'    => 'Running system cleanup.',
+					// 		'Query SQL'  => $result['sql'],
+					// 		'Query Args' => $result['args'],
+					// 	), true
+					// );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get the latest event by site id.
+	 *
+	 * @param integer $site_id — Site ID.
+	 * @return array
+	 */
+	private function get_latest_event_by_siteid( $site_id = 0 ) {
+		// Return if site id is empty.
+		if ( empty( $site_id ) ) {
+			return false;
+		}
+
+		// Query for latest event.
+		$event_query = new \WSAL\MainWPExtension\Models\OccurrenceQuery();
+		$event_query->addCondition( 'site_id = %s ', $site_id ); // Set site id.
+		$event_query->addOrderBy( 'created_on', true );
+		$event_query->setLimit( 1 );
+		$event = $event_query->getAdapter()->Execute( $event_query );
+
+		if ( isset( $event[0] ) ) {
+			return $event[0];
+		}
+		return false;
+	}
+
+	/**
+	 * Get live event by site id (from child site).
+	 *
+	 * @param integer $site_id — Site ID.
+	 * @return stdClass
+	 */
+	private function get_live_event_by_siteid( $site_id = 0 ) {
+		// Return if site id is empty.
+		if ( empty( $site_id ) ) {
+			return false;
+		}
+
+		// Post data for child sites.
+		$post_data = array(
+			'action' => 'latest_event',
+		);
+
+		// Call to child sites to fetch WSAL events.
+		$latest_event = apply_filters(
+			'mainwp_fetchurlauthed',
+			$this->get_child_file(),
+			$this->get_child_key(),
+			$site_id,
+			'extra_excution',
+			$post_data
+		);
+		return $latest_event;
 	}
 }
 

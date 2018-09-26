@@ -144,4 +144,44 @@ class Settings {
 	public function get_view_per_page() {
 		return (int) $this->get_option( 'items-per-page', 10 );
 	}
+
+	/**
+	 * Return Site ID.
+	 *
+	 * @return integer
+	 */
+	public function get_view_site_id() {
+		// @codingStandardsIgnoreStart
+		return isset( $_GET['mwpal-site-id'] ) ? (int) sanitize_text_field( $_GET['mwpal-site-id'] ) : 0; // Site ID.
+		// @codingStandardsIgnoreEnd
+	}
+
+	/**
+	 * Method: Get number of hours since last logged alert.
+	 *
+	 * @return mixed – False if $created_on is empty | Number of hours otherwise.
+	 *
+	 * @param float $created_on – Timestamp of last logged alert.
+	 */
+	public function get_hours_since_last_alert( $created_on ) {
+		// If $created_on is empty, then return.
+		if ( empty( $created_on ) ) {
+			return false;
+		}
+
+		// Last alert date.
+		$created_date = new \DateTime( date( 'Y-m-d H:i:s', $created_on ) );
+
+		// Current date.
+		$current_date = new \DateTime( 'NOW' );
+
+		// Calculate time difference.
+		$time_diff = $current_date->diff( $created_date );
+		$diff_days = $time_diff->d; // Difference in number of days.
+		$diff_hrs  = $time_diff->h; // Difference in number of hours.
+		$total_hrs = ( $diff_days * 24 ) + $diff_hrs; // Total number of hours.
+
+		// Return difference in hours.
+		return $total_hrs;
+	}
 }

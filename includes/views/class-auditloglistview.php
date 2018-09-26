@@ -104,7 +104,7 @@ final class AuditLogListView extends \WP_List_Table {
 			}
 			?>
 			<div class="wsal-ipp wsal-ipp-<?php echo esc_attr( $which ); ?>">
-				<?php esc_html_e( 'Show ', 'wp-security-audit-log' ); ?>
+				<?php esc_html_e( 'Show ', 'mwp-al-ext' ); ?>
 				<select class="wsal-ipps" onchange="mwpalIppsChange(value);">
 					<?php foreach ( $items as $item ) { ?>
 						<option
@@ -115,7 +115,24 @@ final class AuditLogListView extends \WP_List_Table {
 						</option>
 					<?php } ?>
 				</select>
-				<?php esc_html_e( ' Items', 'wp-security-audit-log' ); ?>
+				<?php esc_html_e( ' Items', 'mwp-al-ext' ); ?>
+			</div>
+			<?php
+		endif;
+
+		if ( count( $this->mwp_child_sites ) > 1 ) :
+			$current_site = $this->activity_log->settings->get_view_site_id();
+			?>
+			<div class="wsal-ssa wsal-ssa-<?php echo esc_attr( $which ); ?>">
+				<select class="wsal-ssas" onchange="mwpSsasChange(value);">
+					<option value="0"><?php esc_html_e( 'All Sites', 'mwp-al-ext' ); ?></option>
+					<?php foreach ( $this->mwp_child_sites as $site ) { ?>
+						<option value="<?php echo esc_attr( $site['id'] ); ?>"
+							<?php echo ( $current_site === $site['id'] ) ? 'selected="selected"' : false; ?>>
+							<?php echo esc_html( $site['name'] ) . ' (' . esc_html( $site['url'] ) . ')'; ?>
+						</option>
+					<?php } ?>
+				</select>
 			</div>
 			<?php
 		endif;
@@ -363,7 +380,7 @@ final class AuditLogListView extends \WP_List_Table {
 		$events_query = new \WSAL\MainWPExtension\Models\OccurrenceQuery();
 
 		// Get site id for specific site events.
-		$bid = (int) $this->get_view_site_id();
+		$bid = (int) $this->activity_log->settings->get_view_site_id();
 		if ( $bid ) {
 			$events_query->addCondition( 'site_id = %s ', $bid );
 		}
@@ -496,7 +513,7 @@ final class AuditLogListView extends \WP_List_Table {
 
 			case '%LinkFile%' === $name:
 				if ( 'NULL' != $value ) {
-					$site_id = $this->get_view_site_id(); // Site id for multisite.
+					$site_id = $this->activity_log->settings->get_view_site_id(); // Site id for multisite.
 					return '<a href="javascript:;" onclick="download_404_log( this )" data-log-file="' . esc_attr( $value ) . '" data-site-id="' . esc_attr( $site_id ) . '" data-nonce-404="' . esc_attr( wp_create_nonce( 'wsal-download-404-log-' . $value ) ) . '" title="' . esc_html__( 'Download the log file', 'mwp-al-ext' ) . '">' . esc_html__( 'Download the log file', 'mwp-al-ext' ) . '</a>';
 				} else {
 					return 'Click <a href="' . esc_url( admin_url( 'admin.php?page=wsal-togglealerts#tab-system-activity' ) ) . '">here</a> to log such requests to file';
