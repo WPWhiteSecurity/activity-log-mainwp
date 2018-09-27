@@ -109,6 +109,32 @@
 
 __webpack_require__(/*! ../../css/src/styles.scss */ "./assets/css/src/styles.scss");
 
+jQuery(document).ready(function () {
+	jQuery('.mwp-ssas').on('change', function () {
+		var value = jQuery(this).val();
+		jQuery('#mwpal-site-id').val(value);
+		jQuery('#audit-log-viewer').submit();
+	});
+
+	jQuery('.mwp-ipps').on('change', function () {
+		var value = jQuery(this).val();
+		jQuery(this).attr('disabled', true);
+		jQuery.post(scriptData.ajaxURL, {
+			action: 'set_per_page_events',
+			count: value,
+			nonce: scriptData.scriptNonce
+		}, function () {
+			location.reload();
+		});
+	});
+}); /**
+     * Entry Point
+     *
+     * @since 0.1.0
+     */
+
+// Import styles.
+
 /***/ })
 
 /******/ });

@@ -103,9 +103,9 @@ final class AuditLogListView extends \WP_List_Table {
 				$items[] = $per_page;
 			}
 			?>
-			<div class="wsal-ipp wsal-ipp-<?php echo esc_attr( $which ); ?>">
+			<div class="mwp-ipp mwp-ipp-<?php echo esc_attr( $which ); ?>">
 				<?php esc_html_e( 'Show ', 'mwp-al-ext' ); ?>
-				<select class="wsal-ipps" onchange="mwpalIppsChange(value);">
+				<select class="mwp-ipps">
 					<?php foreach ( $items as $item ) { ?>
 						<option
 							value="<?php echo is_string( $item ) ? '' : esc_attr( $item ); ?>"
@@ -123,12 +123,12 @@ final class AuditLogListView extends \WP_List_Table {
 		if ( count( $this->mwp_child_sites ) > 1 ) :
 			$current_site = $this->activity_log->settings->get_view_site_id();
 			?>
-			<div class="wsal-ssa wsal-ssa-<?php echo esc_attr( $which ); ?>">
-				<select class="wsal-ssas" onchange="mwpSsasChange(value);">
+			<div class="mwp-ssa mwp-ssa-<?php echo esc_attr( $which ); ?>">
+				<select class="mwp-ssas">
 					<option value="0"><?php esc_html_e( 'All Sites', 'mwp-al-ext' ); ?></option>
 					<?php foreach ( $this->mwp_child_sites as $site ) { ?>
 						<option value="<?php echo esc_attr( $site['id'] ); ?>"
-							<?php echo ( $current_site === $site['id'] ) ? 'selected="selected"' : false; ?>>
+							<?php echo ( $current_site === (int) $site['id'] ) ? 'selected="selected"' : false; ?>>
 							<?php echo esc_html( $site['name'] ) . ' (' . esc_html( $site['url'] ) . ')'; ?>
 						</option>
 					<?php } ?>
@@ -355,20 +355,11 @@ final class AuditLogListView extends \WP_List_Table {
 	}
 
 	/**
-	 * Get Site ID.
-	 *
-	 * @return int
-	 */
-	public function get_view_site_id() {
-		return 0;
-	}
-
-	/**
 	 * Method: Prepare items.
 	 */
 	public function prepare_items() {
 		// Per page views.
-		$per_page = 10;
+		$per_page = $this->activity_log->settings->get_view_per_page();
 
 		$columns  = $this->get_columns();
 		$hidden   = array();

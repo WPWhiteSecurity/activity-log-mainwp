@@ -16,8 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// require_once ABSPATH . 'wp-admin/includes/plugin.php';
-
 /**
  * View class of the extension.
  */
@@ -54,6 +52,8 @@ class View extends Abstract_View {
 
 		add_action( 'mainwp-pageheader-extensions', array( $this, 'enqueue_styles' ), 10 );
 		add_action( 'mainwp-pagefooter-extensions', array( $this, 'enqueue_scripts' ), 10 );
+		add_action( 'admin_init', array( $this, 'handle_auditlog_form_submission' ) );
+		add_action( 'wp_ajax_set_per_page_events', array( $this, 'set_per_page_events' ) );
 	}
 
 	/**
@@ -100,13 +100,60 @@ class View extends Abstract_View {
 		}
 
 		wp_enqueue_script( 'jquery' );
-		wp_enqueue_script(
+		wp_register_script(
 			'mwpal-view-script',
 			trailingslashit( MWPAL_BASE_URL ) . 'assets/js/dist/index.js',
 			array( 'jquery' ),
 			filemtime( trailingslashit( MWPAL_BASE_DIR ) . 'assets/js/dist/index.js' ),
-			true
+			false
 		);
+
+		// JS data.
+		$script_data = array(
+			'ajaxURL'     => admin_url( 'admin-ajax.php' ),
+			'scriptNonce' => wp_create_nonce( 'mwp-activitylog-nonce' ),
+		);
+		wp_localize_script( 'mwpal-view-script', 'scriptData', $script_data );
+		wp_enqueue_script( 'mwpal-view-script' );
+	}
+
+	/**
+	 * Handle Audit Log Form Submission.
+	 */
+	public function handle_auditlog_form_submission() {
+		// Verify nonce for security.
+		if ( isset( $_GET['_wpnonce'] ) ) {
+			check_admin_referer( 'bulk-activity-logs' );
+		}
+
+		// Global WP page now variable.
+		global $pagenow;
+
+		// Only run the function on audit log custom page.
+		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // Current page.
+
+		if ( 'admin.php' !== $pagenow ) {
+			return;
+		} elseif ( 'Extensions-Mainwp-Activity-Log-Extension' !== $page ) { // Page is admin.php, now check auditlog page.
+			return; // Return if the current page is not auditlog's.
+		}
+
+		// Site id.
+		$site_id = isset( $_GET['mwpal-site-id'] ) ? (int) sanitize_text_field( wp_unslash( $_GET['mwpal-site-id'] ) ) : false;
+
+		if ( ! empty( $wpnonce ) ) {
+			// Remove args array.
+			$remove_args = array(
+				'_wp_http_referer',
+				'_wpnonce',
+			);
+
+			if ( empty( $site_id ) ) {
+				$remove_args[] = 'mwpal-site-id';
+			}
+			wp_safe_redirect( remove_query_arg( $remove_args ) );
+			exit();
+		}
 	}
 
 	/**
@@ -171,11 +218,16 @@ class View extends Abstract_View {
 		$this->query_child_site_events();
 		$site_id = $this->activity_log->settings->get_view_site_id();
 
+		// @codingStandardsIgnoreStart
+		$mwp_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // Admin WSAL Page.
+		// @codingStandardsIgnoreEnd
+
 		if ( $this->activity_log->is_child_enabled() ) {
 			$this->get_list_view()->prepare_items();
 			?>
 			<form id="audit-log-viewer" method="get">
 				<div id="audit-log-viewer-content">
+					<input type="hidden" name="page" value="<?php echo esc_attr( $mwp_page ); ?>" />
 					<input type="hidden" id="mwpal-site-id" name="mwpal-site-id" value="<?php echo esc_attr( $site_id ); ?>" />
 					<?php
 					/**
@@ -279,5 +331,28 @@ class View extends Abstract_View {
 			$this->list_view = new AuditLogListView( $this->activity_log );
 		}
 		return $this->list_view;
+	}
+
+	/**
+	 * Set Per Page Events
+	 */
+	public function set_per_page_events() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			die( esc_html__( 'Access denied.', 'mwp-al-ext' ) );
+		}
+
+		// @codingStandardsIgnoreStart
+		$nonce           = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : false;
+		$per_page_events = isset( $_POST['count'] ) ? sanitize_text_field( wp_unslash( $_POST['count'] ) ) : false;
+		// @codingStandardsIgnoreEnd
+
+		if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'mwp-activitylog-nonce' ) ) {
+			if ( empty( $per_page_events ) ) {
+				die( esc_html__( 'Count parameter expected.', 'mwp-al-ext' ) );
+			}
+			$this->activity_log->settings->set_view_per_page( (int) $per_page_events );
+			die();
+		}
+		die( esc_html__( 'Nonce verification failed.', 'mwp-al-ext' ) );
 	}
 }

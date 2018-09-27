@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: MainWP Activity Log Extension
+ * Plugin Name: Activity Log for MainWP
  * Plugin URI: http://www.wpsecurityauditlog.com/
  * Description: An add-on for MainWP to be able to view the activity logs of all child sites from the central MainWP dashboard.
  * Author: WP White Security
@@ -31,8 +31,6 @@
 */
 
 namespace WSAL\MainWPExtension;
-
-// use \WSAL\MainWPExtension\Views\View as SingleView;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -387,22 +385,12 @@ class Activity_Log {
 					// Delete events by site id.
 					$delete_query = new \WSAL\MainWPExtension\Models\OccurrenceQuery();
 					$delete_query->addCondition( 'site_id = %s ', $site['id'] );
-					// $result       = $delete_query->getAdapter()->GetSqlDelete( $delete_query );
-					$delete_count = $delete_query->getAdapter()->Delete( $delete_query );
+					$delete_count = (int) $delete_query->getAdapter()->Delete( $delete_query );
 
 					// Nothing to delete.
-					if ( 0 == $delete_count ) {
-						return;
+					if ( 0 === $delete_count ) {
+						continue;
 					}
-
-					// Keep track of what we're doing.
-					// $this->alerts->Trigger(
-					// 	0003, array(
-					// 		'Message'    => 'Running system cleanup.',
-					// 		'Query SQL'  => $result['sql'],
-					// 		'Query Args' => $result['args'],
-					// 	), true
-					// );
 				}
 			}
 		}

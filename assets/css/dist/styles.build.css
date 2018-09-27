@@ -101,14 +101,14 @@ td.column-user {
   color: #FFF;
   background: #333; }
 
-.wsal-ipp,
-.wsal-ssa {
+.mwp-ipp,
+.mwp-ssa {
   display: inline-block;
   color: #555;
   line-height: 30px;
   font-size: 12px; }
 
-.wsal-ipp select {
+.mwp-ipp select {
   margin-bottom: 6px;
   width: 56px; }
 
