@@ -44,6 +44,20 @@ class View extends Abstract_View {
 	private $list_view = null;
 
 	/**
+	 * Extension Tabs.
+	 *
+	 * @var array
+	 */
+	private $mwpal_extension_tabs = array();
+
+	/**
+	 * Current Tab.
+	 *
+	 * @var string
+	 */
+	private $current_tab = '';
+
+	/**
 	 * Constructor.
 	 *
 	 * @param Activity_Log $activity_log – Instance of Activity_Log.
@@ -56,6 +70,46 @@ class View extends Abstract_View {
 		add_action( 'admin_init', array( $this, 'handle_auditlog_form_submission' ) );
 		add_action( 'wp_ajax_set_per_page_events', array( $this, 'set_per_page_events' ) );
 		add_action( 'wp_ajax_metadata_inspector', array( $this, 'metadata_inspector' ) );
+
+		// Extension view URL.
+		$extension_url = add_query_arg( 'page', 'Extensions-Mainwp-Activity-Log-Extension', admin_url( 'admin.php' ) );
+
+		// Tab links.
+		$mwpal_extension_tabs = array(
+			'activity-log' => array(
+				'name'   => __( 'Activity Log', 'mwp-al-ext' ),
+				'link'   => add_query_arg( 'tab', 'activity-log', $extension_url ),
+				'render' => array( $this, 'tab_activity_log' ),
+				'save'   => array( $this, 'tab_activity_log_save' ),
+			),
+			'settings'     => array(
+				'name'   => __( 'Extension Settings', 'mwp-al-ext' ),
+				'link'   => add_query_arg( 'tab', 'settings', $extension_url ),
+				'render' => array( $this, 'tab_settings' ),
+				'save'   => array( $this, 'tab_settings_save' ),
+			),
+		);
+
+		/**
+		 * Filter: `mwpal_extension_tabs`
+		 *
+		 * This filter is used to filter the tabs of WSAL settings page.
+		 *
+		 * Setting tabs structure:
+		 *     $mwpal_extension_tabs['unique-tab-id'] = array(
+		 *         'name'   => Name of the tab,
+		 *         'link'   => Link of the tab,
+		 *         'render' => This function is used to render HTML elements in the tab,
+		 *         'name'   => This function is used to save the related setting of the tab,
+		 *     );
+		 *
+		 * @param array $mwpal_extension_tabs – Array of extension tabs.
+		 */
+		$this->mwpal_extension_tabs = apply_filters( 'mwpal_extension_tabs', $mwpal_extension_tabs );
+
+		// Get the current tab.
+		$current_tab       = filter_input( INPUT_GET, 'tab', FILTER_SANITIZE_STRING );
+		$this->current_tab = empty( $current_tab ) ? 'activity-log' : $current_tab;
 	}
 
 	/**
@@ -140,12 +194,10 @@ class View extends Abstract_View {
 		// Verify nonce for security.
 		if ( isset( $_GET['_wpnonce'] ) ) {
 			check_admin_referer( 'bulk-activity-logs' );
-		}
 
-		// Site id.
-		$site_id = isset( $_GET['mwpal-site-id'] ) ? (int) sanitize_text_field( wp_unslash( $_GET['mwpal-site-id'] ) ) : false;
+			// Site id.
+			$site_id = isset( $_GET['mwpal-site-id'] ) ? (int) sanitize_text_field( wp_unslash( $_GET['mwpal-site-id'] ) ) : false;
 
-		if ( ! empty( $wpnonce ) ) {
 			// Remove args array.
 			$remove_args = array(
 				'_wp_http_referer',
@@ -158,6 +210,7 @@ class View extends Abstract_View {
 			wp_safe_redirect( remove_query_arg( $remove_args ) );
 			exit();
 		}
+
 	}
 
 	/**
@@ -229,34 +282,29 @@ class View extends Abstract_View {
 		if ( $this->activity_log->is_child_enabled() ) {
 			$this->get_list_view()->prepare_items();
 			?>
-			<form id="audit-log-viewer" method="get">
-				<div id="audit-log-viewer-content">
-					<input type="hidden" name="page" value="<?php echo esc_attr( $mwp_page ); ?>" />
-					<input type="hidden" id="mwpal-site-id" name="mwpal-site-id" value="<?php echo esc_attr( $site_id ); ?>" />
-					<?php
-					/**
-					 * Action: `mwpal_auditlog_after_view`
-					 *
-					 * Do action before the view renders.
-					 *
-					 * @param ActivityLogListView $this->list_view – Events list view.
-					 */
-					do_action( 'mwpal_auditlog_before_view', $this->get_list_view() );
-
-					// Display events table.
-					$this->get_list_view()->display();
-
-					/**
-					 * Action: `mwpal_auditlog_after_view`
-					 *
-					 * Do action after the view has been rendered.
-					 *
-					 * @param ActivityLogListView $this->list_view – Events list view.
-					 */
-					do_action( 'mwpal_auditlog_after_view', $this->get_list_view() );
-					?>
-				</div>
-			</form>
+			<nav class="mainwp-subnav-tabs">
+				<?php foreach ( $this->mwpal_extension_tabs as $tab_id => $tab ) : ?>
+					<?php if ( empty( $this->current_tab ) ) : ?>
+						<a href="<?php echo esc_url( $tab['link'] ); ?>" class="mainwp_action <?php echo ( 'activity-log' === $tab_id ) ? 'mainwp_action_down' : false; ?>">
+							<?php echo esc_html( $tab['name'] ); ?>
+						</a>
+					<?php else : ?>
+						<a href="<?php echo esc_url( $tab['link'] ); ?>" class="mainwp_action <?php echo ( $tab_id === $this->current_tab ) ? 'mainwp_action_down' : false; ?>">
+							<?php echo esc_html( $tab['name'] ); ?>
+						</a>
+					<?php endif; ?>
+				<?php endforeach; ?>
+				<div class="clear"></div>
+			</nav>
+			<div class="mwpal-content-wrapper">
+				<?php
+				if ( ! empty( $this->current_tab ) && ! empty( $this->mwpal_extension_tabs[ $this->current_tab ]['render'] ) ) {
+					call_user_func( $this->mwpal_extension_tabs[ $this->current_tab ]['render'] );
+				} else {
+					call_user_func( $this->mwpal_extension_tabs['activity-log']['render'] );
+				}
+				?>
+			</div>
 			<?php
 		} else {
 			?>
@@ -265,6 +313,49 @@ class View extends Abstract_View {
 			</div>
 			<?php
 		}
+	}
+
+	/**
+	 * Tab: `Activity Log`
+	 */
+	public function tab_activity_log() {
+		?>
+		<form id="audit-log-viewer" method="get">
+			<div id="audit-log-viewer-content">
+				<input type="hidden" name="page" value="<?php echo esc_attr( $mwp_page ); ?>" />
+				<input type="hidden" id="mwpal-site-id" name="mwpal-site-id" value="<?php echo esc_attr( $site_id ); ?>" />
+				<?php
+				/**
+				 * Action: `mwpal_auditlog_after_view`
+				 *
+				 * Do action before the view renders.
+				 *
+				 * @param ActivityLogListView $this->list_view – Events list view.
+				 */
+				do_action( 'mwpal_auditlog_before_view', $this->get_list_view() );
+
+				// Display events table.
+				$this->get_list_view()->display();
+
+				/**
+				 * Action: `mwpal_auditlog_after_view`
+				 *
+				 * Do action after the view has been rendered.
+				 *
+				 * @param ActivityLogListView $this->list_view – Events list view.
+				 */
+				do_action( 'mwpal_auditlog_after_view', $this->get_list_view() );
+				?>
+			</div>
+		</form>
+		<?php
+	}
+
+	/**
+	 * Tab: `Settings`
+	 */
+	public function tab_settings() {
+		echo 'Hello, World!';
 	}
 
 	/**
