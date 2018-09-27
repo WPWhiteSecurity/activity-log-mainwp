@@ -30,8 +30,16 @@ td.column-user {
 
 .column-user img {
   float: left;
-  margin-right: 4px;
+  margin-right: 4px; }
+
+.column-user img.avatar {
   border-radius: 50px; }
+
+.wsal-system-icon {
+  width: 32px;
+  font-size: 32px;
+  height: 32px;
+  margin-right: 4px; }
 
 .column-scip {
   width: 120px; }

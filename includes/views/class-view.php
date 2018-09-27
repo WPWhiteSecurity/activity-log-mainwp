@@ -10,6 +10,7 @@
 namespace WSAL\MainWPExtension\Views;
 
 use \WSAL\MainWPExtension\Activity_Log as Activity_Log;
+// use \WSAL\MainWPExtension\Event_Ref as Event_Ref;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -54,6 +55,7 @@ class View extends Abstract_View {
 		add_action( 'mainwp-pagefooter-extensions', array( $this, 'enqueue_scripts' ), 10 );
 		add_action( 'admin_init', array( $this, 'handle_auditlog_form_submission' ) );
 		add_action( 'wp_ajax_set_per_page_events', array( $this, 'set_per_page_events' ) );
+		add_action( 'wp_ajax_metadata_inspector', array( $this, 'metadata_inspector' ) );
 	}
 
 	/**
@@ -352,6 +354,45 @@ class View extends Abstract_View {
 			}
 			$this->activity_log->settings->set_view_per_page( (int) $per_page_events );
 			die();
+		}
+		die( esc_html__( 'Nonce verification failed.', 'mwp-al-ext' ) );
+	}
+
+	/**
+	 * Events Metadata Viewer
+	 */
+	public function metadata_inspector() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			die( esc_html__( 'Access denied.', 'mwp-al-ext' ) );
+		}
+
+		// @codingStandardsIgnoreStart
+		$nonce         = isset( $_GET['mwp_meta_nonc'] ) ? sanitize_text_field( wp_unslash( $_GET['mwp_meta_nonc'] ) ) : false;
+		$occurrence_id = isset( $_GET['occurrence_id'] ) ? (int) sanitize_text_field( wp_unslash( $_GET['occurrence_id'] ) ) : false;
+		// @codingStandardsIgnoreEnd
+
+		if ( empty( $occurrence_id ) ) {
+			die( esc_html__( 'Occurrence ID parameter expected.', 'mwp-al-ext' ) );
+		}
+
+		if ( ! empty( $nonce ) && wp_verify_nonce( $nonce, 'mwp-meta-display-' . $occurrence_id ) ) {
+			$occurrence = new \WSAL\MainWPExtension\Models\Occurrence();
+			$occurrence->Load( 'id = %d', array( $occurrence_id ) );
+			$event_meta = $occurrence->GetMetaArray();
+			unset( $event_meta['ReportText'] );
+
+			// Set Event_Ref class scripts and styles.
+			\Event_Ref::config( 'stylePath', esc_url( trailingslashit( MWPAL_BASE_URL ) ) . 'assets/css/dist/wsal-ref.css' );
+			\Event_Ref::config( 'scriptPath', esc_url( trailingslashit( MWPAL_BASE_URL ) ) . 'assets/js/dist/wsal-ref.js' );
+
+			echo '<!DOCTYPE html><html><head>';
+			echo '<style type="text/css">';
+			echo 'html, body { margin: 0; padding: 0; }';
+			echo '</style>';
+			echo '</head><body>';
+			\wsal_r( $event_meta );
+			echo '</body></html>';
+			die;
 		}
 		die( esc_html__( 'Nonce verification failed.', 'mwp-al-ext' ) );
 	}

@@ -89,6 +89,26 @@ final class AuditLogListView extends \WP_List_Table {
 	}
 
 	/**
+	 * Generate the table navigation above or below the table
+	 *
+	 * @param string $which – Nav position.
+	 */
+	protected function display_tablenav( $which ) {
+		if ( 'top' === $which ) {
+			wp_nonce_field( 'bulk-' . $this->_args['plural'] );
+		}
+		?>
+		<div class="tablenav <?php echo esc_attr( $which ); ?>">
+			<?php
+			$this->extra_tablenav( $which );
+			$this->pagination( $which );
+			?>
+			<br class="clear" />
+		</div>
+		<?php
+	}
+
+	/**
 	 * Table navigation.
 	 *
 	 * @param string $which - Position of the nav.
@@ -211,19 +231,19 @@ final class AuditLogListView extends \WP_List_Table {
 
 				// Check if the usernames exists & matches pre-defined cases.
 				if ( 'Plugin' === $username ) {
-					$image = '<img src="' . trailingslashit( MWPAL_BASE_URL ) . 'assets/img/plugin-logo.png" class="avatar avatar-32 photo" width="32" height="32" alt=""/>';
+					$image = '<img src="' . trailingslashit( MWPAL_BASE_URL ) . 'assets/img/wsal-logo.png" width="32" alt="WSAL Logo"/>';
 					$uhtml = '<i>' . __( 'Plugin', 'mwp-al-ext' ) . '</i>';
 					$roles = '';
 				} elseif ( 'Plugins' === $username ) {
-					$image = '<img src="' . trailingslashit( MWPAL_BASE_URL ) . 'assets/img/wordpress-logo-32.png" class="avatar avatar-32 photo" width="32" height="32" alt=""/>';
+					$image = '<span class="dashicons dashicons-wordpress wsal-system-icon"></span>';
 					$uhtml = '<i>' . __( 'Plugins', 'mwp-al-ext' ) . '</i>';
 					$roles = '';
 				} elseif ( 'Website Visitor' === $username ) {
-					$image = '<img src="' . trailingslashit( MWPAL_BASE_URL ) . 'assets/img/wordpress-logo-32.png" class="avatar avatar-32 photo" width="32" height="32" alt=""/>';
+					$image = '<span class="dashicons dashicons-wordpress wsal-system-icon"></span>';
 					$uhtml = '<i>' . __( 'Website Visitor', 'mwp-al-ext' ) . '</i>';
 					$roles = '';
 				} elseif ( 'System' === $username ) {
-					$image = '<img src="' . trailingslashit( MWPAL_BASE_URL ) . 'assets/img/wordpress-logo-32.png" class="avatar avatar-32 photo" width="32" height="32" alt=""/>';
+					$image = '<span class="dashicons dashicons-wordpress wsal-system-icon"></span>';
 					$uhtml = '<i>' . __( 'System', 'mwp-al-ext' ) . '</i>';
 					$roles = '';
 				} else {
@@ -308,10 +328,19 @@ final class AuditLogListView extends \WP_List_Table {
 				return '<div id="Event' . $item->id . '">' . $item->GetMessage( array( $this, 'meta_formatter' ) ) . '</div>';
 
 			case 'data':
-				$url     = admin_url( 'admin-ajax.php' ) . '?action=AjaxInspector&amp;occurrence=' . $item->id;
+				$url_args = array(
+					'action'        => 'metadata_inspector',
+					'occurrence_id' => $item->id,
+					'mwp_meta_nonc' => wp_create_nonce( 'mwp-meta-display-' . $item->id ),
+					'TB_iframe'     => 'true',
+					'width'         => '600',
+					'height'        => '550',
+				);
+
+				$url     = add_query_arg( $url_args, admin_url( 'admin-ajax.php' ) );
 				$tooltip = esc_attr__( 'View all details of this change', 'mwp-al-ext' );
 				return '<a class="more-info thickbox" data-tooltip="' . $tooltip . '" title="' . __( 'Alert Data Inspector', 'mwp-al-ext' ) . '"'
-					. ' href="' . $url . '&amp;TB_iframe=true&amp;width=600&amp;height=550">&hellip;</a>';
+					. ' href="' . $url . '">&hellip;</a>';
 
 			default:
 				/* translators: Column Name */
