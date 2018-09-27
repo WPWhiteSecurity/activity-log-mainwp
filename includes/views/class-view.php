@@ -123,21 +123,23 @@ class View extends Abstract_View {
 	 * Handle Audit Log Form Submission.
 	 */
 	public function handle_auditlog_form_submission() {
-		// Verify nonce for security.
-		if ( isset( $_GET['_wpnonce'] ) ) {
-			check_admin_referer( 'bulk-activity-logs' );
-		}
-
 		// Global WP page now variable.
 		global $pagenow;
 
 		// Only run the function on audit log custom page.
+		// @codingStandardsIgnoreStart
 		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // Current page.
+		// @codingStandardsIgnoreEnd
 
 		if ( 'admin.php' !== $pagenow ) {
 			return;
 		} elseif ( 'Extensions-Mainwp-Activity-Log-Extension' !== $page ) { // Page is admin.php, now check auditlog page.
 			return; // Return if the current page is not auditlog's.
+		}
+
+		// Verify nonce for security.
+		if ( isset( $_GET['_wpnonce'] ) ) {
+			check_admin_referer( 'bulk-activity-logs' );
 		}
 
 		// Site id.
