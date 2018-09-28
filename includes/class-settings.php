@@ -184,4 +184,22 @@ class Settings {
 		// Return difference in hours.
 		return $total_hrs;
 	}
+
+	/**
+	 * Return audit log columns.
+	 *
+	 * @return array
+	 */
+	public function get_columns() {
+		$columns = array(
+			'site'       => '1',
+			'alert_code' => '1',
+			'type'       => '1',
+			'date'       => '1',
+			'username'   => '1',
+			'source_ip'  => '1',
+			'message'    => '1',
+		);
+		return $columns;
+	}
 }

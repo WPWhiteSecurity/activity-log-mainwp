@@ -127,6 +127,10 @@ jQuery(document).ready(function () {
 			location.reload();
 		});
 	});
+
+	if ('settings' === scriptData.currentTab) {
+		jQuery('#mainwp-tabs a:nth-child(2)').removeClass('nav-tab-active');
+	}
 }); /**
      * Entry Point
      *

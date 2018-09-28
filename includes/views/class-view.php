@@ -66,6 +66,7 @@ class View extends Abstract_View {
 		parent::__construct( $activity_log );
 		add_filter( 'mainwp_left_menu_sub', array( $this, 'mwp_left_menu_sub' ), 10, 1 );
 		add_filter( 'mainwp_subleft_menu_sub', array( $this, 'mwp_sub_menu_dropdown' ), 10, 1 );
+		add_action( 'mainwp_extensions_top_header_after_tab', array( $this, 'activitylog_settings_tab' ), 10, 1 );
 		add_action( 'mainwp-pageheader-extensions', array( $this, 'enqueue_styles' ), 10 );
 		add_action( 'mainwp-pagefooter-extensions', array( $this, 'enqueue_scripts' ), 10 );
 		add_action( 'admin_init', array( $this, 'handle_auditlog_form_submission' ) );
@@ -165,6 +166,30 @@ class View extends Abstract_View {
 	}
 
 	/**
+	 * Add Activity Log Settings Tab.
+	 *
+	 * @param string $current_page – Path of the extension.
+	 */
+	public function activitylog_settings_tab( $current_page ) {
+		$activity_log = basename( $current_page, '.php' );
+
+		if ( 'mainwp-activity-log-extension' !== $activity_log ) {
+			return;
+		}
+
+		$settings_url_args = array(
+			'page' => MWPAL_EXTENSION_NAME,
+			'tab'  => 'settings',
+		);
+		$settings_tab_url  = add_query_arg( $settings_url_args, admin_url( 'admin.php' ) );
+		?>
+		<a class="nav-tab pos-nav-tab echo <?php echo ( 'settings' === $this->current_tab ) ? 'nav-tab-active' : false; ?>" href="<?php echo esc_url( $settings_tab_url ); ?>">
+			<?php esc_html_e( 'Extension Settings', 'mwp-al-ext' ); ?>
+		</a>
+		<?php
+	}
+
+	/**
 	 * Enqueue Styles in Head.
 	 */
 	public function enqueue_styles() {
@@ -220,6 +245,7 @@ class View extends Abstract_View {
 		$script_data = array(
 			'ajaxURL'     => admin_url( 'admin-ajax.php' ),
 			'scriptNonce' => wp_create_nonce( 'mwp-activitylog-nonce' ),
+			'currentTab'  => $this->current_tab,
 		);
 		wp_localize_script( 'mwpal-view-script', 'scriptData', $script_data );
 		wp_enqueue_script( 'mwpal-view-script' );
@@ -330,22 +356,6 @@ class View extends Abstract_View {
 		if ( $this->activity_log->is_child_enabled() ) {
 			$this->get_list_view()->prepare_items();
 			?>
-			<nav class="mainwp-subnav-tabs">
-				<?php foreach ( $this->mwpal_extension_tabs as $tab_id => $tab ) : ?>
-					<?php if ( empty( $this->current_tab ) ) : ?>
-						<a href="<?php echo esc_url( $tab['link'] ); ?>" class="mainwp_action <?php echo ( 'activity-log' === $tab_id ) ? 'mainwp_action_down' : false; ?>">
-							<?php echo esc_html( $tab['name'] ); ?>
-						</a>
-					<?php else : ?>
-						<a href="<?php echo esc_url( $tab['link'] ); ?>" class="mainwp_action <?php echo ( $tab_id === $this->current_tab ) ? 'mainwp_action_down' : false; ?>">
-							<?php echo esc_html( $tab['name'] ); ?>
-						</a>
-					<?php endif; ?>
-				<?php endforeach; ?>
-				<div class="clear"></div>
-			</nav>
-			<!-- Extension Sub-tabs -->
-
 			<div class="mwpal-content-wrapper">
 				<?php
 				if ( ! empty( $this->current_tab ) && ! empty( $this->mwpal_extension_tabs[ $this->current_tab ]['render'] ) ) {
@@ -409,7 +419,140 @@ class View extends Abstract_View {
 	 * Tab: `Settings`
 	 */
 	public function tab_settings() {
-		echo 'Hello, World!';
+		?>
+		<div class="metabox-holder columns-1">
+			<div class="meta-box-sortables ui-sortable">
+				<div id="mwpal-setting-contentbox-1" class="postbox">
+					<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'Activity Log Settings', 'mwp-al-ext' ); ?></span></h2>
+					<div class="inside">
+						<table class="form-table">
+							<tbody>
+								<tr>
+									<th scope="row"><label for="utc"><?php esc_html_e( 'Events Timestamp', 'wp-security-audit-log' ); ?></label></th>
+									<td>
+										<fieldset>
+											<?php
+											// $timezone = $this->_plugin->settings->GetTimezone();
+
+											/**
+											 * Transform timezone values.
+											 *
+											 * @since 3.2.3
+											 */
+											// if ( '0' === $timezone ) {
+											// 	$timezone = 'utc';
+											// } elseif ( '1' === $timezone ) {
+											// 	$timezone = 'wp';
+											// }
+											?>
+											<label for="utc">
+												<input type="radio" name="Timezone" id="utc" style="margin-top: -2px;"
+													<?php //checked( $timezone, 'utc' ); ?> value="utc">
+												<?php esc_html_e( 'UTC', 'wp-security-audit-log' ); ?>
+											</label>
+											<br/>
+											<label for="timezone">
+												<input type="radio" name="Timezone" id="timezone" style="margin-top: -2px;"
+													<?php //checked( $timezone, 'wp' ); ?> value="wp">
+												<?php esc_html_e( 'Timezone configured on this WordPress website', 'wp-security-audit-log' ); ?>
+											</label>
+										</fieldset>
+									</td>
+								</tr>
+								<!-- Alerts Timestamp -->
+
+								<tr>
+									<th scope="row"><label for="column_username"><?php esc_html_e( 'User Information in Audit Log', 'wp-security-audit-log' ); ?></label></th>
+									<td>
+										<fieldset>
+											<?php //$type_username = $this->_plugin->settings->get_type_username(); ?>
+											<label for="column_username">
+												<input type="radio" name="type_username" id="column_username" style="margin-top: -2px;" <?php //checked( $type_username, 'username' ); ?> value="username">
+												<span><?php esc_html_e( 'WordPress Username', 'wp-security-audit-log' ); ?></span>
+											</label>
+											<br/>
+											<label for="columns_first_last_name">
+												<input type="radio" name="type_username" id="columns_first_last_name" style="margin-top: -2px;" <?php //checked( $type_username, 'first_last_name' ); ?> value="first_last_name">
+												<span><?php esc_html_e( 'First Name & Last Name', 'wp-security-audit-log' ); ?></span>
+											</label>
+											<br/>
+											<label for="columns_display_name">
+												<input type="radio" name="type_username" id="columns_display_name" style="margin-top: -2px;" <?php //checked( $type_username, 'display_name' ); ?> value="display_name">
+												<span><?php esc_html_e( 'Configured Public Display Name', 'wp-security-audit-log' ); ?></span>
+											</label>
+										</fieldset>
+									</td>
+								</tr>
+								<!-- Select type of name -->
+
+								<tr>
+									<th><label for="columns"><?php esc_html_e( 'Activity Log Columns Selection', 'wp-security-audit-log' ); ?></label></th>
+									<td>
+										<fieldset>
+											<?php $columns = $this->activity_log->settings->get_columns(); ?>
+											<?php foreach ( $columns as $key => $value ) { ?>
+												<label for="columns">
+													<input type="checkbox" name="Columns[<?php echo esc_attr( $key ); ?>]" id="<?php echo esc_attr( $key ); ?>" class="sel-columns" style="margin-top: -2px;"
+														<?php checked( $value, '1' ); ?> value="1">
+													<?php if ( 'alert_code' === $key ) : ?>
+														<span><?php esc_html_e( 'Event ID', 'wp-security-audit-log' ); ?></span>
+													<?php elseif ( 'type' === $key ) : ?>
+														<span><?php esc_html_e( 'Severity', 'wp-security-audit-log' ); ?></span>
+													<?php elseif ( 'date' === $key ) : ?>
+														<span><?php esc_html_e( 'Date & Time', 'wp-security-audit-log' ); ?></span>
+													<?php elseif ( 'username' === $key ) : ?>
+														<span><?php esc_html_e( 'User', 'wp-security-audit-log' ); ?></span>
+													<?php elseif ( 'source_ip' === $key ) : ?>
+														<span><?php esc_html_e( 'Source IP Address', 'wp-security-audit-log' ); ?></span>
+													<?php else : ?>
+														<span><?php echo esc_html( ucwords( str_replace( '_', ' ', $key ) ) ); ?></span>
+													<?php endif; ?>
+												</label>
+												<br/>
+											<?php } ?>
+										</fieldset>
+									</td>
+								</tr>
+								<!-- Audit Log Columns Selection -->
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<!-- Activity Log Settings -->
+
+				<div id="mwpal-setting-contentbox-2" class="postbox">
+					<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'Extension Settings', 'mwp-al-ext' ); ?></span></h2>
+					<div class="inside">
+						<table class="form-table">
+							<tbody>
+								<tr>
+									<th scope="row"><label for="child-site-events"><?php esc_html_e( 'Events to Retrieve from Child Sites', 'wp-security-audit-log' ); ?></label></th>
+									<td>
+										<fieldset>
+											<input type="number" id="child-site-events" name="child-site-events" />
+										</fieldset>
+									</td>
+								</tr>
+
+								<tr>
+									<th scope="row"><label for="events-frequency"><?php esc_html_e( 'Events Frequency', 'wp-security-audit-log' ); ?></label></th>
+									<td>
+										<fieldset>
+											<input type="number" id="events-frequency" name="events-frequency" />
+										</fieldset>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<!-- Extension Settings -->
+			</div>
+			<p class="submit">
+				<input type="submit" name="submit" id="submit" class="button-primary button button-hero" value="<?php esc_attr_e( 'Save Settings', 'mwp-al-ext' ); ?>">
+			</p>
+		</div>
+		<?php
 	}
 
 	/**
