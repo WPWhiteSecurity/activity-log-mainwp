@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Activity Log for MainWP
+ * Plugin Name: Activity Log MainWP
  * Plugin URI: http://www.wpsecurityauditlog.com/
  * Description: An add-on for MainWP to be able to view the activity logs of all child sites from the central MainWP dashboard.
  * Author: WP White Security
@@ -231,7 +231,11 @@ class Activity_Log {
 
 		// Plugin Extension Name.
 		if ( ! defined( 'MWPAL_EXTENSION_NAME' ) ) {
-			define( 'MWPAL_EXTENSION_NAME', 'mainwp-activity-log-extension' );
+			$filename = basename( __FILE__, '.php' );
+			$filename = str_replace( '-', ' ', $filename );
+			$filename = ucwords( $filename );
+			$filename = str_replace( ' ', '-', $filename );
+			define( 'MWPAL_EXTENSION_NAME', 'Extensions-' . $filename );
 		}
 
 		// Plugin Min PHP Version.
@@ -267,7 +271,7 @@ class Activity_Log {
 	public function get_this_extension( $plugins ) {
 		$plugins[] = array(
 			'plugin'   => __FILE__,
-			'api'      => MWPAL_EXTENSION_NAME,
+			'api'      => basename( __FILE__, '.php' ),
 			'mainwp'   => false,
 			'callback' => array( &$this, 'display_extension' ),
 		);

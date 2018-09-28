@@ -64,7 +64,8 @@ class View extends Abstract_View {
 	 */
 	public function __construct( Activity_Log $activity_log ) {
 		parent::__construct( $activity_log );
-
+		add_filter( 'mainwp_left_menu_sub', array( $this, 'mwp_left_menu_sub' ), 10, 1 );
+		add_filter( 'mainwp_subleft_menu_sub', array( $this, 'mwp_sub_menu_dropdown' ), 10, 1 );
 		add_action( 'mainwp-pageheader-extensions', array( $this, 'enqueue_styles' ), 10 );
 		add_action( 'mainwp-pagefooter-extensions', array( $this, 'enqueue_scripts' ), 10 );
 		add_action( 'admin_init', array( $this, 'handle_auditlog_form_submission' ) );
@@ -72,7 +73,7 @@ class View extends Abstract_View {
 		add_action( 'wp_ajax_metadata_inspector', array( $this, 'metadata_inspector' ) );
 
 		// Extension view URL.
-		$extension_url = add_query_arg( 'page', 'Extensions-Mainwp-Activity-Log-Extension', admin_url( 'admin.php' ) );
+		$extension_url = add_query_arg( 'page', MWPAL_EXTENSION_NAME, admin_url( 'admin.php' ) );
 
 		// Tab links.
 		$mwpal_extension_tabs = array(
@@ -113,6 +114,57 @@ class View extends Abstract_View {
 	}
 
 	/**
+	 * Filter MainWP Dashboard Menu
+	 *
+	 * Modify MainWP Dashboard menu to include activity log's menu.
+	 *
+	 * @param array $mwp_sub_menu – MainWP Sub-Menu.
+	 * @return array
+	 */
+	public function mwp_left_menu_sub( $mwp_sub_menu ) {
+		$activity_log_key = false;
+		$extensions_menu  = isset( $mwp_sub_menu['Extensions'] ) ? $mwp_sub_menu['Extensions'] : false;
+
+		if ( $extensions_menu ) {
+			foreach ( $extensions_menu as $key => $submenu ) {
+				if ( MWPAL_EXTENSION_NAME === $submenu[1] ) {
+					$activity_log_key = $key;
+					break;
+				}
+			}
+
+			$sub_menu_before = array_slice( $mwp_sub_menu['mainwp_tab'], 0, 2 );
+			$sub_menu_after  = array_splice( $mwp_sub_menu['mainwp_tab'], 2 );
+			$activity_log    = $mwp_sub_menu['Extensions'][ $activity_log_key ];
+			$activity_log[3] = '<i class="fa fa-globe"></i>';
+
+			$mwp_sub_menu['mainwp_tab'][] = $activity_log;
+			$mwp_sub_menu['mainwp_tab']   = array_merge( $mwp_sub_menu['mainwp_tab'], $sub_menu_after );
+			unset( $mwp_sub_menu['Extensions'][ $activity_log_key ] );
+		}
+		return $mwp_sub_menu;
+	}
+
+	/**
+	 * Filter MainWP Dropdown Menus
+	 *
+	 * Modify mainwp dropdown menu to include activity log's
+	 * dropdown menu.
+	 *
+	 * @param array $mwp_dropdown_menu – Dropdown menus of MainWP.
+	 * @return array
+	 */
+	public function mwp_sub_menu_dropdown( $mwp_dropdown_menu ) {
+		$mwp_dropdown_menu[ MWPAL_EXTENSION_NAME ] = array(
+			array(
+				'Extension Settings',
+				'admin.php?page=' . MWPAL_EXTENSION_NAME . '&tab=settings',
+			),
+		);
+		return $mwp_dropdown_menu;
+	}
+
+	/**
 	 * Enqueue Styles in Head.
 	 */
 	public function enqueue_styles() {
@@ -125,7 +177,7 @@ class View extends Abstract_View {
 
 		if ( 'admin.php' !== $pagenow ) {
 			return;
-		} elseif ( 'Extensions-Mainwp-Activity-Log-Extension' !== $page ) {
+		} elseif ( MWPAL_EXTENSION_NAME !== $page ) {
 			return;
 		}
 
@@ -151,7 +203,7 @@ class View extends Abstract_View {
 
 		if ( 'admin.php' !== $pagenow ) {
 			return;
-		} elseif ( 'Extensions-Mainwp-Activity-Log-Extension' !== $page ) {
+		} elseif ( MWPAL_EXTENSION_NAME !== $page ) {
 			return;
 		}
 
@@ -187,7 +239,7 @@ class View extends Abstract_View {
 
 		if ( 'admin.php' !== $pagenow ) {
 			return;
-		} elseif ( 'Extensions-Mainwp-Activity-Log-Extension' !== $page ) { // Page is admin.php, now check auditlog page.
+		} elseif ( MWPAL_EXTENSION_NAME !== $page ) { // Page is admin.php, now check auditlog page.
 			return; // Return if the current page is not auditlog's.
 		}
 
@@ -275,10 +327,6 @@ class View extends Abstract_View {
 		$this->query_child_site_events();
 		$site_id = $this->activity_log->settings->get_view_site_id();
 
-		// @codingStandardsIgnoreStart
-		$mwp_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // Admin WSAL Page.
-		// @codingStandardsIgnoreEnd
-
 		if ( $this->activity_log->is_child_enabled() ) {
 			$this->get_list_view()->prepare_items();
 			?>
@@ -296,6 +344,8 @@ class View extends Abstract_View {
 				<?php endforeach; ?>
 				<div class="clear"></div>
 			</nav>
+			<!-- Extension Sub-tabs -->
+
 			<div class="mwpal-content-wrapper">
 				<?php
 				if ( ! empty( $this->current_tab ) && ! empty( $this->mwpal_extension_tabs[ $this->current_tab ]['render'] ) ) {
@@ -305,6 +355,7 @@ class View extends Abstract_View {
 				}
 				?>
 			</div>
+			<!-- Content Wrapper -->
 			<?php
 		} else {
 			?>
@@ -319,6 +370,9 @@ class View extends Abstract_View {
 	 * Tab: `Activity Log`
 	 */
 	public function tab_activity_log() {
+		// @codingStandardsIgnoreStart
+		$mwp_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // Admin WSAL Page.
+		// @codingStandardsIgnoreEnd
 		?>
 		<form id="audit-log-viewer" method="get">
 			<div id="audit-log-viewer-content">
