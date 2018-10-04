@@ -376,8 +376,8 @@ class Activity_Log {
 			if ( $event ) {
 				$hrs_diff = $this->settings->get_hours_since_last_alert( $event->created_on );
 
-				// If the hours difference is more than 3.
-				if ( $hrs_diff > 3 ) {
+				// If the hours difference is more than the selected frequency.
+				if ( $hrs_diff > $this->settings->get_events_frequency() ) {
 					// Get latest event from child site.
 					$live_event = $this->get_live_event_by_siteid( $site['id'] );
 

@@ -349,7 +349,7 @@ class Settings {
 	 * @return integer
 	 */
 	public function get_child_site_events() {
-		return $this->get_option( 'child_site_events', 50 );
+		return $this->get_option( 'child_site_events', 100 );
 	}
 
 	/**

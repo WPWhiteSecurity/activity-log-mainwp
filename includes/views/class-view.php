@@ -613,7 +613,7 @@ class View extends Abstract_View {
 				// Post data for child sites.
 				$post_data = array(
 					'action'       => 'get_events',
-					'events_count' => 100,
+					'events_count' => $this->activity_log->settings->get_child_site_events(),
 				);
 
 				// Call to child sites to fetch WSAL events.

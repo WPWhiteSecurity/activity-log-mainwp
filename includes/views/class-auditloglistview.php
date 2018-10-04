@@ -63,10 +63,12 @@ final class AuditLogListView extends \WP_List_Table {
 		$this->activity_log = $activity_log;
 
 		// Set GMT offset.
-		$this->gmt_offset_sec = get_option( 'gmt_offset' ) * HOUR_IN_SECONDS;
-
-		// Get date time format.
-		$this->datetime_format = $this->activity_log->settings->get_date_time_format();
+		$timezone = $this->activity_log->settings->get_timezone();
+		if ( 'utc' === $timezone ) {
+			$this->gmt_offset_sec = date( 'Z' );
+		} else {
+			$this->gmt_offset_sec = get_option( 'gmt_offset' ) * HOUR_IN_SECONDS;
+		}
 
 		// Get MainWP child sites.
 		$this->mwp_child_sites = $this->activity_log->settings->get_mwp_child_sites();
@@ -184,11 +186,9 @@ final class AuditLogListView extends \WP_List_Table {
 	 * @param string $column_name - Name of the column.
 	 */
 	public function column_default( $item, $column_name ) {
-		// Get date time format.
-		$datetime_format = $this->datetime_format;
-
-		// Get MainWP & WSAL child sites.
-		$mwp_child_sites = $this->mwp_child_sites;
+		$datetime_format = $this->activity_log->settings->get_date_time_format(); // Get date time format.
+		$type_username   = $this->activity_log->settings->get_type_username(); // Get username type to display.
+		$mwp_child_sites = $this->mwp_child_sites; // Get MainWP child sites.
 
 		switch ( $column_name ) {
 			case 'site':
@@ -256,10 +256,20 @@ final class AuditLogListView extends \WP_List_Table {
 					$uhtml = '<i>' . __( 'System', 'mwp-al-ext' ) . '</i>';
 					$roles = '';
 				} else {
-					// Get user data.
-					$user_data    = $item->get_user_data();
-					$image        = get_avatar( $user_data->user_email, 32 ); // Avatar.
-					$display_name = $user_data->display_name;
+					$user_data = $item->get_user_data(); // Get user data.
+					$image     = get_avatar( $user_data->user_email, 32 ); // Avatar.
+
+					// Checks for display name.
+					if ( 'display_name' === $type_username && ! empty( $user_data->display_name ) ) {
+						$display_name = $user_data->display_name;
+					} elseif (
+						'first_last_name' === $type_username
+						&& ( ! empty( $user_data->first_name ) || ! empty( $user_data->last_name ) )
+					) {
+						$display_name = $user_data->first_name . ' ' . $user_data->last_name;
+					} else {
+						$display_name = $user_data->username;
+					}
 
 					$site_id    = (string) $item->site_id;
 					$site_index = array_search( $site_id, array_column( $mwp_child_sites, 'id' ), true );
@@ -374,6 +384,41 @@ final class AuditLogListView extends \WP_List_Table {
 			'mesg' => __( 'Message', 'mwp-al-ext' ),
 			'data' => '',
 		);
+
+		// Get selected columns.
+		$selected = $this->activity_log->settings->get_columns_selected();
+
+		// If selected columns are not empty, then unset default columns.
+		if ( ! empty( $selected ) ) {
+			unset( $cols );
+			$selected = (array) json_decode( $selected );
+			foreach ( $selected as $key => $value ) {
+				switch ( $key ) {
+					case 'site':
+						$cols['site'] = __( 'Site', 'mwp-al-ext' );
+						break;
+					case 'alert_code':
+						$cols['type'] = __( 'Event ID', 'mwp-al-ext' );
+						break;
+					case 'type':
+						$cols['code'] = __( 'Severity', 'mwp-al-ext' );
+						break;
+					case 'date':
+						$cols['crtd'] = __( 'Date', 'mwp-al-ext' );
+						break;
+					case 'username':
+						$cols['user'] = __( 'User', 'mwp-al-ext' );
+						break;
+					case 'source_ip':
+						$cols['scip'] = __( 'Source IP', 'mwp-al-ext' );
+						break;
+					case 'message':
+						$cols['mesg'] = __( 'Message', 'mwp-al-ext' );
+						break;
+				}
+			}
+			$cols['data'] = '';
+		}
 		return $cols;
 	}
 
