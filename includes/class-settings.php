@@ -200,6 +200,182 @@ class Settings {
 			'source_ip'  => '1',
 			'message'    => '1',
 		);
+
+		// Get selected columns.
+		$selected = $this->get_columns_selected();
+
+		if ( ! empty( $selected ) ) {
+			$columns = array(
+				'site'       => '0',
+				'alert_code' => '0',
+				'type'       => '0',
+				'date'       => '0',
+				'username'   => '0',
+				'source_ip'  => '0',
+				'message'    => '0',
+			);
+			$selected = (array) json_decode( $selected );
+			$columns  = array_merge( $columns, $selected );
+		}
 		return $columns;
+	}
+
+	/**
+	 * Get Selected Columns.
+	 *
+	 * @return string
+	 */
+	public function get_columns_selected() {
+		return $this->get_option( 'columns' );
+	}
+
+	/**
+	 * Set Columns.
+	 *
+	 * @param array $columns – Columns.
+	 */
+	public function set_columns( $columns ) {
+		$this->update_option( 'columns', wp_json_encode( $columns ) );
+	}
+
+	/**
+	 * Get WSAL Child Sites.
+	 *
+	 * @return array
+	 */
+	public function get_wsal_child_sites() {
+		// Check if the WSAL child sites option exists.
+		$child_sites = $this->get_option( 'wsal-child-sites' );
+
+		// Get MainWP Child sites.
+		$mwp_sites    = $this->get_mwp_child_sites();
+		$activity_log = \WSAL\MainWPExtension\Activity_Log::get_instance();
+
+		if ( empty( $child_sites ) && ! empty( $mwp_sites ) ) {
+			foreach ( $mwp_sites as $site ) {
+				$post_data = array( 'action' => 'check_wsal' );
+
+				// Call to child sites to check if WSAL is installed on them or not.
+				$results[ $site['id'] ] = apply_filters(
+					'mainwp_fetchurlauthed',
+					$activity_log->get_child_file(),
+					$activity_log->get_child_key(),
+					$site['id'],
+					'extra_excution',
+					$post_data
+				);
+			}
+
+			if ( ! empty( $results ) && is_array( $results ) ) {
+				$child_sites = array();
+
+				foreach ( $results as $site_id => $site_obj ) {
+					if ( empty( $site_obj ) ) {
+						continue;
+					} elseif ( true === $site_obj->wsal_installed ) {
+						$child_sites[ $site_id ] = $site_obj;
+					}
+				}
+				$this->update_option( 'wsal-child-sites', $child_sites );
+			}
+		}
+		return $child_sites;
+	}
+
+	/**
+	 * Set WSAL Child Sites.
+	 *
+	 * @param array $site_ids – Array of Site ids.
+	 * @return void
+	 */
+	public function set_wsal_child_sites( $site_ids ) {
+		if ( empty( $site_ids ) || ! is_array( $site_ids ) ) {
+			return;
+		}
+
+		// Get WSAL child sites.
+		$wsal_sites = $this->get_wsal_child_sites();
+		$new_sites  = array();
+
+		foreach ( $site_ids as $id ) {
+			if ( isset( $wsal_sites[ $id ] ) ) {
+				$new_sites[ $id ] = $wsal_sites[ $id ];
+			} else {
+				$new_sites[ $id ] = new \stdClass();
+			}
+		}
+		$this->update_option( 'wsal-child-sites', $new_sites );
+	}
+
+	/**
+	 * Get Timezone.
+	 *
+	 * @return string
+	 */
+	public function get_timezone() {
+		return $this->get_option( 'timezone', 'wp' );
+	}
+
+	/**
+	 * Set Timezone.
+	 *
+	 * @param string $newvalue – New value.
+	 */
+	public function set_timezone( $newvalue ) {
+		$this->update_option( 'timezone', $newvalue );
+	}
+
+	/**
+	 * Get Username Type.
+	 *
+	 * @return string
+	 */
+	public function get_type_username() {
+		return $this->get_option( 'type_username', 'display_name' );
+	}
+
+	/**
+	 * Set Username Type.
+	 *
+	 * @param string $newvalue – New value.
+	 */
+	public function set_type_username( $newvalue ) {
+		$this->update_option( 'type_username', $newvalue );
+	}
+
+	/**
+	 * Get number of child site events.
+	 *
+	 * @return integer
+	 */
+	public function get_child_site_events() {
+		return $this->get_option( 'child_site_events', 50 );
+	}
+
+	/**
+	 * Set number of child site events.
+	 *
+	 * @param integer $newvalue – New value.
+	 */
+	public function set_child_site_events( $newvalue ) {
+		$this->update_option( 'child_site_events', $newvalue );
+	}
+
+	/**
+	 * Get Events Frequency.
+	 *
+	 * @return integer
+	 */
+	public function get_events_frequency() {
+		return $this->get_option( 'events_frequency', 3 );
+	}
+
+	/**
+	 * Set Events Frequency.
+	 *
+	 * @param integer $newvalue – New value.
+	 */
+	public function set_events_frequency( $newvalue ) {
+		$this->update_option( 'events_frequency', $newvalue );
 	}
 }

@@ -206,6 +206,22 @@ class View extends Abstract_View {
 			return;
 		}
 
+		if ( 'settings' === $this->current_tab ) {
+			// Select2 styles.
+			wp_enqueue_style(
+				'mwpal-select2-css',
+				trailingslashit( MWPAL_BASE_URL ) . 'assets/js/dist/select2/select2.css',
+				array(),
+				'3.5.1'
+			);
+			wp_enqueue_style(
+				'mwpal-select2-bootstrap-css',
+				trailingslashit( MWPAL_BASE_URL ) . 'assets/js/dist/select2/select2-bootstrap.css',
+				array(),
+				'3.5.1'
+			);
+		}
+
 		// View styles.
 		wp_enqueue_style(
 			'mwpal-view-styles',
@@ -233,6 +249,18 @@ class View extends Abstract_View {
 		}
 
 		wp_enqueue_script( 'jquery' );
+
+		if ( 'settings' === $this->current_tab ) {
+			// Select2 script.
+			wp_enqueue_script(
+				'mwpal-select2-js',
+				trailingslashit( MWPAL_BASE_URL ) . 'assets/js/dist/select2/select2.min.js',
+				array( 'jquery' ),
+				'3.5.1',
+				true
+			);
+		}
+
 		wp_register_script(
 			'mwpal-view-script',
 			trailingslashit( MWPAL_BASE_URL ) . 'assets/js/dist/index.js',
@@ -246,6 +274,7 @@ class View extends Abstract_View {
 			'ajaxURL'     => admin_url( 'admin-ajax.php' ),
 			'scriptNonce' => wp_create_nonce( 'mwp-activitylog-nonce' ),
 			'currentTab'  => $this->current_tab,
+			'selectSites' => __( 'Select Child Site(s)', 'mwp-al-ext' ),
 		);
 		wp_localize_script( 'mwpal-view-script', 'scriptData', $script_data );
 		wp_enqueue_script( 'mwpal-view-script' );
@@ -269,8 +298,8 @@ class View extends Abstract_View {
 			return; // Return if the current page is not auditlog's.
 		}
 
-		// Verify nonce for security.
-		if ( isset( $_GET['_wpnonce'] ) ) {
+		if ( isset( $_GET['_wpnonce'] ) && 'activity-log' === $this->current_tab ) {
+			// Verify nonce for security.
 			check_admin_referer( 'bulk-activity-logs' );
 
 			// Site id.
@@ -287,51 +316,27 @@ class View extends Abstract_View {
 			}
 			wp_safe_redirect( remove_query_arg( $remove_args ) );
 			exit();
+		} elseif ( isset( $_POST['_wpnonce'] ) && isset( $_POST['submit'] ) && 'settings' === $this->current_tab ) {
+			// Verify nonce for security.
+			check_admin_referer( 'mwpal-settings-nonce' );
+
+			// Get form options.
+			$timezone          = isset( $_POST['timezone'] ) ? sanitize_text_field( wp_unslash( $_POST['timezone'] ) ) : false;
+			$type_username     = isset( $_POST['type_username'] ) ? sanitize_text_field( wp_unslash( $_POST['type_username'] ) ) : false;
+			$child_site_events = isset( $_POST['child-site-events'] ) ? (int) sanitize_text_field( wp_unslash( $_POST['child-site-events'] ) ) : false;
+			$events_frequency  = isset( $_POST['events-frequency'] ) ? (int) sanitize_text_field( wp_unslash( $_POST['events-frequency'] ) ) : false;
+			// @codingStandardsIgnoreStart
+			$columns          = isset( $_POST['columns'] ) ? array_map( 'sanitize_text_field', $_POST['columns'] ) : false;
+			$wsal_child_sites = isset( $_POST['mwpal-wsal-child-sites'] ) ? array_map( 'sanitize_text_field', $_POST['mwpal-wsal-child-sites'] ) : false;
+			// @codingStandardsIgnoreEnd
+
+			$this->activity_log->settings->set_timezone( $timezone );
+			$this->activity_log->settings->set_type_username( $type_username );
+			$this->activity_log->settings->set_child_site_events( $child_site_events );
+			$this->activity_log->settings->set_events_frequency( $events_frequency );
+			$this->activity_log->settings->set_columns( $columns );
+			$this->activity_log->settings->set_wsal_child_sites( $wsal_child_sites );
 		}
-
-	}
-
-	/**
-	 * Get WSAL Child Sites.
-	 *
-	 * @return array
-	 */
-	private function get_wsal_child_sites() {
-		// Check if the WSAL child sites option exists.
-		$child_sites = $this->activity_log->settings->get_option( 'wsal-child-sites' );
-
-		if ( empty( $child_sites ) && ! empty( $this->mainwp_sites ) ) {
-			foreach ( $this->mainwp_sites as $site ) {
-				$post_data = array(
-					'action' => 'check_wsal',
-				);
-
-				// Call to child sites to check if WSAL is installed on them or not.
-				$results[ $site['id'] ] = apply_filters(
-					'mainwp_fetchurlauthed',
-					$this->activity_log->get_child_file(),
-					$this->activity_log->get_child_key(),
-					$site['id'],
-					'extra_excution',
-					$post_data
-				);
-			}
-
-			if ( ! empty( $results ) && is_array( $results ) ) {
-				$child_sites = array();
-
-				foreach ( $results as $site_id => $site_obj ) {
-					if ( empty( $site_obj ) ) {
-						continue;
-					} elseif ( true === $site_obj->wsal_installed ) {
-						$child_sites[ $site_id ] = $site_obj;
-					}
-				}
-				$this->activity_log->settings->update_option( 'wsal-child-sites', $child_sites );
-			}
-		}
-
-		return $child_sites;
 	}
 
 	/**
@@ -348,9 +353,9 @@ class View extends Abstract_View {
 	 */
 	public function content() {
 		// Fetch all child-sites.
-		$this->mainwp_sites     = apply_filters( 'mainwp-getsites', $this->activity_log->get_child_file(), $this->activity_log->get_child_key(), null );
-		$this->wsal_child_sites = $this->get_wsal_child_sites(); // Check child sites with WSAL.
-		$this->query_child_site_events();
+		$this->mwp_child_sites  = $this->activity_log->settings->get_mwp_child_sites(); // Get MainWP child sites.
+		$this->wsal_child_sites = $this->activity_log->settings->get_wsal_child_sites(); // Get child sites with WSAL installed.
+		$this->query_child_site_events(); // Query events from child sites with WSAL.
 		$site_id = $this->activity_log->settings->get_view_site_id();
 
 		if ( $this->activity_log->is_child_enabled() ) {
@@ -419,138 +424,158 @@ class View extends Abstract_View {
 	 * Tab: `Settings`
 	 */
 	public function tab_settings() {
+		// @codingStandardsIgnoreStart
+		$mwp_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // Admin WSAL Page.
+		// @codingStandardsIgnoreEnd
 		?>
 		<div class="metabox-holder columns-1">
-			<div class="meta-box-sortables ui-sortable">
-				<div id="mwpal-setting-contentbox-1" class="postbox">
-					<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'Activity Log Settings', 'mwp-al-ext' ); ?></span></h2>
-					<div class="inside">
-						<table class="form-table">
-							<tbody>
-								<tr>
-									<th scope="row"><label for="utc"><?php esc_html_e( 'Events Timestamp', 'wp-security-audit-log' ); ?></label></th>
-									<td>
-										<fieldset>
-											<?php
-											// $timezone = $this->_plugin->settings->GetTimezone();
-
-											/**
-											 * Transform timezone values.
-											 *
-											 * @since 3.2.3
-											 */
-											// if ( '0' === $timezone ) {
-											// 	$timezone = 'utc';
-											// } elseif ( '1' === $timezone ) {
-											// 	$timezone = 'wp';
-											// }
-											?>
-											<label for="utc">
-												<input type="radio" name="Timezone" id="utc" style="margin-top: -2px;"
-													<?php //checked( $timezone, 'utc' ); ?> value="utc">
-												<?php esc_html_e( 'UTC', 'wp-security-audit-log' ); ?>
-											</label>
-											<br/>
-											<label for="timezone">
-												<input type="radio" name="Timezone" id="timezone" style="margin-top: -2px;"
-													<?php //checked( $timezone, 'wp' ); ?> value="wp">
-												<?php esc_html_e( 'Timezone configured on this WordPress website', 'wp-security-audit-log' ); ?>
-											</label>
-										</fieldset>
-									</td>
-								</tr>
-								<!-- Alerts Timestamp -->
-
-								<tr>
-									<th scope="row"><label for="column_username"><?php esc_html_e( 'User Information in Audit Log', 'wp-security-audit-log' ); ?></label></th>
-									<td>
-										<fieldset>
-											<?php //$type_username = $this->_plugin->settings->get_type_username(); ?>
-											<label for="column_username">
-												<input type="radio" name="type_username" id="column_username" style="margin-top: -2px;" <?php //checked( $type_username, 'username' ); ?> value="username">
-												<span><?php esc_html_e( 'WordPress Username', 'wp-security-audit-log' ); ?></span>
-											</label>
-											<br/>
-											<label for="columns_first_last_name">
-												<input type="radio" name="type_username" id="columns_first_last_name" style="margin-top: -2px;" <?php //checked( $type_username, 'first_last_name' ); ?> value="first_last_name">
-												<span><?php esc_html_e( 'First Name & Last Name', 'wp-security-audit-log' ); ?></span>
-											</label>
-											<br/>
-											<label for="columns_display_name">
-												<input type="radio" name="type_username" id="columns_display_name" style="margin-top: -2px;" <?php //checked( $type_username, 'display_name' ); ?> value="display_name">
-												<span><?php esc_html_e( 'Configured Public Display Name', 'wp-security-audit-log' ); ?></span>
-											</label>
-										</fieldset>
-									</td>
-								</tr>
-								<!-- Select type of name -->
-
-								<tr>
-									<th><label for="columns"><?php esc_html_e( 'Activity Log Columns Selection', 'wp-security-audit-log' ); ?></label></th>
-									<td>
-										<fieldset>
-											<?php $columns = $this->activity_log->settings->get_columns(); ?>
-											<?php foreach ( $columns as $key => $value ) { ?>
-												<label for="columns">
-													<input type="checkbox" name="Columns[<?php echo esc_attr( $key ); ?>]" id="<?php echo esc_attr( $key ); ?>" class="sel-columns" style="margin-top: -2px;"
-														<?php checked( $value, '1' ); ?> value="1">
-													<?php if ( 'alert_code' === $key ) : ?>
-														<span><?php esc_html_e( 'Event ID', 'wp-security-audit-log' ); ?></span>
-													<?php elseif ( 'type' === $key ) : ?>
-														<span><?php esc_html_e( 'Severity', 'wp-security-audit-log' ); ?></span>
-													<?php elseif ( 'date' === $key ) : ?>
-														<span><?php esc_html_e( 'Date & Time', 'wp-security-audit-log' ); ?></span>
-													<?php elseif ( 'username' === $key ) : ?>
-														<span><?php esc_html_e( 'User', 'wp-security-audit-log' ); ?></span>
-													<?php elseif ( 'source_ip' === $key ) : ?>
-														<span><?php esc_html_e( 'Source IP Address', 'wp-security-audit-log' ); ?></span>
-													<?php else : ?>
-														<span><?php echo esc_html( ucwords( str_replace( '_', ' ', $key ) ) ); ?></span>
-													<?php endif; ?>
+			<form method="post" id="mwpal-settings">
+				<input type="hidden" name="page" value="<?php echo esc_attr( $mwp_page ); ?>" />
+				<?php wp_nonce_field( 'mwpal-settings-nonce' ); ?>
+				<div class="meta-box-sortables ui-sortable">
+					<div id="mwpal-setting-contentbox-1" class="postbox">
+						<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'Activity Log Settings', 'mwp-al-ext' ); ?></span></h2>
+						<div class="inside">
+							<table class="form-table">
+								<tbody>
+									<tr>
+										<th scope="row"><label for="utc"><?php esc_html_e( 'Events Timestamp', 'wp-security-audit-log' ); ?></label></th>
+										<td>
+											<fieldset>
+												<?php $timezone = $this->activity_log->settings->get_timezone(); ?>
+												<label for="utc">
+													<input type="radio" name="timezone" id="utc" style="margin-top: -2px;" <?php checked( $timezone, 'utc' ); ?> value="utc">
+													<?php esc_html_e( 'UTC', 'wp-security-audit-log' ); ?>
 												</label>
 												<br/>
-											<?php } ?>
-										</fieldset>
-									</td>
-								</tr>
-								<!-- Audit Log Columns Selection -->
-							</tbody>
-						</table>
+												<label for="timezone">
+													<input type="radio" name="timezone" id="timezone" style="margin-top: -2px;" <?php checked( $timezone, 'wp' ); ?> value="wp">
+													<?php esc_html_e( 'Timezone configured on this WordPress website', 'wp-security-audit-log' ); ?>
+												</label>
+											</fieldset>
+										</td>
+									</tr>
+									<!-- Alerts Timestamp -->
+
+									<tr>
+										<th scope="row"><label for="column_username"><?php esc_html_e( 'User Information in Audit Log', 'wp-security-audit-log' ); ?></label></th>
+										<td>
+											<fieldset>
+												<?php $type_username = $this->activity_log->settings->get_type_username(); ?>
+												<label for="column_username">
+													<input type="radio" name="type_username" id="column_username" style="margin-top: -2px;" <?php checked( $type_username, 'username' ); ?> value="username">
+													<span><?php esc_html_e( 'WordPress Username', 'wp-security-audit-log' ); ?></span>
+												</label>
+												<br/>
+												<label for="columns_first_last_name">
+													<input type="radio" name="type_username" id="columns_first_last_name" style="margin-top: -2px;" <?php checked( $type_username, 'first_last_name' ); ?> value="first_last_name">
+													<span><?php esc_html_e( 'First Name & Last Name', 'wp-security-audit-log' ); ?></span>
+												</label>
+												<br/>
+												<label for="columns_display_name">
+													<input type="radio" name="type_username" id="columns_display_name" style="margin-top: -2px;" <?php checked( $type_username, 'display_name' ); ?> value="display_name">
+													<span><?php esc_html_e( 'Configured Public Display Name', 'wp-security-audit-log' ); ?></span>
+												</label>
+											</fieldset>
+										</td>
+									</tr>
+									<!-- Select type of name -->
+
+									<tr>
+										<th><label for="columns"><?php esc_html_e( 'Activity Log Columns Selection', 'wp-security-audit-log' ); ?></label></th>
+										<td>
+											<fieldset>
+												<?php $columns = $this->activity_log->settings->get_columns(); ?>
+												<?php foreach ( $columns as $key => $value ) { ?>
+													<label for="columns">
+														<input type="checkbox" name="columns[<?php echo esc_attr( $key ); ?>]" id="<?php echo esc_attr( $key ); ?>" class="sel-columns" style="margin-top: -2px;"
+															<?php checked( $value, '1' ); ?> value="1">
+														<?php if ( 'alert_code' === $key ) : ?>
+															<span><?php esc_html_e( 'Event ID', 'wp-security-audit-log' ); ?></span>
+														<?php elseif ( 'type' === $key ) : ?>
+															<span><?php esc_html_e( 'Severity', 'wp-security-audit-log' ); ?></span>
+														<?php elseif ( 'date' === $key ) : ?>
+															<span><?php esc_html_e( 'Date & Time', 'wp-security-audit-log' ); ?></span>
+														<?php elseif ( 'username' === $key ) : ?>
+															<span><?php esc_html_e( 'User', 'wp-security-audit-log' ); ?></span>
+														<?php elseif ( 'source_ip' === $key ) : ?>
+															<span><?php esc_html_e( 'Source IP Address', 'wp-security-audit-log' ); ?></span>
+														<?php else : ?>
+															<span><?php echo esc_html( ucwords( str_replace( '_', ' ', $key ) ) ); ?></span>
+														<?php endif; ?>
+													</label>
+													<br/>
+												<?php } ?>
+											</fieldset>
+										</td>
+									</tr>
+									<!-- Audit Log Columns Selection -->
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<!-- Activity Log Settings -->
+
+					<div id="mwpal-setting-contentbox-2" class="postbox">
+						<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'Extension Settings', 'mwp-al-ext' ); ?></span></h2>
+						<div class="inside">
+							<table class="form-table">
+								<tbody>
+									<tr>
+										<th scope="row"><label for="child-site-events"><?php esc_html_e( 'Events to Retrieve from Child Sites', 'wp-security-audit-log' ); ?></label></th>
+										<td>
+											<fieldset>
+												<?php $child_site_events = $this->activity_log->settings->get_child_site_events(); ?>
+												<input type="number" id="child-site-events" name="child-site-events" value="<?php echo esc_attr( $child_site_events ); ?>" />
+											</fieldset>
+										</td>
+									</tr>
+
+									<tr>
+										<th scope="row"><label for="events-frequency"><?php esc_html_e( 'Events Frequency', 'wp-security-audit-log' ); ?></label></th>
+										<td>
+											<fieldset>
+												<?php $events_frequency = $this->activity_log->settings->get_events_frequency(); ?>
+												<input type="number" id="events-frequency" name="events-frequency" value="<?php echo esc_attr( $events_frequency ); ?>" />
+												<?php esc_html_e( 'hours', 'mwp-al-ext' ); ?>
+											</fieldset>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<!-- Extension Settings -->
+
+					<div id="mwpal-setting-contentbox-3" class="postbox">
+						<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'Child Sites Settings', 'mwp-al-ext' ); ?></span></h2>
+						<div class="inside">
+							<table class="form-table">
+								<tbody>
+									<tr>
+										<th scope="row"><label for="child-site-events"><?php esc_html_e( 'Active WSAL Child Sites', 'wp-security-audit-log' ); ?></label></th>
+										<td>
+											<select name="mwpal-wsal-child-sites[]" id="mwpal-wsal-child-sites" multiple="multiple">
+												<?php foreach ( $this->mwp_child_sites as $site ) : ?>
+													<option value="<?php echo esc_attr( $site['id'] ); ?>" <?php echo isset( $this->wsal_child_sites[ $site['id'] ] ) ? 'selected' : false; ?>>
+														<?php echo esc_html( $site['name'] ); ?>
+													</option>
+												<?php endforeach; ?>
+											</select>
+											<br />
+											<br />
+											<input type="button" class="button-primary" id="mwpal-wsal-sites-refresh" value="<?php esc_html_e( 'Refresh Child Sites', 'mwp-al-ext' ); ?>" />
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
 					</div>
 				</div>
-				<!-- Activity Log Settings -->
-
-				<div id="mwpal-setting-contentbox-2" class="postbox">
-					<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'Extension Settings', 'mwp-al-ext' ); ?></span></h2>
-					<div class="inside">
-						<table class="form-table">
-							<tbody>
-								<tr>
-									<th scope="row"><label for="child-site-events"><?php esc_html_e( 'Events to Retrieve from Child Sites', 'wp-security-audit-log' ); ?></label></th>
-									<td>
-										<fieldset>
-											<input type="number" id="child-site-events" name="child-site-events" />
-										</fieldset>
-									</td>
-								</tr>
-
-								<tr>
-									<th scope="row"><label for="events-frequency"><?php esc_html_e( 'Events Frequency', 'wp-security-audit-log' ); ?></label></th>
-									<td>
-										<fieldset>
-											<input type="number" id="events-frequency" name="events-frequency" />
-										</fieldset>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-				<!-- Extension Settings -->
-			</div>
-			<p class="submit">
-				<input type="submit" name="submit" id="submit" class="button-primary button button-hero" value="<?php esc_attr_e( 'Save Settings', 'mwp-al-ext' ); ?>">
-			</p>
+				<p class="submit">
+					<input type="submit" name="submit" id="submit" class="button-primary button button-hero" value="<?php esc_attr_e( 'Save Settings', 'mwp-al-ext' ); ?>">
+				</p>
+			</form>
 		</div>
 		<?php
 	}
@@ -569,7 +594,7 @@ class View extends Abstract_View {
 	 */
 	private function query_child_site_events() {
 		// Check if the WSAL child sites option exists.
-		$child_sites = $this->get_wsal_child_sites();
+		$child_sites = $this->activity_log->settings->get_wsal_child_sites();
 
 		if ( ! empty( $child_sites ) && is_array( $child_sites ) ) {
 			$sites_data = array();

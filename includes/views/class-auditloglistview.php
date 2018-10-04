@@ -140,18 +140,27 @@ final class AuditLogListView extends \WP_List_Table {
 			<?php
 		endif;
 
-		if ( count( $this->mwp_child_sites ) > 1 ) :
+		// Get child sites with WSAL installed.
+		$wsal_child_sites = $this->activity_log->settings->get_wsal_child_sites();
+		if ( count( $wsal_child_sites ) > 1 ) :
 			$current_site = $this->activity_log->settings->get_view_site_id();
 			?>
 			<div class="mwp-ssa mwp-ssa-<?php echo esc_attr( $which ); ?>">
 				<select class="mwp-ssas">
 					<option value="0"><?php esc_html_e( 'All Sites', 'mwp-al-ext' ); ?></option>
-					<?php foreach ( $this->mwp_child_sites as $site ) { ?>
-						<option value="<?php echo esc_attr( $site['id'] ); ?>"
-							<?php echo ( $current_site === (int) $site['id'] ) ? 'selected="selected"' : false; ?>>
-							<?php echo esc_html( $site['name'] ) . ' (' . esc_html( $site['url'] ) . ')'; ?>
-						</option>
-					<?php } ?>
+					<?php
+					foreach ( $wsal_child_sites as $site_id => $site_data ) :
+						$key = array_search( $site_id, array_column( $this->mwp_child_sites, 'id' ), false );
+						if ( false !== $key ) :
+							?>
+							<option value="<?php echo esc_attr( $this->mwp_child_sites[ $key ]['id'] ); ?>"
+								<?php echo ( $current_site === (int) $this->mwp_child_sites[ $key ]['id'] ) ? 'selected="selected"' : false; ?>>
+								<?php echo esc_html( $this->mwp_child_sites[ $key ]['name'] ) . ' (' . esc_html( $this->mwp_child_sites[ $key ]['url'] ) . ')'; ?>
+							</option>
+						<?php
+						endif;
+					endforeach;
+					?>
 				</select>
 			</div>
 			<?php
