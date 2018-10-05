@@ -38,8 +38,24 @@ jQuery( document ).ready( function() {
 		jQuery( '#mainwp-tabs a:nth-child(2)' ).removeClass( 'nav-tab-active' );
 	}
 
+	/**
+	 * Active WSAL Child Sites setting.
+	 */
 	jQuery( '#mwpal-wsal-child-sites' ).select2({
 		placeholder: scriptData.selectSites,
 		width: '500px'
+	});
+
+	jQuery( '#mwpal-wsal-sites-refresh' ).click( function() {
+		const refreshBtn = jQuery( this );
+		refreshBtn.attr( 'disabled', true );
+		refreshBtn.val( 'Refreshing Child Sites...' );
+
+		jQuery.post( scriptData.ajaxURL, {
+			action: 'refresh_child_sites',
+			nonce: scriptData.scriptNonce
+		}, function() {
+			location.reload();
+		});
 	});
 });

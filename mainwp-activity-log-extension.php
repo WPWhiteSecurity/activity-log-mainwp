@@ -389,12 +389,7 @@ class Activity_Log {
 					// Delete events by site id.
 					$delete_query = new \WSAL\MainWPExtension\Models\OccurrenceQuery();
 					$delete_query->addCondition( 'site_id = %s ', $site['id'] );
-					$delete_count = (int) $delete_query->getAdapter()->Delete( $delete_query );
-
-					// Nothing to delete.
-					if ( 0 === $delete_count ) {
-						continue;
-					}
+					$delete_query->getAdapter()->Delete( $delete_query );
 				}
 			}
 		}

@@ -297,11 +297,23 @@ class Settings {
 		$wsal_sites = $this->get_wsal_child_sites();
 		$new_sites  = array();
 
+		// Set new WSAL sites.
 		foreach ( $site_ids as $id ) {
 			if ( isset( $wsal_sites[ $id ] ) ) {
 				$new_sites[ $id ] = $wsal_sites[ $id ];
+				unset( $wsal_sites[ $id ] );
 			} else {
 				$new_sites[ $id ] = new \stdClass();
+			}
+		}
+
+		// Remove events of removed sites from the DB.
+		if ( ! empty( $wsal_sites ) && is_array( $wsal_sites ) ) {
+			foreach ( $wsal_sites as $site_id => $site ) {
+				// Delete events by site id.
+				$delete_query = new \WSAL\MainWPExtension\Models\OccurrenceQuery();
+				$delete_query->addCondition( 'site_id = %s ', $site_id );
+				$delete_query->getAdapter()->Delete( $delete_query );
 			}
 		}
 		$this->update_option( 'wsal-child-sites', $new_sites );

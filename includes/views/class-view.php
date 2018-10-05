@@ -72,6 +72,7 @@ class View extends Abstract_View {
 		add_action( 'admin_init', array( $this, 'handle_auditlog_form_submission' ) );
 		add_action( 'wp_ajax_set_per_page_events', array( $this, 'set_per_page_events' ) );
 		add_action( 'wp_ajax_metadata_inspector', array( $this, 'metadata_inspector' ) );
+		add_action( 'wp_ajax_refresh_child_sites', array( $this, 'refresh_child_sites' ) );
 
 		// Extension view URL.
 		$extension_url = add_query_arg( 'page', MWPAL_EXTENSION_NAME, admin_url( 'admin.php' ) );
@@ -708,6 +709,22 @@ class View extends Abstract_View {
 			\wsal_r( $event_meta );
 			echo '</body></html>';
 			die;
+		}
+		die( esc_html__( 'Nonce verification failed.', 'mwp-al-ext' ) );
+	}
+
+	/**
+	 * Refresh WSAL Child Sites
+	 */
+	public function refresh_child_sites() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			die( esc_html__( 'Access denied.', 'mwp-al-ext' ) );
+		}
+
+		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'mwp-activitylog-nonce' ) ) {
+			$this->activity_log->settings->delete_option( 'wsal-child-sites' );
+			$this->activity_log->settings->get_wsal_child_sites();
+			die();
 		}
 		die( esc_html__( 'Nonce verification failed.', 'mwp-al-ext' ) );
 	}
