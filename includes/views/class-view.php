@@ -440,18 +440,18 @@ class View extends Abstract_View {
 							<table class="form-table">
 								<tbody>
 									<tr>
-										<th scope="row"><label for="utc"><?php esc_html_e( 'Events Timestamp', 'wp-security-audit-log' ); ?></label></th>
+										<th scope="row"><label for="utc"><?php esc_html_e( 'Events Timestamp', 'mwp-al-ext' ); ?></label></th>
 										<td>
 											<fieldset>
 												<?php $timezone = $this->activity_log->settings->get_timezone(); ?>
 												<label for="utc">
 													<input type="radio" name="timezone" id="utc" style="margin-top: -2px;" <?php checked( $timezone, 'utc' ); ?> value="utc">
-													<?php esc_html_e( 'UTC', 'wp-security-audit-log' ); ?>
+													<?php esc_html_e( 'UTC', 'mwp-al-ext' ); ?>
 												</label>
 												<br/>
 												<label for="timezone">
 													<input type="radio" name="timezone" id="timezone" style="margin-top: -2px;" <?php checked( $timezone, 'wp' ); ?> value="wp">
-													<?php esc_html_e( 'Timezone configured on this WordPress website', 'wp-security-audit-log' ); ?>
+													<?php esc_html_e( 'Timezone configured on this WordPress website', 'mwp-al-ext' ); ?>
 												</label>
 											</fieldset>
 										</td>
@@ -459,23 +459,23 @@ class View extends Abstract_View {
 									<!-- Alerts Timestamp -->
 
 									<tr>
-										<th scope="row"><label for="column_username"><?php esc_html_e( 'User Information in Audit Log', 'wp-security-audit-log' ); ?></label></th>
+										<th scope="row"><label for="column_username"><?php esc_html_e( 'User Information in Audit Log', 'mwp-al-ext' ); ?></label></th>
 										<td>
 											<fieldset>
 												<?php $type_username = $this->activity_log->settings->get_type_username(); ?>
 												<label for="column_username">
 													<input type="radio" name="type_username" id="column_username" style="margin-top: -2px;" <?php checked( $type_username, 'username' ); ?> value="username">
-													<span><?php esc_html_e( 'WordPress Username', 'wp-security-audit-log' ); ?></span>
+													<span><?php esc_html_e( 'WordPress Username', 'mwp-al-ext' ); ?></span>
 												</label>
 												<br/>
 												<label for="columns_first_last_name">
 													<input type="radio" name="type_username" id="columns_first_last_name" style="margin-top: -2px;" <?php checked( $type_username, 'first_last_name' ); ?> value="first_last_name">
-													<span><?php esc_html_e( 'First Name & Last Name', 'wp-security-audit-log' ); ?></span>
+													<span><?php esc_html_e( 'First Name & Last Name', 'mwp-al-ext' ); ?></span>
 												</label>
 												<br/>
 												<label for="columns_display_name">
 													<input type="radio" name="type_username" id="columns_display_name" style="margin-top: -2px;" <?php checked( $type_username, 'display_name' ); ?> value="display_name">
-													<span><?php esc_html_e( 'Configured Public Display Name', 'wp-security-audit-log' ); ?></span>
+													<span><?php esc_html_e( 'Configured Public Display Name', 'mwp-al-ext' ); ?></span>
 												</label>
 											</fieldset>
 										</td>
@@ -483,7 +483,7 @@ class View extends Abstract_View {
 									<!-- Select type of name -->
 
 									<tr>
-										<th><label for="columns"><?php esc_html_e( 'Activity Log Columns Selection', 'wp-security-audit-log' ); ?></label></th>
+										<th><label for="columns"><?php esc_html_e( 'Activity Log Columns Selection', 'mwp-al-ext' ); ?></label></th>
 										<td>
 											<fieldset>
 												<?php $columns = $this->activity_log->settings->get_columns(); ?>
@@ -492,15 +492,15 @@ class View extends Abstract_View {
 														<input type="checkbox" name="columns[<?php echo esc_attr( $key ); ?>]" id="<?php echo esc_attr( $key ); ?>" class="sel-columns" style="margin-top: -2px;"
 															<?php checked( $value, '1' ); ?> value="1">
 														<?php if ( 'alert_code' === $key ) : ?>
-															<span><?php esc_html_e( 'Event ID', 'wp-security-audit-log' ); ?></span>
+															<span><?php esc_html_e( 'Event ID', 'mwp-al-ext' ); ?></span>
 														<?php elseif ( 'type' === $key ) : ?>
-															<span><?php esc_html_e( 'Severity', 'wp-security-audit-log' ); ?></span>
+															<span><?php esc_html_e( 'Severity', 'mwp-al-ext' ); ?></span>
 														<?php elseif ( 'date' === $key ) : ?>
-															<span><?php esc_html_e( 'Date & Time', 'wp-security-audit-log' ); ?></span>
+															<span><?php esc_html_e( 'Date & Time', 'mwp-al-ext' ); ?></span>
 														<?php elseif ( 'username' === $key ) : ?>
-															<span><?php esc_html_e( 'User', 'wp-security-audit-log' ); ?></span>
+															<span><?php esc_html_e( 'User', 'mwp-al-ext' ); ?></span>
 														<?php elseif ( 'source_ip' === $key ) : ?>
-															<span><?php esc_html_e( 'Source IP Address', 'wp-security-audit-log' ); ?></span>
+															<span><?php esc_html_e( 'Source IP Address', 'mwp-al-ext' ); ?></span>
 														<?php else : ?>
 															<span><?php echo esc_html( ucwords( str_replace( '_', ' ', $key ) ) ); ?></span>
 														<?php endif; ?>
@@ -523,7 +523,7 @@ class View extends Abstract_View {
 							<table class="form-table">
 								<tbody>
 									<tr>
-										<th scope="row"><label for="child-site-events"><?php esc_html_e( 'Events to Retrieve from Child Sites', 'wp-security-audit-log' ); ?></label></th>
+										<th scope="row"><label for="child-site-events"><?php esc_html_e( 'Events to Retrieve from Child Sites', 'mwp-al-ext' ); ?></label></th>
 										<td>
 											<fieldset>
 												<?php $child_site_events = $this->activity_log->settings->get_child_site_events(); ?>
@@ -533,7 +533,7 @@ class View extends Abstract_View {
 									</tr>
 
 									<tr>
-										<th scope="row"><label for="events-frequency"><?php esc_html_e( 'Events Frequency', 'wp-security-audit-log' ); ?></label></th>
+										<th scope="row"><label for="events-frequency"><?php esc_html_e( 'Events Frequency', 'mwp-al-ext' ); ?></label></th>
 										<td>
 											<fieldset>
 												<?php $events_frequency = $this->activity_log->settings->get_events_frequency(); ?>
@@ -554,7 +554,7 @@ class View extends Abstract_View {
 							<table class="form-table">
 								<tbody>
 									<tr>
-										<th scope="row"><label for="child-site-events"><?php esc_html_e( 'Active WSAL Child Sites', 'wp-security-audit-log' ); ?></label></th>
+										<th scope="row"><label for="child-site-events"><?php esc_html_e( 'Active WSAL Child Sites', 'mwp-al-ext' ); ?></label></th>
 										<td>
 											<select name="mwpal-wsal-child-sites[]" id="mwpal-wsal-child-sites" multiple="multiple">
 												<?php foreach ( $this->mwp_child_sites as $site ) : ?>
