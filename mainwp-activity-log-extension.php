@@ -115,6 +115,13 @@ class Activity_Log {
 	public $constants;
 
 	/**
+	 * MainWP Sensor.
+	 *
+	 * @var \WSAL\MainWPExtension\Sensors\Sensor_MainWP
+	 */
+	public $sensor_mainwp;
+
+	/**
 	 * Returns the singular instance of the plugin.
 	 *
 	 * @return Activity_Log
@@ -147,6 +154,10 @@ class Activity_Log {
 		$this->settings       = new \WSAL\MainWPExtension\Settings();
 		$this->constants      = new \WSAL\MainWPExtension\ConstantManager( $this );
 		$this->alerts         = new \WSAL\MainWPExtension\AlertManager( $this );
+		$this->sensor_mainwp  = new \WSAL\MainWPExtension\Sensors\Sensor_MainWP( $this );
+
+		// Start listening to events.
+		add_action( 'init', array( $this, 'mwpal_init' ) );
 
 		// Installation routine.
 		register_activation_hook( __FILE__, array( $this, 'install_extension' ) );
@@ -170,6 +181,13 @@ class Activity_Log {
 		}
 		add_action( 'admin_init', array( &$this, 'redirect_to_extensions' ) );
 		add_action( 'admin_notices', array( &$this, 'mainwp_error_notice' ) );
+	}
+
+	/**
+	 * Start listening to events.
+	 */
+	public function mwpal_init() {
+		$this->sensor_mainwp->hook_events();
 	}
 
 	/**

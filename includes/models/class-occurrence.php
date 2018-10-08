@@ -199,8 +199,11 @@ class Occurrence extends ActiveRecord {
 		$meta = $this->getAdapter()->GetFirstNamedMeta( $this, array( 'Username', 'CurrentUserID' ) );
 		if ( $meta ) {
 			switch ( true ) {
-				case 'Username' == $meta->name:
+				case 'Username' === $meta->name:
 					return $meta->value;
+				case 'CurrentUserID' === $meta->name:
+					$data = get_userdata( $meta->value );
+					return $data ? $data->user_login : null;
 			}
 		}
 		return null;

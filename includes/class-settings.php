@@ -390,4 +390,79 @@ class Settings {
 	public function set_events_frequency( $newvalue ) {
 		$this->update_option( 'events_frequency', $newvalue );
 	}
+
+	/**
+	 * Get Current User Roles.
+	 *
+	 * @param array $base_roles – Base roles.
+	 * @return array
+	 */
+	public function get_current_user_roles( $base_roles = null ) {
+		if ( null === $base_roles ) {
+			$base_roles = wp_get_current_user()->roles;
+		}
+		if ( function_exists( 'is_super_admin' ) && is_super_admin() ) {
+			$base_roles[] = 'superadmin';
+		}
+		return $base_roles;
+	}
+
+	/**
+	 * Get Client IP.
+	 *
+	 * @return string
+	 */
+	public function get_main_client_ip() {
+		$result = null;
+		if ( isset( $_SERVER['REMOTE_ADDR'] ) ) {
+			$result = $this->normalize_ip( sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) );
+			if ( ! $this->validate_ip( $result ) ) {
+				$result = 'Error ' . self::ERROR_CODE_INVALID_IP . ': Invalid IP Address';
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 * Normalize IP Address.
+	 *
+	 * @param string $ip – IP Address.
+	 * @return string
+	 */
+	protected function normalize_ip( $ip ) {
+		$ip = trim( $ip );
+		if ( strpos( $ip, ':' ) !== false && substr_count( $ip, '.' ) == 3 && strpos( $ip, '[' ) === false ) {
+			// IPv4 with a port (eg: 11.22.33.44:80).
+			$ip = explode( ':', $ip );
+			$ip = $ip[0];
+		} else {
+			// IPv6 with a port (eg: [::1]:80).
+			$ip = explode( ']', $ip );
+			$ip = ltrim( $ip[0], '[' );
+		}
+		return $ip;
+	}
+
+	/**
+	 * Validate IP Address.
+	 *
+	 * @param string $ip – IP Address.
+	 * @return string
+	 */
+	protected function validate_ip( $ip ) {
+		$opts        = FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6;
+		$filtered_ip = filter_var( $ip, FILTER_VALIDATE_IP, $opts );
+		if ( ! $filtered_ip || empty( $filtered_ip ) ) {
+			// Regex IPV4.
+			if ( preg_match( '/^(([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([1-9]?[0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/', $ip ) ) {
+				return $ip;
+			} // Regex IPV6.
+			elseif ( preg_match( '/^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$/', $ip ) ) {
+				return $ip;
+			}
+			return false;
+		} else {
+			return $filtered_ip;
+		}
+	}
 }

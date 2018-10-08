@@ -47,6 +47,15 @@ final class AlertManager {
 	protected $loggers = array();
 
 	/**
+	 * Triggered Alerts
+	 *
+	 * Contains an array of alerts that have been triggered for this request.
+	 *
+	 * @var array
+	 */
+	protected $triggered_types = array();
+
+	/**
 	 * Constructor: AlertManager instance.
 	 *
 	 * @param Activity_Log $activity_log – Activity log instance.
@@ -133,7 +142,9 @@ final class AlertManager {
 			// Handle single item.
 			list($type, $code, $catg, $subcatg, $desc, $mesg) = $info;
 			if ( isset( $this->alerts[ $type ] ) ) {
-				throw new Exception( "Alert $type already registered with Alert Manager." );
+				add_action( 'admin_notices', array( $this, 'duplicate_event_notice' ) );
+				/* Translators: Event ID */
+				throw new Exception( sprintf( esc_html__( 'Event %s already registered with Activity Log MainWP Extension.', 'mwp-al-ext' ), $type ) );
 			}
 			$this->alerts[ $type ] = new Alert( $type, $code, $catg, $subcatg, $desc, $mesg );
 		} else {
@@ -145,11 +156,29 @@ final class AlertManager {
 	}
 
 	/**
+	 * Duplicate Event Notice
+	 *
+	 * WP admin notice for duplicate event.
+	 */
+	public function duplicate_event_notice() {
+		$class   = 'notice notice-error';
+		$message = __( 'You have custom events that are using the same ID or IDs which are already registered in the plugin, so they have been disabled.', 'mwp-al-ext' );
+		printf(
+			/* Translators: 1.CSS classes, 2. Notice, 3. Contact us link */
+			'<div class="%1$s"><p>%2$s %3$s ' . esc_html__( '%4$s to help you solve this issue.', 'mwp-al-ext' ) . '</p></div>',
+			esc_attr( $class ),
+			'<span style="color:#dc3232; font-weight:bold;">' . esc_html__( 'ERROR:', 'mwp-al-ext' ) . '</span>',
+			esc_html( $message ),
+			'<a href="https://www.wpsecurityauditlog.com/contact" target="_blank">' . esc_html__( 'Contact us', 'mwp-al-ext' ) . '</a>'
+		);
+	}
+
+	/**
 	 * Method: Returns an array of loaded loggers.
 	 *
 	 * @return AbstractLogger[]
 	 */
-	public function GetLoggers() {
+	public function get_loggers() {
 		return $this->loggers;
 	}
 
@@ -218,7 +247,7 @@ final class AlertManager {
 	 * @param bool $sorted – Sort the alerts array or not.
 	 * @return array
 	 */
-	public function GetCategorizedAlerts( $sorted = true ) {
+	public function get_categorized_alerts( $sorted = true ) {
 		$result = array();
 		foreach ( $this->alerts as $alert ) {
 			if ( ! isset( $result[ $alert->catg ] ) ) {
@@ -251,7 +280,7 @@ final class AlertManager {
 		if ( is_array( $events ) ) {
 			foreach ( $events as $event_id => $event ) {
 				// Get loggers.
-				$loggers = $this->GetLoggers();
+				$loggers = $this->get_loggers();
 
 				// Get meta data of event.
 				$meta_data = $event->meta_data;
@@ -267,6 +296,104 @@ final class AlertManager {
 					$logger->log( $event->alert_id, $meta_data, $event->created_on, $site_id );
 				}
 			}
+		}
+	}
+
+	/**
+	 * Trigger an event.
+	 *
+	 * @param integer $type - Event type.
+	 * @param array   $data - Event data.
+	 */
+	public function trigger( $type, $data = array() ) {
+		// Get username.
+		$username = wp_get_current_user()->user_login;
+		if ( empty( $username ) && ! empty( $data['Username'] ) ) {
+			$username = $data['Username'];
+		}
+
+		// Get current user roles.
+		$roles = $this->activity_log->settings->get_current_user_roles();
+		if ( empty( $roles ) && ! empty( $data['CurrentUserRoles'] ) ) {
+			$roles = $data['CurrentUserRoles'];
+		}
+
+		// Trigger event.
+		$this->commit_event( $type, $data, null );
+	}
+
+	/**
+	 * Method: Commit an alert now.
+	 *
+	 * @param int   $type  - Alert type.
+	 * @param array $data  - Data of the alert.
+	 * @param array $cond  - Condition for the alert.
+	 * @param bool  $retry - Retry.
+	 * @internal
+	 *
+	 * @throws Exception - Error if alert is not registered.
+	 */
+	protected function commit_event( $type, $data, $cond, $retry = true ) {
+		if ( ! $cond || ! ! call_user_func( $cond, $this ) ) {
+			if ( isset( $this->alerts[ $type ] ) ) {
+				// Ok, convert alert to a log entry.
+				$this->triggered_types[] = $type;
+				$this->log( $type, $data );
+			} elseif ( $retry ) {
+				// This is the last attempt at loading alerts from default file.
+				$this->activity_log->load_events();
+				return $this->commit_event( $type, $data, $cond, false );
+			} else {
+				// In general this shouldn't happen, but it could, so we handle it here.
+				/* translators: Event ID */
+				throw new Exception( sprintf( esc_html__( 'Event with code %d has not be registered.', 'mwp-al-ext' ), $type ) );
+			}
+		}
+	}
+
+	/**
+	 * Log Alert
+	 *
+	 * Converts an Alert into a Log entry (by invoking loggers).
+	 * You should not call this method directly.
+	 *
+	 * @param integer $type - Alert type.
+	 * @param array   $data - Misc alert data.
+	 */
+	protected function log( $type, $data = array() ) {
+		// Client IP.
+		if ( ! isset( $data['ClientIP'] ) ) {
+			$client_ip = $this->activity_log->settings->get_main_client_ip();
+			if ( ! empty( $client_ip ) ) {
+				$data['ClientIP'] = $client_ip;
+			}
+		}
+
+		// User agent.
+		if ( ! isset( $data['UserAgent'] ) ) {
+			if ( isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
+				$data['UserAgent'] = sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) );
+			}
+		}
+
+		// Username.
+		if ( ! isset( $data['Username'] ) && ! isset( $data['CurrentUserID'] ) ) {
+			if ( function_exists( 'get_current_user_id' ) ) {
+				$data['CurrentUserID'] = get_current_user_id();
+			}
+		}
+
+		// Current user roles.
+		if ( ! isset( $data['CurrentUserRoles'] ) && function_exists( 'is_user_logged_in' ) && is_user_logged_in() ) {
+			$current_user_roles = $this->activity_log->settings->get_current_user_roles();
+			if ( ! empty( $current_user_roles ) ) {
+				$data['CurrentUserRoles'] = $current_user_roles;
+			}
+		}
+
+		// Log event.
+		foreach ( $this->loggers as $logger ) {
+			$logger->log( $type, $data, null, 0 );
 		}
 	}
 }

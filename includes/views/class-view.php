@@ -10,7 +10,6 @@
 namespace WSAL\MainWPExtension\Views;
 
 use \WSAL\MainWPExtension\Activity_Log as Activity_Log;
-// use \WSAL\MainWPExtension\Event_Ref as Event_Ref;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {

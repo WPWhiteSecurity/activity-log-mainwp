@@ -39,7 +39,11 @@ function load_include_custom_file( $activity_log ) {
 		if ( file_exists( $file ) ) {
 			require_once $file;
 			if ( is_array( $custom_alerts ) ) {
-				$activity_log->alerts->RegisterGroup( $custom_alerts );
+				try {
+					$activity_log->alerts->RegisterGroup( $custom_alerts );
+				} catch ( Exception $ex ) {
+					$activity_log->log( $ex->getMessage() );
+				}
 			}
 		}
 	}
@@ -580,6 +584,25 @@ function mwpaldefaults_init( \WSAL\MainWPExtension\Activity_Log $activity_log ) 
 					array( 8823, E_WARNING, __( 'User set the option Date in Snippet Preview for Posts/Pages in the Yoast SEO plugin settings', 'mwp-al-ext' ), __( '%Status% the option Date in Snippet Preview for %SEOPostType% in the Yoast SEO plugin settings.', 'mwp-al-ext' ) ),
 					array( 8824, E_WARNING, __( 'User set the option Yoast SEO Meta Box for Posts/Pages in the Yoast SEO plugin settings', 'mwp-al-ext' ), __( '%Status% the option Yoast SEO Meta Box for %SEOPostType% in the Yoast SEO plugin settings.', 'mwp-al-ext' ) ),
 					array( 8825, E_WARNING, __( 'User Enabled/Disabled the advanced settings for authors in the Yoast SEO plugin settings', 'mwp-al-ext' ), __( '%Status% the advanced settings for authors in the Yoast SEO settings.', 'mwp-al-ext' ) ),
+				),
+
+				/**
+				 * Alerts: MainWP
+				 */
+				__( 'MainWP', 'mwp-al-ext' ) => array(
+					array( 7700, E_CRITICAL, __( 'User added the child site', 'mwp-al-ext' ), __( 'Added the child site %friendly_name%.', 'mwp-al-ext' ) ),
+					array( 7701, E_CRITICAL, __( 'User removed the child site', 'mwp-al-ext' ), __( 'Removed the child site %friendly_name%.', 'mwp-al-ext' ) ),
+					array( 7702, E_WARNING, __( 'User edited the child site', 'mwp-al-ext' ), __( 'Edited the child site %friendly_name%.', 'mwp-al-ext' ) ),
+					array( 7703, E_NOTICE, __( 'User synced data with the child site', 'mwp-al-ext' ), __( 'Synced data with the child site %friendly_name%.', 'mwp-al-ext' ) ),
+					array( 7704, E_NOTICE, __( 'User synced data with all the child sites', 'mwp-al-ext' ), __( 'Synced data with all the child sites.', 'mwp-al-ext' ) ),
+					array( 7705, E_CRITICAL, __( 'User installed the extension', 'mwp-al-ext' ), __( 'Installed the extension %extension_name%.', 'mwp-al-ext' ) ),
+					array( 7706, E_CRITICAL, __( 'User deactivated the extension', 'mwp-al-ext' ), __( 'Deactivated the extension %extension_name%.', 'mwp-al-ext' ) ),
+					array( 7707, E_NOTICE, __( 'User added/removed extension to/from the menu.', 'mwp-al-ext' ), __( 'Added/Removed extension to/from the menu.', 'mwp-al-ext' ) ),
+					array( 7750, E_NOTICE, __( 'User added a monitor for site', 'mwp-al-ext' ), __( 'Added a monitor for site %friendly_name%.', 'mwp-al-ext' ) ),
+					array( 7751, E_NOTICE, __( 'User deleted a monitor for site', 'mwp-al-ext' ), __( 'Deleted a monitor for site %friendly_name%.', 'mwp-al-ext' ) ),
+					array( 7752, E_NOTICE, __( 'User started the monitor for the site', 'mwp-al-ext' ), __( 'Started the monitor for the site %friendly_name%.', 'mwp-al-ext' ) ),
+					array( 7753, E_WARNING, __( 'User stopped the monitor for the site', 'mwp-al-ext' ), __( 'Stopped the monitor for the site %friendly_name%.', 'mwp-al-ext' ) ),
+					array( 7754, E_NOTICE, __( 'User created monitors for all child sites', 'mwp-al-ext' ), __( 'Created monitors for all child sites.', 'mwp-al-ext' ) ),
 				),
 			),
 		)

@@ -196,10 +196,12 @@ final class AuditLogListView extends \WP_List_Table {
 				$site_index = array_search( $site_id, array_column( $mwp_child_sites, 'id' ), true );
 
 				$html = '';
-				if ( isset( $mwp_child_sites[ $site_index ] ) ) {
+				if ( false !== $site_index && isset( $mwp_child_sites[ $site_index ] ) ) {
 					$html  = '<a href="' . esc_url( $mwp_child_sites[ $site_index ]['url'] ) . '" target="_blank">';
 					$html .= esc_html( $mwp_child_sites[ $site_index ]['name'] );
 					$html .= '</a>';
+				} else {
+					$html = __( 'MainWP Dashboard', 'mwp-al-ext' );
 				}
 				return $html;
 
@@ -257,7 +259,10 @@ final class AuditLogListView extends \WP_List_Table {
 					$roles = '';
 				} else {
 					$user_data = $item->get_user_data(); // Get user data.
-					$image     = get_avatar( $user_data->user_email, 32 ); // Avatar.
+					if ( empty( $user_data ) ) {
+						$user_data = get_user_by( 'login', $username );
+					}
+					$image = get_avatar( $user_data->user_email, 32 ); // Avatar.
 
 					// Checks for display name.
 					if ( 'display_name' === $type_username && ! empty( $user_data->display_name ) ) {
@@ -275,12 +280,15 @@ final class AuditLogListView extends \WP_List_Table {
 					$site_index = array_search( $site_id, array_column( $mwp_child_sites, 'id' ), true );
 					$site_url   = '#';
 
-					if ( isset( $mwp_child_sites[ $site_index ] ) ) {
+					if ( false !== $site_index && isset( $mwp_child_sites[ $site_index ] ) ) {
 						$site_url = $mwp_child_sites[ $site_index ]['url'];
+						$user_url = add_query_arg( 'user_id', $user_data->user_id, trailingslashit( $site_url ) . 'wp-admin/user-edit.php' );
+					} elseif ( empty( $user_data ) ) {
+						$user_url = add_query_arg( 'user_id', $user_data->ID, admin_url( 'user-edit.php' ) );
 					}
 
 					// User html.
-					$uhtml = '<a href="' . esc_url( add_query_arg( 'user_id', $user_data->user_id, $site_url . '/wp-admin/user-edit.php' ) ) . '" target="_blank">' . esc_html( $display_name ) . '</a>';
+					$uhtml = '<a href="' . esc_url( $user_url ) . '" target="_blank">' . esc_html( $display_name ) . '</a>';
 
 					$roles = $item->GetUserRoles();
 					if ( is_array( $roles ) && count( $roles ) ) {
