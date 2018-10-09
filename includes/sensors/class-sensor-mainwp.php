@@ -47,6 +47,7 @@ class Sensor_MainWP {
 		add_action( 'mainwp_delete_site', array( $this, 'site_removed' ), 10, 1 );
 		add_action( 'mainwp_update_site', array( $this, 'site_edited' ), 10, 1 );
 		add_action( 'mainwp-site-synced', array( $this, 'site_synced' ), 10, 1 );
+		add_action( 'mainwp_synced_all_sites', array( $this, 'synced_all_sites' ) );
 	}
 
 	/**
@@ -141,6 +142,14 @@ class Sensor_MainWP {
 			return;
 		}
 
+		// @codingStandardsIgnoreStart
+		$is_global_sync = isset( $_POST['isGlobalSync'] ) ? sanitize_text_field( wp_unslash( $_POST['isGlobalSync'] ) ) : false;
+		// @codingStandardsIgnoreEnd
+
+		if ( 'true' === $is_global_sync ) { // Check if not global sync.
+			return;
+		}
+
 		if ( isset( $website->name ) ) {
 			$this->activity_log->alerts->trigger( 7703, array(
 				'friendly_name' => $website->name,
@@ -149,5 +158,23 @@ class Sensor_MainWP {
 				'mainwp_dash'   => true,
 			) );
 		}
+	}
+
+	/**
+	 * MainWP Sites Synced
+	 *
+	 * Log event when MainWP sites are synced altogether.
+	 */
+	public function synced_all_sites() {
+		// @codingStandardsIgnoreStart
+		$is_global_sync = isset( $_POST['isGlobalSync'] ) ? sanitize_text_field( wp_unslash( $_POST['isGlobalSync'] ) ) : false;
+		// @codingStandardsIgnoreEnd
+
+		if ( 'true' !== $is_global_sync ) { // Check if global sync is false.
+			return;
+		}
+
+		// Trigger global sync event.
+		$this->activity_log->alerts->trigger( 7704, array( 'mainwp_dash' => true ) );
 	}
 }
