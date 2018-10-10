@@ -283,7 +283,7 @@ final class AuditLogListView extends \WP_List_Table {
 					if ( false !== $site_index && isset( $mwp_child_sites[ $site_index ] ) ) {
 						$site_url = $mwp_child_sites[ $site_index ]['url'];
 						$user_url = add_query_arg( 'user_id', $user_data->user_id, trailingslashit( $site_url ) . 'wp-admin/user-edit.php' );
-					} elseif ( empty( $user_data ) ) {
+					} else {
 						$user_url = add_query_arg( 'user_id', $user_data->ID, admin_url( 'user-edit.php' ) );
 					}
 

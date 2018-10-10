@@ -144,7 +144,7 @@ final class AlertManager {
 			if ( isset( $this->alerts[ $type ] ) ) {
 				add_action( 'admin_notices', array( $this, 'duplicate_event_notice' ) );
 				/* Translators: Event ID */
-				throw new Exception( sprintf( esc_html__( 'Event %s already registered with Activity Log MainWP Extension.', 'mwp-al-ext' ), $type ) );
+				throw new \Exception( sprintf( esc_html__( 'Event %s already registered with Activity Log MainWP Extension.', 'mwp-al-ext' ), $type ) );
 			}
 			$this->alerts[ $type ] = new Alert( $type, $code, $catg, $subcatg, $desc, $mesg );
 		} else {

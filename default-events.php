@@ -41,7 +41,7 @@ function load_include_custom_file( $activity_log ) {
 			if ( is_array( $custom_alerts ) ) {
 				try {
 					$activity_log->alerts->RegisterGroup( $custom_alerts );
-				} catch ( Exception $ex ) {
+				} catch ( \Exception $ex ) {
 					$activity_log->log( $ex->getMessage() );
 				}
 			}
@@ -596,8 +596,10 @@ function mwpaldefaults_init( \WSAL\MainWPExtension\Activity_Log $activity_log ) 
 					array( 7703, E_NOTICE, __( 'User synced data with the child site', 'mwp-al-ext' ), __( 'Synced data with the child site %friendly_name%.', 'mwp-al-ext' ) ),
 					array( 7704, E_NOTICE, __( 'User synced data with all the child sites', 'mwp-al-ext' ), __( 'Synced data with all the child sites.', 'mwp-al-ext' ) ),
 					array( 7705, E_CRITICAL, __( 'User installed the extension', 'mwp-al-ext' ), __( 'Installed the extension %extension_name%.', 'mwp-al-ext' ) ),
-					array( 7706, E_CRITICAL, __( 'User deactivated the extension', 'mwp-al-ext' ), __( 'Deactivated the extension %extension_name%.', 'mwp-al-ext' ) ),
-					array( 7707, E_NOTICE, __( 'User added/removed extension to/from the menu.', 'mwp-al-ext' ), __( '%action% %extension% %option% the menu.', 'mwp-al-ext' ) ),
+					array( 7706, E_CRITICAL, __( 'User activated the extension', 'mwp-al-ext' ), __( 'Activated the extension %extension_name%.', 'mwp-al-ext' ) ),
+					array( 7707, E_CRITICAL, __( 'User deactivated the extension', 'mwp-al-ext' ), __( 'Deactivated the extension %extension_name%.', 'mwp-al-ext' ) ),
+					array( 7708, E_CRITICAL, __( 'User uninstalled the extension', 'mwp-al-ext' ), __( 'Uninstalled the extension %extension_name%.', 'mwp-al-ext' ) ),
+					array( 7709, E_NOTICE, __( 'User added/removed extension to/from the menu.', 'mwp-al-ext' ), __( '%action% %extension% %option% the menu.', 'mwp-al-ext' ) ),
 					array( 7750, E_NOTICE, __( 'User added a monitor for site', 'mwp-al-ext' ), __( 'Added a monitor for site %friendly_name%.', 'mwp-al-ext' ) ),
 					array( 7751, E_NOTICE, __( 'User deleted a monitor for site', 'mwp-al-ext' ), __( 'Deleted a monitor for site %friendly_name%.', 'mwp-al-ext' ) ),
 					array( 7752, E_NOTICE, __( 'User started the monitor for the site', 'mwp-al-ext' ), __( 'Started the monitor for the site %friendly_name%.', 'mwp-al-ext' ) ),

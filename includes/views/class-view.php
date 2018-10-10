@@ -356,7 +356,6 @@ class View extends Abstract_View {
 		$this->mwp_child_sites  = $this->activity_log->settings->get_mwp_child_sites(); // Get MainWP child sites.
 		$this->wsal_child_sites = $this->activity_log->settings->get_wsal_child_sites(); // Get child sites with WSAL installed.
 		$this->query_child_site_events(); // Query events from child sites with WSAL.
-		$site_id = $this->activity_log->settings->get_view_site_id();
 
 		if ( $this->activity_log->is_child_enabled() ) {
 			$this->get_list_view()->prepare_items();
@@ -385,6 +384,7 @@ class View extends Abstract_View {
 	 * Tab: `Activity Log`
 	 */
 	public function tab_activity_log() {
+		$site_id = $this->activity_log->settings->get_view_site_id();
 		// @codingStandardsIgnoreStart
 		$mwp_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // Admin WSAL Page.
 		// @codingStandardsIgnoreEnd

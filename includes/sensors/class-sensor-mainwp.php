@@ -19,23 +19,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * MainWP Sensor Class.
  */
-class Sensor_MainWP {
+class Sensor_MainWP extends Abstract_Sensor {
 
 	/**
-	 * Instance of main plugin class.
+	 * List of Plugins.
 	 *
-	 * @var \WSAL\MainWPExtension\Activity_Log
+	 * @var array
 	 */
-	public $activity_log;
-
-	/**
-	 * Constructor.
-	 *
-	 * @param Activity_Log $activity_log – Instance of main class.
-	 */
-	public function __construct( Activity_Log $activity_log ) {
-		$this->activity_log = $activity_log;
-	}
+	protected $old_plugins = array();
 
 	/**
 	 * Hook Events
@@ -50,6 +41,21 @@ class Sensor_MainWP {
 		add_action( 'mainwp_synced_all_sites', array( $this, 'synced_all_sites' ) ); // All sites synced.
 		add_action( 'mainwp_added_extension_menu', array( $this, 'added_extension_menu' ), 10, 1 ); // Extension added to MainWP menu.
 		add_action( 'mainwp_removed_extension_menu', array( $this, 'removed_extension_menu' ), 10, 1 ); // Extension removed from MainWP menu.
+		add_action( 'activated_plugin', array( $this, 'mwp_extension_activated' ), 10, 2 );
+		add_action( 'deactivated_plugin', array( $this, 'mwp_extension_deactivated' ), 10, 2 );
+
+		$has_permission = ( current_user_can( 'install_plugins' ) || current_user_can( 'delete_plugins' ) || current_user_can( 'update_plugins' ) );
+		if ( $has_permission ) { // Check user permissions.
+			add_action( 'admin_init', array( $this, 'event_admin_init' ) );
+			add_action( 'shutdown', array( $this, 'admin_shutdown' ), 10 );
+		}
+	}
+
+	/**
+	 * Triggered when a user accesses the admin area.
+	 */
+	public function event_admin_init() {
+		$this->old_plugins = get_plugins();
 	}
 
 	/**
@@ -213,12 +219,139 @@ class Sensor_MainWP {
 	public function extension_menu_edited( $slug, $action ) {
 		// Check if the slug is not empty and it is active.
 		if ( ! empty( $slug ) && \is_plugin_active( $slug ) ) {
-			$this->activity_log->alerts->trigger( 7707, array(
+			$this->activity_log->alerts->trigger( 7709, array(
 				'mainwp_dash' => true,
 				'extension'   => $slug,
 				'action'      => $action,
 				'option'      => 'Added' === $action ? 'to' : 'from',
 			) );
+		}
+	}
+
+	/**
+	 * MainWP Extension Activated
+	 *
+	 * @param string $extension – Extension file path.
+	 */
+	public function mwp_extension_activated( $extension ) {
+		$this->extension_log_event( 7706, $extension );
+	}
+
+	/**
+	 * MainWP Extension Deactivated
+	 *
+	 * @param string $extension – Extension file path.
+	 */
+	public function mwp_extension_deactivated( $extension ) {
+		$this->extension_log_event( 7707, $extension );
+	}
+
+	/**
+	 * Add Extension Event
+	 *
+	 * @param string $event     – Event ID.
+	 * @param string $extension – Name of extension.
+	 */
+	private function extension_log_event( $event = 0, $extension ) {
+		$extension_dir = explode( '/', $extension );
+		$extension_dir = isset( $extension_dir[0] ) ? $extension_dir[0] : false;
+
+		if ( ! $extension_dir ) {
+			return;
+		}
+
+		// Get MainWP extensions data.
+		$mwp_extensions = \MainWP_Extensions_View::getAvailableExtensions();
+		$extension_ids  = array_keys( $mwp_extensions );
+		if ( ! in_array( $extension_dir, $extension_ids, true ) ) {
+			return;
+		}
+
+		if ( $event ) {
+			// Event data.
+			$event_data = array();
+
+			if ( 7708 === $event ) {
+				// Get extension data.
+				$plugin_file = trailingslashit( WP_PLUGIN_DIR ) . $extension;
+				$event_data  = array(
+					'mainwp_dash'    => true,
+					'extension_name' => isset( $mwp_extensions[ $extension_dir ]['title'] ) ? $mwp_extensions[ $extension_dir ]['title'] : false,
+					'PluginFile'     => $plugin_file,
+					'PluginData'     => (object) array(
+						'Name' => isset( $mwp_extensions[ $extension_dir ]['title'] ) ? $mwp_extensions[ $extension_dir ]['title'] : false,
+					),
+				);
+			} else {
+				// Get extension data.
+				$plugin_file = trailingslashit( WP_PLUGIN_DIR ) . $extension;
+				$plugin_data = get_plugin_data( $plugin_file );
+				$event_data  = array(
+					'mainwp_dash'    => true,
+					'extension_name' => isset( $mwp_extensions[ $extension_dir ]['title'] ) ? $mwp_extensions[ $extension_dir ]['title'] : false,
+					'Plugin'         => (object) array(
+						'Name'            => $plugin_data['Name'],
+						'PluginURI'       => $plugin_data['PluginURI'],
+						'Version'         => $plugin_data['Version'],
+						'Author'          => $plugin_data['Author'],
+						'Network'         => $plugin_data['Network'] ? 'True' : 'False',
+						'plugin_dir_path' => $plugin_file,
+					),
+				);
+			}
+
+			// Log the event.
+			$this->activity_log->alerts->trigger( $event, $event_data );
+		}
+	}
+
+	/**
+	 * Log Extension Install/Uninstall Events.
+	 */
+	public function admin_shutdown() {
+		// Get action from $_GET array.
+		// @codingStandardsIgnoreStart
+		$action      = isset( $_REQUEST['action'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) : false;
+		$plugin      = isset( $_POST['plugin'] ) ? sanitize_text_field( wp_unslash( $_POST['plugin'] ) ) : false;
+		$checked     = isset( $_POST['checked'] ) ? array_map( 'sanitize_text_field', $_POST['checked'] )  : false;
+		$script_name = isset( $_SERVER['SCRIPT_NAME'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SCRIPT_NAME'] ) ) : false;
+		// @codingStandardsIgnoreEnd
+
+		$actype = '';
+		if ( ! empty( $script_name ) ) {
+			$actype = basename( $script_name, '.php' );
+		}
+		$is_plugins = 'plugins' === $actype;
+
+		// Plugin actions.
+		$plugin_actions = array( 'install-plugin', 'upload-plugin', 'delete-selected', 'delete-plugin' );
+
+		// Install plugin.
+		if ( in_array( $action, $plugin_actions, true ) && current_user_can( 'install_plugins' ) ) {
+			$wp_plugins = get_plugins();
+			$plugin     = array_values( array_diff( array_keys( $wp_plugins ), array_keys( $this->old_plugins ) ) );
+			if ( count( $plugin ) !== 1 ) {
+				return $this->log_error(
+					'Expected exactly one new plugin but found ' . count( $plugin ),
+					array(
+						'NewPlugin'  => $plugin,
+						'OldPlugins' => $this->old_plugins,
+						'NewPlugins' => $wp_plugins,
+					)
+				);
+			}
+			$this->extension_log_event( 7705, $plugin[0] );
+		}
+
+		// Uninstall plugin.
+		if ( $is_plugins && in_array( $action, $plugin_actions, true ) && current_user_can( 'delete_plugins' ) ) {
+			if ( 'delete-plugin' === $action && ! empty( $plugin ) ) {
+				$this->extension_log_event( 7708, $plugin );
+			} elseif ( 'delete-selected' === $action && ! empty( $checked ) && is_array( $checked ) ) {
+				foreach ( $checked as $plugin ) {
+					$this->extension_log_event( 7708, $plugin );
+				}
+			}
 		}
 	}
 }
