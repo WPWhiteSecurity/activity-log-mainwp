@@ -43,11 +43,13 @@ class Sensor_MainWP {
 	 * Listening to events using hooks.
 	 */
 	public function hook_events() {
-		add_action( 'mainwp_added_new_site', array( $this, 'site_added' ), 10, 1 );
-		add_action( 'mainwp_delete_site', array( $this, 'site_removed' ), 10, 1 );
-		add_action( 'mainwp_update_site', array( $this, 'site_edited' ), 10, 1 );
-		add_action( 'mainwp-site-synced', array( $this, 'site_synced' ), 10, 1 );
-		add_action( 'mainwp_synced_all_sites', array( $this, 'synced_all_sites' ) );
+		add_action( 'mainwp_added_new_site', array( $this, 'site_added' ), 10, 1 ); // Site added.
+		add_action( 'mainwp_delete_site', array( $this, 'site_removed' ), 10, 1 ); // Site removed.
+		add_action( 'mainwp_update_site', array( $this, 'site_edited' ), 10, 1 ); // Site edited.
+		add_action( 'mainwp-site-synced', array( $this, 'site_synced' ), 10, 1 ); // Site synced.
+		add_action( 'mainwp_synced_all_sites', array( $this, 'synced_all_sites' ) ); // All sites synced.
+		add_action( 'mainwp_added_extension_menu', array( $this, 'added_extension_menu' ), 10, 1 ); // Extension added to MainWP menu.
+		add_action( 'mainwp_removed_extension_menu', array( $this, 'removed_extension_menu' ), 10, 1 ); // Extension removed from MainWP menu.
 	}
 
 	/**
@@ -176,5 +178,47 @@ class Sensor_MainWP {
 
 		// Trigger global sync event.
 		$this->activity_log->alerts->trigger( 7704, array( 'mainwp_dash' => true ) );
+	}
+
+	/**
+	 * MainWP Extension Added
+	 *
+	 * MainWP extension added to menu.
+	 *
+	 * @param string $slug – Extension slug.
+	 */
+	public function added_extension_menu( $slug ) {
+		$this->extension_menu_edited( $slug, 'Added' );
+	}
+
+	/**
+	 * MainWP Extension Removed
+	 *
+	 * MainWP extension removed from menu.
+	 *
+	 * @param string $slug – Extension slug.
+	 */
+	public function removed_extension_menu( $slug ) {
+		$this->extension_menu_edited( $slug, 'Removed' );
+	}
+
+	/**
+	 * MainWP Menu Edited
+	 *
+	 * Extension added/removed from MainWP menu.
+	 *
+	 * @param string $slug   – Slug of the extension.
+	 * @param string $action – Added or Removed action.
+	 */
+	public function extension_menu_edited( $slug, $action ) {
+		// Check if the slug is not empty and it is active.
+		if ( ! empty( $slug ) && \is_plugin_active( $slug ) ) {
+			$this->activity_log->alerts->trigger( 7707, array(
+				'mainwp_dash' => true,
+				'extension'   => $slug,
+				'action'      => $action,
+				'option'      => 'Added' === $action ? 'to' : 'from',
+			) );
+		}
 	}
 }

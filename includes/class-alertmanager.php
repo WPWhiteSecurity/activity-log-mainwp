@@ -310,6 +310,8 @@ final class AlertManager {
 		$username = wp_get_current_user()->user_login;
 		if ( empty( $username ) && ! empty( $data['Username'] ) ) {
 			$username = $data['Username'];
+		} else {
+			$username = 'System';
 		}
 
 		// Get current user roles.
