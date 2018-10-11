@@ -323,11 +323,8 @@ class Sensor_MainWP extends Abstract_Sensor {
 		}
 		$is_plugins = 'plugins' === $actype;
 
-		// Plugin actions.
-		$plugin_actions = array( 'install-plugin', 'upload-plugin', 'delete-selected', 'delete-plugin' );
-
 		// Install plugin.
-		if ( in_array( $action, $plugin_actions, true ) && current_user_can( 'install_plugins' ) ) {
+		if ( in_array( $action, array( 'install-plugin', 'upload-plugin' ), true ) && current_user_can( 'install_plugins' ) ) {
 			$wp_plugins = get_plugins();
 			$plugin     = array_values( array_diff( array_keys( $wp_plugins ), array_keys( $this->old_plugins ) ) );
 			if ( count( $plugin ) !== 1 ) {
@@ -344,10 +341,10 @@ class Sensor_MainWP extends Abstract_Sensor {
 		}
 
 		// Uninstall plugin.
-		if ( $is_plugins && in_array( $action, $plugin_actions, true ) && current_user_can( 'delete_plugins' ) ) {
+		if ( in_array( $action, array( 'delete-selected', 'delete-plugin' ), true ) && current_user_can( 'delete_plugins' ) ) {
 			if ( 'delete-plugin' === $action && ! empty( $plugin ) ) {
 				$this->extension_log_event( 7708, $plugin );
-			} elseif ( 'delete-selected' === $action && ! empty( $checked ) && is_array( $checked ) ) {
+			} elseif ( $is_plugins && 'delete-selected' === $action && ! empty( $checked ) && is_array( $checked ) ) {
 				foreach ( $checked as $plugin ) {
 					$this->extension_log_event( 7708, $plugin );
 				}

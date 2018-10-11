@@ -135,7 +135,7 @@ final class AlertManager {
 	 * Register an alert type.
 	 *
 	 * @param array $info - Array of [type, code, category, description, message] respectively.
-	 * @throws Exception - Error if alert is already registered.
+	 * @throws \Exception - Error if alert is already registered.
 	 */
 	public function Register( $info ) {
 		if ( 1 === func_num_args() ) {

@@ -237,8 +237,11 @@ final class AuditLogListView extends \WP_List_Table {
 				) : '<i>' . __( 'Unknown', 'mwp-al-ext' ) . '</i>';
 
 			case 'user':
-				// Get username.
-				$username = $item->GetUsername();
+				$username  = $item->GetUsername(); // Get username.
+				$user_data = $item->get_user_data(); // Get user data.
+				if ( empty( $user_data ) ) {
+					$user_data = get_user_by( 'login', $username );
+				}
 
 				// Check if the usernames exists & matches pre-defined cases.
 				if ( 'Plugin' === $username ) {
@@ -257,11 +260,7 @@ final class AuditLogListView extends \WP_List_Table {
 					$image = '<span class="dashicons dashicons-wordpress wsal-system-icon"></span>';
 					$uhtml = '<i>' . __( 'System', 'mwp-al-ext' ) . '</i>';
 					$roles = '';
-				} else {
-					$user_data = $item->get_user_data(); // Get user data.
-					if ( empty( $user_data ) ) {
-						$user_data = get_user_by( 'login', $username );
-					}
+				} elseif ( $username && $user_data ) {
 					$image = get_avatar( $user_data->user_email, 32 ); // Avatar.
 
 					// Checks for display name.
@@ -298,6 +297,10 @@ final class AuditLogListView extends \WP_List_Table {
 					} else {
 						$roles = '<i>' . __( 'Unknown', 'mwp-al-ext' ) . '</i>';
 					}
+				} else {
+					$image = '<span class="dashicons dashicons-wordpress wsal-system-icon"></span>';
+					$uhtml = '<i>' . __( 'System', 'mwp-al-ext' ) . '</i>';
+					$roles = '';
 				}
 				return $image . $uhtml . '<br/>' . $roles;
 
