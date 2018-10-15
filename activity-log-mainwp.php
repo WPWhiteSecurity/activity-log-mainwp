@@ -249,7 +249,8 @@ class Activity_Log {
 
 		// Plugin Extension Name.
 		if ( ! defined( 'MWPAL_EXTENSION_NAME' ) ) {
-			$filename = basename( __FILE__, '.php' );
+			$filename = str_replace( trailingslashit( WP_PLUGIN_DIR ), '', MWPAL_BASE_DIR );
+			$filename = untrailingslashit( $filename );
 			$filename = str_replace( '-', ' ', $filename );
 			$filename = ucwords( $filename );
 			$filename = str_replace( ' ', '-', $filename );

@@ -173,7 +173,7 @@ class View extends Abstract_View {
 	public function activitylog_settings_tab( $current_page ) {
 		$activity_log = basename( $current_page, '.php' );
 
-		if ( 'mainwp-activity-log-extension' !== $activity_log ) {
+		if ( 'activity-log-mainwp' !== $activity_log ) {
 			return;
 		}
 
