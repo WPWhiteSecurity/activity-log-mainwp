@@ -697,8 +697,8 @@ class View extends Abstract_View {
 			unset( $event_meta['ReportText'] );
 
 			// Set Event_Ref class scripts and styles.
-			\Event_Ref::config( 'stylePath', esc_url( trailingslashit( MWPAL_BASE_URL ) ) . 'assets/css/dist/wsal-ref.css' );
-			\Event_Ref::config( 'scriptPath', esc_url( trailingslashit( MWPAL_BASE_URL ) ) . 'assets/js/dist/wsal-ref.js' );
+			\Event_Ref::config( 'stylePath', trailingslashit( MWPAL_BASE_DIR ) . 'assets/css/dist/wsal-ref.css' );
+			\Event_Ref::config( 'scriptPath', trailingslashit( MWPAL_BASE_DIR ) . 'assets/js/dist/wsal-ref.js' );
 
 			echo '<!DOCTYPE html><html><head>';
 			echo '<style type="text/css">';
