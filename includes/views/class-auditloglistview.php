@@ -145,19 +145,20 @@ final class AuditLogListView extends \WP_List_Table {
 		if ( 'top' === $which ) :
 			// Get child sites with WSAL installed.
 			$wsal_child_sites = $this->activity_log->settings->get_wsal_child_sites();
-			if ( count( $wsal_child_sites ) > 1 ) :
+			if ( count( $wsal_child_sites ) > 0 ) :
 				$current_site = $this->activity_log->settings->get_view_site_id();
 				?>
 				<div class="mwp-ssa mwp-ssa-<?php echo esc_attr( $which ); ?>">
 					<select class="mwp-ssas">
 						<option value="0"><?php esc_html_e( 'All Sites', 'mwp-al-ext' ); ?></option>
+						<option value="dashboard" <?php selected( $current_site, 'dashboard' ); ?>><?php esc_html_e( 'MainWP Dashboard', 'mwp-al-ext' ); ?></option>
 						<?php
 						foreach ( $wsal_child_sites as $site_id => $site_data ) :
 							$key = array_search( $site_id, array_column( $this->mwp_child_sites, 'id' ), false );
 							if ( false !== $key ) :
 								?>
 								<option value="<?php echo esc_attr( $this->mwp_child_sites[ $key ]['id'] ); ?>"
-									<?php echo ( $current_site === (int) $this->mwp_child_sites[ $key ]['id'] ) ? 'selected="selected"' : false; ?>>
+									<?php selected( (int) $this->mwp_child_sites[ $key ]['id'], $current_site ); ?>>
 									<?php echo esc_html( $this->mwp_child_sites[ $key ]['name'] ) . ' (' . esc_html( $this->mwp_child_sites[ $key ]['url'] ) . ')'; ?>
 								</option>
 							<?php
@@ -467,9 +468,11 @@ final class AuditLogListView extends \WP_List_Table {
 		$events_query = new \WSAL\MainWPExtension\Models\OccurrenceQuery();
 
 		// Get site id for specific site events.
-		$bid = (int) $this->activity_log->settings->get_view_site_id();
-		if ( $bid ) {
+		$bid = $this->activity_log->settings->get_view_site_id();
+		if ( $bid && 'dashboard' !== $bid ) {
 			$events_query->addCondition( 'site_id = %s ', $bid );
+		} elseif ( 'dashboard' === $bid ) {
+			$events_query->addCondition( 'site_id = %s ', '0' );
 		}
 
 		/**

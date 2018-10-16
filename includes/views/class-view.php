@@ -303,7 +303,12 @@ class View extends Abstract_View {
 			check_admin_referer( 'bulk-activity-logs' );
 
 			// Site id.
-			$site_id = isset( $_GET['mwpal-site-id'] ) ? (int) sanitize_text_field( wp_unslash( $_GET['mwpal-site-id'] ) ) : false;
+			$site_id = isset( $_GET['mwpal-site-id'] ) ? sanitize_text_field( wp_unslash( $_GET['mwpal-site-id'] ) ) : false;
+
+			// Check for dashboard.
+			if ( 'dashboard' !== $site_id ) {
+				$site_id = (int) $site_id;
+			}
 
 			// Remove args array.
 			$remove_args = array(

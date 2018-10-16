@@ -152,8 +152,13 @@ class Settings {
 	 */
 	public function get_view_site_id() {
 		// @codingStandardsIgnoreStart
-		return isset( $_GET['mwpal-site-id'] ) ? (int) sanitize_text_field( $_GET['mwpal-site-id'] ) : 0; // Site ID.
+		$site_id = isset( $_GET['mwpal-site-id'] ) ? sanitize_text_field( $_GET['mwpal-site-id'] ) : 0; // Site ID.
 		// @codingStandardsIgnoreEnd
+
+		if ( 'dashboard' !== $site_id ) {
+			return (int) $site_id;
+		}
+		return $site_id;
 	}
 
 	/**
