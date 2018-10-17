@@ -12,6 +12,11 @@ const extensionCSSPlugin = new ExtractTextPlugin({
 	filename: '../../css/dist/styles.build.css'
 });
 
+// Extract mwpal-setup-wizard.css for styles.
+const setupWizardCSSPlugin = new ExtractTextPlugin({
+	filename: '../../css/dist/mwpal-setup-wizard.build.css'
+});
+
 // Configuration for the ExtractTextPlugin — DRY rule.
 const extractConfig = {
 	use: [
@@ -62,7 +67,8 @@ let config = {
 	 * it as an index to the following array.
 	 */
 	entry: {
-		'index': './assets/js/src/index.js'
+		'index': './assets/js/src/index.js',
+		'wizard': './assets/js/src/mwpal-setup-wizard.js'
 	},
 
 	// Output object.
@@ -91,17 +97,24 @@ let config = {
 				}
 			},
 
-			// Wizard CSS test rule.
+			// Extension CSS test rule.
 			{
 				test: /styles\.s?css$/,
 				exclude: /(node_modules|bower_components)/,
 				use: extensionCSSPlugin.extract( extractConfig )
+			},
+
+			// Setup Wizard CSS test rule.
+			{
+				test: /mwpal-setup-wizard\.s?css$/,
+				exclude: /(node_modules|bower_components)/,
+				use: setupWizardCSSPlugin.extract( extractConfig )
 			}
 		]
 	},
 
 	// Add plugins.
-	plugins: [ extensionCSSPlugin ]
+	plugins: [ extensionCSSPlugin, setupWizardCSSPlugin ]
 };
 
 // Export config.

@@ -306,6 +306,7 @@ class Settings {
 					unset( $wsal_sites[ $id ] );
 				} elseif ( isset( $disabled_sites[ $id ] ) ) {
 					$new_sites[ $id ] = $disabled_sites[ $id ];
+					unset( $disabled_sites[ $id ] );
 				} else {
 					$new_sites[ $id ] = new \stdClass();
 				}
@@ -319,18 +320,12 @@ class Settings {
 				$delete_query = new \WSAL\MainWPExtension\Models\OccurrenceQuery();
 				$delete_query->addCondition( 'site_id = %s ', $site_id );
 				$delete_query->getAdapter()->Delete( $delete_query );
-			}
-		}
-
-		// Update disabled sites.
-		if ( ! empty( $wsal_sites ) ) {
-			foreach ( $wsal_sites as $site_id => $site ) {
 				$disabled_sites[ $site_id ] = $site;
 			}
 		}
 
 		$this->update_option( 'wsal-child-sites', $new_sites );
-		$this->update_option( 'disabled-wsal-sites', $wsal_sites );
+		$this->update_option( 'disabled-wsal-sites', $disabled_sites );
 	}
 
 	/**

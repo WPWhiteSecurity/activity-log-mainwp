@@ -181,6 +181,10 @@ class Activity_Log {
 		}
 		add_action( 'admin_init', array( &$this, 'redirect_to_extensions' ) );
 		add_action( 'admin_notices', array( &$this, 'mainwp_error_notice' ) );
+
+		if ( false === $this->settings->get_option( 'setup-complete' ) ) {
+			new \WSAL\MainWPExtension\Views\Setup_Wizard( $this );
+		}
 	}
 
 	/**
@@ -276,7 +280,7 @@ class Activity_Log {
 	public function redirect_to_extensions() {
 		if ( 'yes' === $this->settings->is_extension_activated() ) {
 			$this->settings->delete_option( 'activity-extension-activated' );
-			wp_safe_redirect( add_query_arg( 'page', 'Extensions', admin_url( 'admin.php' ) ) );
+			wp_safe_redirect( add_query_arg( 'page', 'activity-log-mainwp-setup', admin_url( 'index.php' ) ) );
 			return;
 		}
 	}

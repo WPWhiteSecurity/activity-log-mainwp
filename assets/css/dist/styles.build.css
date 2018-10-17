@@ -146,7 +146,9 @@ td.column-user {
   height: 250px;
   border: 1px solid #dddddd;
   padding: 5px;
-  margin-top: 5px; }
+  margin-top: 5px;
+  background: #fff;
+  overflow-y: scroll; }
   .sites-container span {
     display: block;
     margin-bottom: 2px; }

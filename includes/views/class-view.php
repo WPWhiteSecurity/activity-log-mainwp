@@ -817,7 +817,7 @@ class View extends Abstract_View {
 			// Get $_POST data.
 			$transfer_action = isset( $_POST['transferAction'] ) ? sanitize_text_field( wp_unslash( $_POST['transferAction'] ) ) : false;
 			$active_sites    = isset( $_POST['activeSites'] ) ? sanitize_text_field( wp_unslash( $_POST['activeSites'] ) ) : false;
-			$active_sites    = explode( ',', $active_sites );
+			$active_sites    = ! empty( $active_sites ) ? explode( ',', $active_sites ) : array();
 			$request_sites   = isset( $_POST['requestSites'] ) ? sanitize_text_field( wp_unslash( $_POST['requestSites'] ) ) : false;
 			$request_sites   = explode( ',', $request_sites );
 
