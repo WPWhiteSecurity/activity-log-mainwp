@@ -157,6 +157,22 @@ jQuery(document).ready(function () {
 	});
 
 	/**
+  * Retrive Logs Manually
+  */
+	jQuery('#mwpal-wsal-manual-retrieve').click(function () {
+		var retrieveBtn = jQuery(this);
+		retrieveBtn.attr('disabled', true);
+		retrieveBtn.val(scriptData.retrieving);
+
+		jQuery.post(scriptData.ajaxURL, {
+			action: 'retrieve_events_manually',
+			nonce: scriptData.scriptNonce
+		}, function () {
+			location.reload();
+		});
+	});
+
+	/**
   * Add Sites to Active Activity Log.
   */
 	jQuery('#mwpal-wcs-add-btn').click(function (e) {

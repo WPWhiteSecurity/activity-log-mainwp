@@ -73,6 +73,7 @@ class View extends Abstract_View {
 		add_action( 'wp_ajax_metadata_inspector', array( $this, 'metadata_inspector' ) );
 		add_action( 'wp_ajax_refresh_child_sites', array( $this, 'refresh_child_sites' ) );
 		add_action( 'wp_ajax_update_active_wsal_sites', array( $this, 'update_active_wsal_sites' ) );
+		add_action( 'wp_ajax_retrieve_events_manually', array( $this, 'retrieve_events_manually' ) );
 
 		// Extension view URL.
 		$extension_url = add_query_arg( 'page', MWPAL_EXTENSION_NAME, admin_url( 'admin.php' ) );
@@ -277,6 +278,7 @@ class View extends Abstract_View {
 			'currentTab'  => $this->current_tab,
 			'selectSites' => __( 'Select Child Site(s)', 'mwp-al-ext' ),
 			'refreshing'  => __( 'Refreshing Child Sites...', 'mwp-al-ext' ),
+			'retrieving'  => __( 'Retrieving Logs...', 'mwp-al-ext' ),
 		);
 		wp_localize_script( 'mwpal-view-script', 'scriptData', $script_data );
 		wp_enqueue_script( 'mwpal-view-script' );
@@ -465,7 +467,7 @@ class View extends Abstract_View {
 									<!-- Alerts Timestamp -->
 
 									<tr>
-										<th scope="row"><label for="column_username"><?php esc_html_e( 'User Information in Audit Log', 'mwp-al-ext' ); ?></label></th>
+										<th scope="row"><label for="column_username"><?php esc_html_e( 'Display this user information in activity log', 'mwp-al-ext' ); ?></label></th>
 										<td>
 											<fieldset>
 												<?php $type_username = $this->activity_log->settings->get_type_username(); ?>
@@ -524,7 +526,8 @@ class View extends Abstract_View {
 					<!-- Activity Log Settings -->
 
 					<div id="mwpal-setting-contentbox-2" class="postbox">
-						<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'Extension Settings', 'mwp-al-ext' ); ?></span></h2>
+						<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'Activity Log Retrieval Settings', 'mwp-al-ext' ); ?></span></h2>
+						<div class="mainwp-postbox-actions-top"><p class="description"><?php esc_html_e( 'The Activity Log for MainWP extension retrieves events directly from the child sites\' activity logs. Use the below settings to specify how many events the extension should retrieve and store from a child site, and how often it should do it.', 'mwp-al-ext' ); ?></p></div>
 						<div class="inside">
 							<table class="form-table">
 								<tbody>
@@ -545,6 +548,7 @@ class View extends Abstract_View {
 												<?php $events_frequency = $this->activity_log->settings->get_events_frequency(); ?>
 												<input type="number" id="events-frequency" name="events-frequency" value="<?php echo esc_attr( $events_frequency ); ?>" />
 												<?php esc_html_e( 'hours', 'mwp-al-ext' ); ?>
+												<p><input type="button" class="button-primary" id="mwpal-wsal-manual-retrieve" value="<?php esc_html_e( 'Retrieve Activity Logs Now', 'mwp-al-ext' ); ?>" /></p>
 											</fieldset>
 										</td>
 									</tr>
@@ -552,10 +556,10 @@ class View extends Abstract_View {
 							</table>
 						</div>
 					</div>
-					<!-- Extension Settings -->
+					<!-- Activity Log Retrieval Settings -->
 
 					<div id="mwpal-setting-contentbox-3" class="postbox">
-						<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'Child Sites Settings', 'mwp-al-ext' ); ?></span></h2>
+						<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'List of Child Sites in the Activity Log for MainWP', 'mwp-al-ext' ); ?></span></h2>
 						<div class="inside">
 							<table class="form-table">
 								<tbody>
@@ -615,6 +619,7 @@ class View extends Abstract_View {
 							</table>
 						</div>
 					</div>
+					<!-- List of Child Sites in the Activity Log for MainWP -->
 				</div>
 				<p class="submit">
 					<input type="submit" name="submit" id="submit" class="button-primary button button-hero" value="<?php esc_attr_e( 'Save Settings', 'mwp-al-ext' ); ?>">
@@ -830,5 +835,33 @@ class View extends Abstract_View {
 			) );
 		}
 		exit();
+	}
+
+	/**
+	 * Retrieve Events Manually.
+	 *
+	 * To retrieve fresh logs, just delete the events of
+	 * the site and refresh the page.
+	 */
+	public function retrieve_events_manually() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			die( esc_html__( 'Access denied.', 'mwp-al-ext' ) );
+		}
+
+		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'mwp-activitylog-nonce' ) ) {
+			// Get MainWP sites.
+			$mwp_sites = $this->activity_log->settings->get_wsal_child_sites();
+
+			if ( ! empty( $mwp_sites ) ) {
+				foreach ( $mwp_sites as $site_id => $site ) {
+					// Delete events by site id.
+					$delete_query = new \WSAL\MainWPExtension\Models\OccurrenceQuery();
+					$delete_query->addCondition( 'site_id = %s ', $site_id );
+					$delete_query->getAdapter()->Delete( $delete_query );
+				}
+			}
+			die();
+		}
+		die( esc_html__( 'Nonce verification failed.', 'mwp-al-ext' ) );
 	}
 }

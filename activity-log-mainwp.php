@@ -387,10 +387,10 @@ class Activity_Log {
 	 */
 	public function events_cleanup() {
 		// Get MainWP sites.
-		$mwp_sites = $this->settings->get_mwp_child_sites();
+		$mwp_sites = $this->settings->get_wsal_child_sites();
 
-		foreach ( $mwp_sites as $site ) {
-			$event = $this->get_latest_event_by_siteid( $site['id'] );
+		foreach ( $mwp_sites as $site_id => $site ) {
+			$event = $this->get_latest_event_by_siteid( $site_id );
 
 			if ( $event ) {
 				$hrs_diff = $this->settings->get_hours_since_last_alert( $event->created_on );
@@ -398,7 +398,7 @@ class Activity_Log {
 				// If the hours difference is more than the selected frequency.
 				if ( $hrs_diff > $this->settings->get_events_frequency() ) {
 					// Get latest event from child site.
-					$live_event = $this->get_live_event_by_siteid( $site['id'] );
+					$live_event = $this->get_live_event_by_siteid( $site_id );
 
 					// If the latest event on the dashboard matches the timestamp of the latest event on child site, then skip.
 					if ( $live_event && $event->created_on === $live_event->created_on ) {
@@ -407,7 +407,7 @@ class Activity_Log {
 
 					// Delete events by site id.
 					$delete_query = new \WSAL\MainWPExtension\Models\OccurrenceQuery();
-					$delete_query->addCondition( 'site_id = %s ', $site['id'] );
+					$delete_query->addCondition( 'site_id = %s ', $site_id );
 					$delete_query->getAdapter()->Delete( $delete_query );
 				}
 			}
