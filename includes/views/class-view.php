@@ -72,6 +72,7 @@ class View extends Abstract_View {
 		add_action( 'wp_ajax_set_per_page_events', array( $this, 'set_per_page_events' ) );
 		add_action( 'wp_ajax_metadata_inspector', array( $this, 'metadata_inspector' ) );
 		add_action( 'wp_ajax_refresh_child_sites', array( $this, 'refresh_child_sites' ) );
+		add_action( 'wp_ajax_update_active_wsal_sites', array( $this, 'update_active_wsal_sites' ) );
 
 		// Extension view URL.
 		$extension_url = add_query_arg( 'page', MWPAL_EXTENSION_NAME, admin_url( 'admin.php' ) );
@@ -275,6 +276,7 @@ class View extends Abstract_View {
 			'scriptNonce' => wp_create_nonce( 'mwp-activitylog-nonce' ),
 			'currentTab'  => $this->current_tab,
 			'selectSites' => __( 'Select Child Site(s)', 'mwp-al-ext' ),
+			'refreshing'  => __( 'Refreshing Child Sites...', 'mwp-al-ext' ),
 		);
 		wp_localize_script( 'mwpal-view-script', 'scriptData', $script_data );
 		wp_enqueue_script( 'mwpal-view-script' );
@@ -332,7 +334,7 @@ class View extends Abstract_View {
 			$events_frequency  = isset( $_POST['events-frequency'] ) ? (int) sanitize_text_field( wp_unslash( $_POST['events-frequency'] ) ) : false;
 			// @codingStandardsIgnoreStart
 			$columns          = isset( $_POST['columns'] ) ? array_map( 'sanitize_text_field', $_POST['columns'] ) : false;
-			$wsal_child_sites = isset( $_POST['mwpal-wsal-child-sites'] ) ? array_map( 'sanitize_text_field', $_POST['mwpal-wsal-child-sites'] ) : false;
+			$wsal_child_sites = isset( $_POST['mwpal-wsal-child-sites'] ) ? sanitize_text_field( wp_unslash( $_POST['mwpal-wsal-child-sites'] ) ) : false;
 			// @codingStandardsIgnoreEnd
 
 			$this->activity_log->settings->set_timezone( $timezone );
@@ -340,7 +342,7 @@ class View extends Abstract_View {
 			$this->activity_log->settings->set_child_site_events( $child_site_events );
 			$this->activity_log->settings->set_events_frequency( $events_frequency );
 			$this->activity_log->settings->set_columns( $columns );
-			$this->activity_log->settings->set_wsal_child_sites( $wsal_child_sites );
+			$this->activity_log->settings->set_wsal_child_sites( ! empty( $wsal_child_sites ) ? explode( ',', $wsal_child_sites ) : false );
 		}
 	}
 
@@ -560,15 +562,52 @@ class View extends Abstract_View {
 									<tr>
 										<th scope="row"><label for="child-site-events"><?php esc_html_e( 'Active WSAL Child Sites', 'mwp-al-ext' ); ?></label></th>
 										<td>
-											<select name="mwpal-wsal-child-sites[]" id="mwpal-wsal-child-sites" multiple="multiple">
-												<?php foreach ( $this->mwp_child_sites as $site ) : ?>
-													<option value="<?php echo esc_attr( $site['id'] ); ?>" <?php echo isset( $this->wsal_child_sites[ $site['id'] ] ) ? 'selected' : false; ?>>
-														<?php echo esc_html( $site['name'] ); ?>
-													</option>
-												<?php endforeach; ?>
-											</select>
-											<br />
-											<br />
+											<div class="mwpal-wcs-container">
+												<div id="mwpal-wcs">
+													<p><?php esc_html_e( 'Sites on MainWP', 'mwp-al-ext' ); ?></p>
+													<div class="sites-container">
+														<?php
+														$disabled_sites = $this->activity_log->settings->get_option( 'disabled-wsal-sites', array() );
+														foreach ( $this->mwp_child_sites as $site ) :
+															if ( isset( $disabled_sites[ $site['id'] ] ) ) :
+																?>
+																<span>
+																	<input id="mwpal-wcs-site-<?php echo esc_attr( $site['id'] ); ?>" name="mwpal-wcs[]" value="<?php echo esc_attr( $site['id'] ); ?>" type="checkbox">
+																	<label for="mwpal-wcs-site-<?php echo esc_attr( $site['id'] ); ?>"><?php echo esc_html( $site['name'] ); ?></label>
+																</span>
+																<?php
+															endif;
+														endforeach;
+														?>
+													</div>
+												</div>
+												<div id="mwpal-wcs-btns">
+													<a href="javascript:;" class="button-primary" id="mwpal-wcs-add-btn"><?php esc_html_e( 'Add to Activity Log', 'mwp-al-ext' ); ?> <span class="dashicons dashicons-arrow-right-alt2"></span></a>
+													<br>
+													<a href="javascript:;" class="button-secondary" id="mwpal-wcs-remove-btn"><span class="dashicons dashicons-arrow-left-alt2"></span> <?php esc_html_e( 'Remove', 'mwp-al-ext' ); ?></a>
+												</div>
+												<div id="mwpal-wcs-al">
+													<p><?php esc_html_e( 'Sites in the Activity Log', 'mwp-al-ext' ); ?></p>
+													<div class="sites-container">
+														<?php
+														$selected_sites = array();
+														foreach ( $this->mwp_child_sites as $site ) :
+															if ( isset( $this->wsal_child_sites[ $site['id'] ] ) ) :
+																$selected_sites[] = $site['id'];
+																?>
+																<span>
+																	<input id="mwpal-wcs-al-site-<?php echo esc_attr( $site['id'] ); ?>" name="mwpal-wcs-al[]" value="<?php echo esc_attr( $site['id'] ); ?>" type="checkbox">
+																	<label for="mwpal-wcs-al-site-<?php echo esc_attr( $site['id'] ); ?>"><?php echo esc_html( $site['name'] ); ?></label>
+																</span>
+																<?php
+															endif;
+														endforeach;
+														$selected_sites = is_array( $selected_sites ) ? implode( ',', $selected_sites ) : false;
+														?>
+													</div>
+													<input type="hidden" id="mwpal-wsal-child-sites" name="mwpal-wsal-child-sites" value="<?php echo esc_attr( $selected_sites ); ?>">
+												</div>
+											</div>
 											<input type="button" class="button-primary" id="mwpal-wsal-sites-refresh" value="<?php esc_html_e( 'Refresh Child Sites', 'mwp-al-ext' ); ?>" />
 										</td>
 									</tr>
@@ -727,9 +766,69 @@ class View extends Abstract_View {
 
 		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'mwp-activitylog-nonce' ) ) {
 			$this->activity_log->settings->delete_option( 'wsal-child-sites' );
+			$this->activity_log->settings->delete_option( 'disabled-wsal-sites' );
 			$this->activity_log->settings->get_wsal_child_sites();
 			die();
 		}
 		die( esc_html__( 'Nonce verification failed.', 'mwp-al-ext' ) );
+	}
+
+	/**
+	 * Update Active WSAL Sites.
+	 */
+	public function update_active_wsal_sites() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			echo wp_json_encode( array(
+				'success' => false,
+				'message' => esc_html__( 'Access denied.', 'mwp-al-ext' ),
+			) );
+			exit();
+		}
+
+		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'mwp-activitylog-nonce' ) ) {
+			// Get $_POST data.
+			$transfer_action = isset( $_POST['transferAction'] ) ? sanitize_text_field( wp_unslash( $_POST['transferAction'] ) ) : false;
+			$active_sites    = isset( $_POST['activeSites'] ) ? sanitize_text_field( wp_unslash( $_POST['activeSites'] ) ) : false;
+			$active_sites    = explode( ',', $active_sites );
+			$request_sites   = isset( $_POST['requestSites'] ) ? sanitize_text_field( wp_unslash( $_POST['requestSites'] ) ) : false;
+			$request_sites   = explode( ',', $request_sites );
+
+			if ( 'remove-sites' === $transfer_action && ! empty( $request_sites ) ) {
+				foreach ( $request_sites as $site ) {
+					$key = array_search( $site, $active_sites, true );
+					if ( false !== $key ) {
+						unset( $active_sites[ $key ] );
+					}
+				}
+
+				echo wp_json_encode( array(
+					'success'     => true,
+					'activeSites' => implode( ',', $active_sites ),
+				) );
+			} elseif ( 'add-sites' === $transfer_action && ! empty( $request_sites ) ) {
+				foreach ( $request_sites as $site ) {
+					$key = array_search( $site, $active_sites, true );
+					if ( false === $key ) {
+						$active_sites[] = $site;
+					}
+				}
+
+				echo wp_json_encode( array(
+					'success'     => true,
+					'activeSites' => implode( ',', $active_sites ),
+				) );
+			} else {
+				echo wp_json_encode( array(
+					'success' => false,
+					'message' => esc_html__( 'Invalid action.', 'mwp-al-ext' ),
+				) );
+			}
+		} else {
+			echo wp_json_encode( array(
+				'success' => false,
+				'message' => esc_html__( 'Access denied.', 'mwp-al-ext' ),
+			) );
+		}
+		exit();
 	}
 }

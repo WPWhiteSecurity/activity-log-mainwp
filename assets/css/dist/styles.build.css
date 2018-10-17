@@ -120,4 +120,50 @@ td.column-user {
   margin-bottom: 6px;
   width: 56px; }
 
+.mwpal-wcs-container {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: justify;
+      justify-content: space-between;
+  -ms-flex-align: center;
+      align-items: center;
+  margin-bottom: 10px; }
+
+#mwpal-wcs-al,
+#mwpal-wcs {
+  -ms-flex-preferred-size: 210px;
+      flex-basis: 210px; }
+
+#mwpal-wcs-btns a {
+  display: block; }
+  #mwpal-wcs-btns a .dashicons {
+    width: 10px;
+    font-size: 13px;
+    vertical-align: middle;
+    margin-top: 3px; }
+
+.sites-container {
+  height: 250px;
+  border: 1px solid #dddddd;
+  padding: 5px;
+  margin-top: 5px; }
+  .sites-container span {
+    display: block;
+    margin-bottom: 2px; }
+  .sites-container label {
+    display: block;
+    padding: 5px;
+    -webkit-transition: all 0.2s linear;
+    -o-transition: all 0.2s linear;
+    transition: all 0.2s linear; }
+    .sites-container label:hover {
+      background: #f1f1f1;
+      -webkit-transition: all 0.2s linear;
+      -o-transition: all 0.2s linear;
+      transition: all 0.2s linear; }
+  .sites-container input[type=checkbox] {
+    display: none; }
+    .sites-container input[type=checkbox]:checked + label {
+      background: #f1f1f1; }
+
 /*# sourceMappingURL=styles.build.css.map*/

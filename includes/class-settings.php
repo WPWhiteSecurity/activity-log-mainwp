@@ -256,7 +256,7 @@ class Settings {
 		$mwp_sites    = $this->get_mwp_child_sites();
 		$activity_log = \WSAL\MainWPExtension\Activity_Log::get_instance();
 
-		if ( empty( $child_sites ) && ! empty( $mwp_sites ) ) {
+		if ( empty( $child_sites ) && ! is_array( $child_sites ) && ! empty( $mwp_sites ) ) {
 			foreach ( $mwp_sites as $site ) {
 				$post_data = array( 'action' => 'check_wsal' );
 
@@ -294,21 +294,21 @@ class Settings {
 	 * @return void
 	 */
 	public function set_wsal_child_sites( $site_ids ) {
-		if ( empty( $site_ids ) || ! is_array( $site_ids ) ) {
-			return;
-		}
-
-		// Get WSAL child sites.
-		$wsal_sites = $this->get_wsal_child_sites();
-		$new_sites  = array();
+		$wsal_sites     = $this->get_wsal_child_sites(); // Get WSAL child sites.
+		$disabled_sites = $this->get_option( 'disabled-wsal-sites', array() ); // Get already disabled sites.
+		$new_sites      = array();
 
 		// Set new WSAL sites.
-		foreach ( $site_ids as $id ) {
-			if ( isset( $wsal_sites[ $id ] ) ) {
-				$new_sites[ $id ] = $wsal_sites[ $id ];
-				unset( $wsal_sites[ $id ] );
-			} else {
-				$new_sites[ $id ] = new \stdClass();
+		if ( ! empty( $site_ids ) && is_array( $site_ids ) ) {
+			foreach ( $site_ids as $id ) {
+				if ( isset( $wsal_sites[ $id ] ) ) {
+					$new_sites[ $id ] = $wsal_sites[ $id ];
+					unset( $wsal_sites[ $id ] );
+				} elseif ( isset( $disabled_sites[ $id ] ) ) {
+					$new_sites[ $id ] = $disabled_sites[ $id ];
+				} else {
+					$new_sites[ $id ] = new \stdClass();
+				}
 			}
 		}
 
@@ -321,7 +321,16 @@ class Settings {
 				$delete_query->getAdapter()->Delete( $delete_query );
 			}
 		}
+
+		// Update disabled sites.
+		if ( ! empty( $wsal_sites ) ) {
+			foreach ( $wsal_sites as $site_id => $site ) {
+				$disabled_sites[ $site_id ] = $site;
+			}
+		}
+
 		$this->update_option( 'wsal-child-sites', $new_sites );
+		$this->update_option( 'disabled-wsal-sites', $wsal_sites );
 	}
 
 	/**

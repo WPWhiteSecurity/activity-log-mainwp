@@ -142,3 +142,57 @@ td.column-user {
 	margin-bottom: 6px;
 	width: 56px;
 }
+
+.mwpal-wcs-container {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+}
+
+#mwpal-wcs-al,
+#mwpal-wcs {
+	flex-basis: 210px;
+}
+
+#mwpal-wcs-btns a {
+	display: block;
+
+	.dashicons {
+		width: 10px;
+		font-size: 13px;
+		vertical-align: middle;
+		margin-top: 3px;
+	}
+}
+
+.sites-container {
+	height: 250px;
+	border: 1px solid #dddddd;
+	padding: 5px;
+	margin-top: 5px;
+
+	span {
+		display: block;
+		margin-bottom: 2px;
+	}
+
+	label {
+		display: block;
+		padding: 5px;
+		transition: all 0.2s linear;
+
+		&:hover {
+			background: #f1f1f1;
+			transition: all 0.2s linear;
+		}
+	}
+
+	input[type=checkbox] {
+		display: none;
+
+		&:checked + label {
+			background: #f1f1f1;
+		}
+	}
+}

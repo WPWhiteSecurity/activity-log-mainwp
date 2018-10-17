@@ -141,17 +141,12 @@ jQuery(document).ready(function () {
 	}
 
 	/**
-  * Active WSAL Child Sites setting.
+  * Refresh WSAL Child Sites.
   */
-	jQuery('#mwpal-wsal-child-sites').select2({
-		placeholder: scriptData.selectSites,
-		width: '500px'
-	});
-
 	jQuery('#mwpal-wsal-sites-refresh').click(function () {
 		var refreshBtn = jQuery(this);
 		refreshBtn.attr('disabled', true);
-		refreshBtn.val('Refreshing Child Sites...');
+		refreshBtn.val(scriptData.refreshing);
 
 		jQuery.post(scriptData.ajaxURL, {
 			action: 'refresh_child_sites',
@@ -160,6 +155,94 @@ jQuery(document).ready(function () {
 			location.reload();
 		});
 	});
+
+	/**
+  * Add Sites to Active Activity Log.
+  */
+	jQuery('#mwpal-wcs-add-btn').click(function (e) {
+		e.preventDefault();
+		var addSites = jQuery('#mwpal-wcs input[type=checkbox]'); // Get checkboxes.
+		transferSites('mwpal-wcs', 'mwpal-wcs-al', addSites, 'add-sites');
+	});
+
+	/**
+  * Remove Sites from Active Activity Log.
+  */
+	jQuery('#mwpal-wcs-remove-btn').click(function (e) {
+		e.preventDefault();
+		var removeSites = jQuery('#mwpal-wcs-al input[type=checkbox]'); // Get checkboxes.
+		transferSites('mwpal-wcs-al', 'mwpal-wcs', removeSites, 'remove-sites');
+	});
+
+	/**
+  * Transfer sites in and out of active activity log.
+  *
+  * @param {string} fromClass     – From HTML class.
+  * @param {string} toClass       – To HTML class.
+  * @param {array} containerSites – Sites to add/remove.
+  * @param {string} action        – Type of action to perform.
+  */
+	function transferSites(fromClass, toClass, containerSites, action) {
+		var selectedSites = [];
+		var container = jQuery('#' + toClass + ' .sites-container');
+		var activeWSALSites = jQuery('#mwpal-wsal-child-sites');
+
+		for (var index = 0; index < containerSites.length; index++) {
+			if (jQuery(containerSites[index]).is(':checked')) {
+				selectedSites.push(jQuery(containerSites[index]).val());
+			}
+		}
+
+		jQuery.ajax({
+			type: 'POST',
+			url: scriptData.ajaxURL,
+			async: true,
+			dataType: 'json',
+			data: {
+				action: 'update_active_wsal_sites',
+				nonce: scriptData.scriptNonce,
+				transferAction: action,
+				activeSites: activeWSALSites.val(),
+				requestSites: selectedSites.toString()
+			},
+			success: function success(data) {
+				if (data.success && selectedSites.length) {
+					for (var _index = 0; _index < selectedSites.length; _index++) {
+						var spanElement = jQuery('<span></span>');
+						var inputElement = jQuery('<input />');
+						inputElement.attr('type', 'checkbox');
+						var labelElement = jQuery('<label></label>');
+						var tempElement = jQuery('#' + fromClass + '-site-' + selectedSites[_index]);
+
+						// Prepare input element.
+						inputElement.attr('name', toClass + '[]');
+						inputElement.attr('id', toClass + '-site-' + selectedSites[_index]);
+						inputElement.attr('value', tempElement.val());
+
+						// Prepare label element.
+						labelElement.attr('for', toClass + '-site-' + selectedSites[_index]);
+						labelElement.html(tempElement.parent().find('label').text());
+
+						// Append the elements together.
+						spanElement.append(inputElement);
+						spanElement.append(labelElement);
+						container.append(spanElement);
+
+						// Remove the temp element.
+						tempElement.parent().remove();
+					}
+					activeWSALSites.val(data.activeSites);
+				} else {
+					console.log(data.message);
+				}
+			},
+			error: function error(xhr, textStatus, _error) {
+				console.log(xhr.statusText);
+				console.log(textStatus);
+				console.log(_error);
+			}
+		});
+	}
 }); /**
      * Entry Point
      *
