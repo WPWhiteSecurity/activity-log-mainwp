@@ -83,7 +83,7 @@ final class Setup_Wizard {
 				'content' => array( $this, 'step_welcome' ),
 			),
 			'wsal_sites' => array(
-				'name'    => __( 'WSAL Sites', 'mwp-al-ext' ),
+				'name'    => __( 'Child Sites', 'mwp-al-ext' ),
 				'content' => array( $this, 'step_wsal_sites' ),
 				'save'    => array( $this, 'step_wsal_sites_save' ),
 			),

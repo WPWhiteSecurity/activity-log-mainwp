@@ -19,13 +19,15 @@ body {
 .steps {
   display: -ms-flexbox;
   display: flex;
+  -ms-flex-pack: center;
+      justify-content: center;
   list-style-type: none;
   margin: 0;
   padding: 0 0 25px;
   text-align: center; }
   .steps li {
-    -ms-flex: 1 0 auto;
-        flex: 1 0 auto;
+    -ms-flex-preferred-size: 200px;
+        flex-basis: 200px;
     font-weight: 700;
     margin: 0 0 5px;
     color: #b4b9be;

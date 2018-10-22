@@ -29,13 +29,14 @@ body {
 // Wizard steps.
 .steps {
 	display: flex;
+	justify-content: center;
 	list-style-type: none;
 	margin: 0;
 	padding: 0 0 25px;
 	text-align: center;
 
 	li {
-		flex: 1 0 auto;
+		flex-basis: 200px;
 		font-weight: 700;
 		margin: 0 0 5px;
 		color: $color-disable;
