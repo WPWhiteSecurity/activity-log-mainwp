@@ -417,6 +417,22 @@ class Settings {
 	}
 
 	/**
+	 * Get Server IP.
+	 *
+	 * @return string
+	 */
+	public function get_server_ip() {
+		$result = null;
+		if ( isset( $_SERVER['SERVER_ADDR'] ) ) {
+			$result = $this->normalize_ip( sanitize_text_field( wp_unslash( $_SERVER['SERVER_ADDR'] ) ) );
+			if ( ! $this->validate_ip( $result ) ) {
+				$result = 'Error ' . self::ERROR_CODE_INVALID_IP . ': Invalid IP Address';
+			}
+		}
+		return $result;
+	}
+
+	/**
 	 * Get Client IP.
 	 *
 	 * @return string

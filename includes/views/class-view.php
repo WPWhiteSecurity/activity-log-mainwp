@@ -644,6 +644,7 @@ class View extends Abstract_View {
 	private function query_child_site_events() {
 		// Check if the WSAL child sites option exists.
 		$child_sites = $this->activity_log->settings->get_wsal_child_sites();
+		$server_ip   = $this->activity_log->settings->get_server_ip(); // Get server IP.
 
 		if ( ! empty( $child_sites ) && is_array( $child_sites ) ) {
 			$sites_data = array();
@@ -669,6 +670,7 @@ class View extends Abstract_View {
 				$this->activity_log->alerts->trigger( 7711, array(
 					'mainwp_dash' => true,
 					'Username'    => 'System',
+					'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
 				) );
 
 				// Call to child sites to fetch WSAL events.
@@ -685,6 +687,7 @@ class View extends Abstract_View {
 				$this->activity_log->alerts->trigger( 7712, array(
 					'mainwp_dash' => true,
 					'Username'    => 'System',
+					'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
 				) );
 			}
 
@@ -706,6 +709,7 @@ class View extends Abstract_View {
 								'site_id'       => $mwp_sites[ $key ]['id'],
 								'mainwp_dash'   => true,
 								'Username'      => 'System',
+								'ClientIP'      => ! empty( $server_ip ) ? $server_ip : false,
 							) );
 						}
 					} elseif ( ! isset( $site_events->events ) ) {
