@@ -224,7 +224,7 @@ final class Setup_Wizard {
 	private function step_welcome() {
 		?>
 		<p><?php esc_html_e( 'Thank you for installing the Activity Log for MainWP Extension.', 'mwp-al-ext' ); ?></p>
-		<p><?php esc_html_e( 'This extension allows you to see the activity logs of all the child websites which have WP Security Audit Log is installed from the MainWP dashboard.', 'mwp-al-ext' ); ?></p>
+		<p><?php esc_html_e( 'This extension allows you to see the activity logs of all the child websites which have WP Security Audit Log installed from the MainWP dashboard.', 'mwp-al-ext' ); ?></p>
 
 		<div class="mwpal-setup-actions">
 			<a class="button button-primary"
