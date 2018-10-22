@@ -307,11 +307,8 @@ final class AlertManager {
 	 */
 	public function trigger( $type, $data = array() ) {
 		// Get username.
-		$username = wp_get_current_user()->user_login;
-		if ( empty( $username ) && ! empty( $data['Username'] ) ) {
-			$username = $data['Username'];
-		} else {
-			$username = 'System';
+		if ( ! isset( $data['Username'] ) || empty( $data['Username'] ) ) {
+			$data['Username'] = wp_get_current_user()->user_login;
 		}
 
 		// Get current user roles.

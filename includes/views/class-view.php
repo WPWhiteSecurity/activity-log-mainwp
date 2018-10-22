@@ -666,7 +666,10 @@ class View extends Abstract_View {
 				);
 
 				// Extension has started retrieving.
-				$this->activity_log->alerts->trigger( 7711, array( 'mainwp_dash' => true ) );
+				$this->activity_log->alerts->trigger( 7711, array(
+					'mainwp_dash' => true,
+					'Username'    => 'System',
+				) );
 
 				// Call to child sites to fetch WSAL events.
 				$sites_data[ $site_id ] = apply_filters(
@@ -679,7 +682,10 @@ class View extends Abstract_View {
 				);
 
 				// Extension is ready after retrieving.
-				$this->activity_log->alerts->trigger( 7712, array( 'mainwp_dash' => true ) );
+				$this->activity_log->alerts->trigger( 7712, array(
+					'mainwp_dash' => true,
+					'Username'    => 'System',
+				) );
 			}
 
 			if ( ! empty( $sites_data ) && is_array( $sites_data ) ) {
@@ -699,6 +705,7 @@ class View extends Abstract_View {
 								'site_url'      => $mwp_sites[ $key ]['url'],
 								'site_id'       => $mwp_sites[ $key ]['id'],
 								'mainwp_dash'   => true,
+								'Username'      => 'System',
 							) );
 						}
 					} elseif ( ! isset( $site_events->events ) ) {
