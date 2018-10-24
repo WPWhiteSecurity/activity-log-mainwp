@@ -564,11 +564,10 @@ class View extends Abstract_View {
 							<table class="form-table">
 								<tbody>
 									<tr>
-										<th scope="row"><label for="child-site-events"><?php esc_html_e( 'Active WSAL Child Sites', 'mwp-al-ext' ); ?></label></th>
 										<td>
 											<div class="mwpal-wcs-container">
 												<div id="mwpal-wcs">
-													<p><?php esc_html_e( 'Sites on MainWP', 'mwp-al-ext' ); ?></p>
+													<p><?php esc_html_e( 'Child sites with WSAL installed', 'mwp-al-ext' ); ?></p>
 													<div class="sites-container">
 														<?php
 														$disabled_sites = $this->activity_log->settings->get_option( 'disabled-wsal-sites', array() );
@@ -591,7 +590,7 @@ class View extends Abstract_View {
 													<a href="javascript:;" class="button-secondary" id="mwpal-wcs-remove-btn"><span class="dashicons dashicons-arrow-left-alt2"></span> <?php esc_html_e( 'Remove', 'mwp-al-ext' ); ?></a>
 												</div>
 												<div id="mwpal-wcs-al">
-													<p><?php esc_html_e( 'Sites in the Activity Log', 'mwp-al-ext' ); ?></p>
+													<p><?php esc_html_e( 'Child sites in the activity log', 'mwp-al-ext' ); ?></p>
 													<div class="sites-container">
 														<?php
 														$selected_sites = array();
@@ -612,7 +611,7 @@ class View extends Abstract_View {
 													<input type="hidden" id="mwpal-wsal-child-sites" name="mwpal-wsal-child-sites" value="<?php echo esc_attr( $selected_sites ); ?>">
 												</div>
 											</div>
-											<input type="button" class="button-primary" id="mwpal-wsal-sites-refresh" value="<?php esc_html_e( 'Refresh Child Sites', 'mwp-al-ext' ); ?>" />
+											<input type="button" class="button-primary" id="mwpal-wsal-sites-refresh" value="<?php esc_html_e( 'Refresh list of child sites', 'mwp-al-ext' ); ?>" />
 										</td>
 									</tr>
 								</tbody>
@@ -804,9 +803,37 @@ class View extends Abstract_View {
 		}
 
 		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'mwp-activitylog-nonce' ) ) {
-			$this->activity_log->settings->delete_option( 'wsal-child-sites' );
-			$this->activity_log->settings->delete_option( 'disabled-wsal-sites' );
-			$this->activity_log->settings->get_wsal_child_sites();
+			$mwp_child_sites  = $this->activity_log->settings->get_mwp_child_sites(); // Get MainWP child sites.
+			$wsal_child_sites = $this->activity_log->settings->get_option( 'wsal-child-sites', array() ); // Get activity log sites.
+			$disabled_sites   = $this->activity_log->settings->get_option( 'disabled-wsal-sites', array() ); // Get disabled WSAL sites.
+			$wsal_site_ids    = array_merge( array_keys( $wsal_child_sites ), array_keys( $disabled_sites ) ); // Merge arrays active & disabled WSAL child sites.
+			$mwp_site_ids     = array_column( $mwp_child_sites, 'id' ); // Get MainWP child site ids.
+			$diff             = array_diff( $mwp_site_ids, $wsal_site_ids ); // Compute the difference.
+
+			if ( ! empty( $diff ) ) {
+				foreach ( $diff as $index => $site_id ) {
+					// Post data for child site.
+					$post_data = array( 'action' => 'check_wsal' );
+
+					// Call to child sites to check if WSAL is installed on them or not.
+					$response = apply_filters(
+						'mainwp_fetchurlauthed',
+						$this->activity_log->get_child_file(),
+						$this->activity_log->get_child_key(),
+						$site_id,
+						'extra_excution',
+						$post_data
+					);
+
+					// Check if WSAL is installed on the child site.
+					if ( true === $response->wsal_installed ) {
+						$disabled_sites[ $site_id ] = $response;
+					}
+				}
+
+				// Update disabled sites.
+				$this->activity_log->settings->update_option( 'disabled-wsal-sites', $disabled_sites );
+			}
 			die();
 		}
 		die( esc_html__( 'Nonce verification failed.', 'mwp-al-ext' ) );

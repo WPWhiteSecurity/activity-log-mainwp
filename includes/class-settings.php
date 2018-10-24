@@ -210,7 +210,7 @@ class Settings {
 		$selected = $this->get_columns_selected();
 
 		if ( ! empty( $selected ) ) {
-			$columns = array(
+			$columns  = array(
 				'site'       => '0',
 				'alert_code' => '0',
 				'type'       => '0',
