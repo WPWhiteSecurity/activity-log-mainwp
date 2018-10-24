@@ -649,6 +649,13 @@ class View extends Abstract_View {
 		if ( ! empty( $child_sites ) && is_array( $child_sites ) ) {
 			$sites_data = array();
 
+			// Extension has started retrieving.
+			$this->activity_log->alerts->trigger( 7711, array(
+				'mainwp_dash' => true,
+				'Username'    => 'System',
+				'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
+			) );
+
 			foreach ( $child_sites as $site_id => $child_site ) {
 				// Get events count from native events DB.
 				$occ_query = new \WSAL\MainWPExtension\Models\OccurrenceQuery();
@@ -666,13 +673,6 @@ class View extends Abstract_View {
 					'events_count' => $this->activity_log->settings->get_child_site_events(),
 				);
 
-				// Extension has started retrieving.
-				$this->activity_log->alerts->trigger( 7711, array(
-					'mainwp_dash' => true,
-					'Username'    => 'System',
-					'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
-				) );
-
 				// Call to child sites to fetch WSAL events.
 				$sites_data[ $site_id ] = apply_filters(
 					'mainwp_fetchurlauthed',
@@ -682,14 +682,14 @@ class View extends Abstract_View {
 					'extra_excution',
 					$post_data
 				);
-
-				// Extension is ready after retrieving.
-				$this->activity_log->alerts->trigger( 7712, array(
-					'mainwp_dash' => true,
-					'Username'    => 'System',
-					'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
-				) );
 			}
+
+			// Extension is ready after retrieving.
+			$this->activity_log->alerts->trigger( 7712, array(
+				'mainwp_dash' => true,
+				'Username'    => 'System',
+				'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
+			) );
 
 			if ( ! empty( $sites_data ) && is_array( $sites_data ) ) {
 				// Get MainWP child sites.
