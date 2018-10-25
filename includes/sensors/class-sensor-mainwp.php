@@ -29,11 +29,21 @@ class Sensor_MainWP extends Abstract_Sensor {
 	protected $old_plugins = array();
 
 	/**
+	 * Current User Object.
+	 *
+	 * @var WP_User
+	 */
+	private $current_user = null;
+
+	/**
 	 * Hook Events
 	 *
 	 * Listening to events using hooks.
 	 */
 	public function hook_events() {
+		add_action( 'clear_auth_cookie', array( $this, 'get_current_user' ), 10 );
+		add_action( 'wp_login', array( $this, 'event_login' ), 10, 2 );
+		add_action( 'wp_logout', array( $this, 'event_logout' ) );
 		add_action( 'mainwp_added_new_site', array( $this, 'site_added' ), 10, 1 ); // Site added.
 		add_action( 'mainwp_delete_site', array( $this, 'site_removed' ), 10, 1 ); // Site removed.
 		add_action( 'mainwp_update_site', array( $this, 'site_edited' ), 10, 1 ); // Site edited.
@@ -56,6 +66,47 @@ class Sensor_MainWP extends Abstract_Sensor {
 	 */
 	public function event_admin_init() {
 		$this->old_plugins = get_plugins();
+	}
+
+	/**
+	 * Sets current user.
+	 */
+	public function get_current_user() {
+		$this->current_user = wp_get_current_user();
+	}
+
+	/**
+	 * Event Login.
+	 *
+	 * @param string  $user_login - WP username.
+	 * @param WP_User $user       - WP_User object.
+	 */
+	public function event_login( $user_login, $user ) {
+		if ( empty( $user ) ) {
+			$user = get_user_by( 'login', $user_login );
+		}
+		$user_roles = $this->activity_log->settings->get_current_user_roles( $user->roles );
+		if ( $this->activity_log->settings->is_login_super_admin( $user_login ) ) {
+			$user_roles[] = 'superadmin';
+		}
+		$this->activity_log->alerts->trigger( 1000, array(
+			'mainwp_dash'      => true,
+			'Username'         => $user_login,
+			'CurrentUserRoles' => $user_roles,
+		) );
+	}
+
+	/**
+	 * Event Logout.
+	 */
+	public function event_logout() {
+		if ( 0 !== $this->current_user->ID ) {
+			$this->activity_log->alerts->Trigger( 1001, array(
+				'mainwp_dash'      => true,
+				'CurrentUserID'    => $this->current_user->ID,
+				'CurrentUserRoles' => $this->activity_log->settings->get_current_user_roles( $this->current_user->roles ),
+			) );
+		}
 	}
 
 	/**

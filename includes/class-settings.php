@@ -417,6 +417,21 @@ class Settings {
 	}
 
 	/**
+	 * Check if the user is super admin.
+	 *
+	 * @param string $username – Username.
+	 * @return boolean
+	 */
+	public function is_login_super_admin( $username ) {
+		$user_id = username_exists( $username );
+		if ( function_exists( 'is_super_admin' ) && is_super_admin( $user_id ) ) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * Get Server IP.
 	 *
 	 * @return string
