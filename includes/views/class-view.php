@@ -646,14 +646,9 @@ class View extends Abstract_View {
 		$server_ip   = $this->activity_log->settings->get_server_ip(); // Get server IP.
 
 		if ( ! empty( $child_sites ) && is_array( $child_sites ) ) {
-			$sites_data = array();
-
-			// Extension has started retrieving.
-			$this->activity_log->alerts->trigger( 7711, array(
-				'mainwp_dash' => true,
-				'Username'    => 'System',
-				'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
-			) );
+			$sites_data        = array();
+			$logged_retrieving = false; // Event 7711.
+			$logged_ready      = false; // Event 7712.
 
 			foreach ( $child_sites as $site_id => $child_site ) {
 				// Get events count from native events DB.
@@ -664,6 +659,16 @@ class View extends Abstract_View {
 				// If events are already present in the DB of a site, then no need to query from child site.
 				if ( 0 !== $occ_count ) {
 					continue;
+				}
+
+				if ( ! $logged_retrieving ) {
+					// Extension has started retrieving.
+					$this->activity_log->alerts->trigger( 7711, array(
+						'mainwp_dash' => true,
+						'Username'    => 'System',
+						'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
+					) );
+					$logged_retrieving = true;
 				}
 
 				// Post data for child sites.
@@ -681,14 +686,17 @@ class View extends Abstract_View {
 					'extra_excution',
 					$post_data
 				);
-			}
 
-			// Extension is ready after retrieving.
-			$this->activity_log->alerts->trigger( 7712, array(
-				'mainwp_dash' => true,
-				'Username'    => 'System',
-				'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
-			) );
+				if ( ! $logged_ready && isset( $sites_data[ $site_id ]->events ) ) {
+					// Extension is ready after retrieving.
+					$this->activity_log->alerts->trigger( 7712, array(
+						'mainwp_dash' => true,
+						'Username'    => 'System',
+						'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
+					) );
+					$logged_ready = true;
+				}
+			}
 
 			if ( ! empty( $sites_data ) && is_array( $sites_data ) ) {
 				// Get MainWP child sites.
