@@ -532,7 +532,7 @@ class View extends Abstract_View {
 							<table class="form-table">
 								<tbody>
 									<tr>
-										<th scope="row"><label for="child-site-events"><?php esc_html_e( 'Events to Retrieve from Child Sites', 'mwp-al-ext' ); ?></label></th>
+										<th scope="row"><label for="child-site-events"><?php esc_html_e( 'Number of Events to Retrieve from Child Sites', 'mwp-al-ext' ); ?></label></th>
 										<td>
 											<fieldset>
 												<?php $child_site_events = $this->activity_log->settings->get_child_site_events(); ?>
@@ -542,7 +542,7 @@ class View extends Abstract_View {
 									</tr>
 
 									<tr>
-										<th scope="row"><label for="events-frequency"><?php esc_html_e( 'Events Frequency', 'mwp-al-ext' ); ?></label></th>
+										<th scope="row"><label for="events-frequency"><?php esc_html_e( 'Events Retrieval Frequency', 'mwp-al-ext' ); ?></label></th>
 										<td>
 											<fieldset>
 												<?php $events_frequency = $this->activity_log->settings->get_events_frequency(); ?>
