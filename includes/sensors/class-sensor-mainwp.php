@@ -60,11 +60,14 @@ class Sensor_MainWP extends Abstract_Sensor {
 			add_action( 'shutdown', array( $this, 'admin_shutdown' ), 10 );
 		}
 
-		add_action( 'mainwp_aum_monitor_created', array( $this, 'aum_monitor_created' ), 10, 1 );
-		add_action( 'mainwp_aum_monitor_deleted', array( $this, 'aum_monitor_deleted' ), 10, 1 );
-		add_action( 'mainwp_aum_monitor_started', array( $this, 'aum_monitor_started' ), 10, 1 );
-		add_action( 'mainwp_aum_monitor_paused', array( $this, 'aum_monitor_paused' ), 10, 1 );
-		add_action( 'mainwp_aum_auto_add_sites', array( $this, 'aum_monitor_auto_add' ), 10, 1 );
+		// Check if Advanced Uptime Monitor Extension is active.
+		if ( is_plugin_active( 'advanced-uptime-monitor-extension/advanced-uptime-monitor-extension.php' ) ) {
+			add_action( 'mainwp_aum_monitor_created', array( $this, 'aum_monitor_created' ), 10, 1 );
+			add_action( 'mainwp_aum_monitor_deleted', array( $this, 'aum_monitor_deleted' ), 10, 1 );
+			add_action( 'mainwp_aum_monitor_started', array( $this, 'aum_monitor_started' ), 10, 1 );
+			add_action( 'mainwp_aum_monitor_paused', array( $this, 'aum_monitor_paused' ), 10, 1 );
+			add_action( 'mainwp_aum_auto_add_sites', array( $this, 'aum_monitor_auto_add' ), 10, 1 );
+		}
 	}
 
 	/**
