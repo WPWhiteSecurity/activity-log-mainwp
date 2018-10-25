@@ -505,4 +505,23 @@ class Settings {
 			return $filtered_ip;
 		}
 	}
+
+	/**
+	 * Search & Return MainWP site.
+	 *
+	 * @param string $column – Column name.
+	 * @param string $value  – Column value.
+	 * @return mixed
+	 */
+	public function get_mwp_site_by( $column = 'id', $value ) {
+		// Get MainWP sites.
+		$mwp_sites = $this->get_mwp_child_sites();
+
+		// Search by column name.
+		$key = array_search( $value, array_column( $mwp_sites, $column ), true );
+		if ( false !== $key ) {
+			return $mwp_sites[ $key ];
+		}
+		return false;
+	}
 }

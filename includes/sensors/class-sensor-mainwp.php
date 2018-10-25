@@ -59,6 +59,12 @@ class Sensor_MainWP extends Abstract_Sensor {
 			add_action( 'admin_init', array( $this, 'event_admin_init' ) );
 			add_action( 'shutdown', array( $this, 'admin_shutdown' ), 10 );
 		}
+
+		add_action( 'mainwp_aum_monitor_created', array( $this, 'aum_monitor_created' ), 10, 1 );
+		add_action( 'mainwp_aum_monitor_deleted', array( $this, 'aum_monitor_deleted' ), 10, 1 );
+		add_action( 'mainwp_aum_monitor_started', array( $this, 'aum_monitor_started' ), 10, 1 );
+		add_action( 'mainwp_aum_monitor_paused', array( $this, 'aum_monitor_paused' ), 10, 1 );
+		add_action( 'mainwp_aum_auto_add_sites', array( $this, 'aum_monitor_auto_add' ), 10, 1 );
 	}
 
 	/**
@@ -401,5 +407,94 @@ class Sensor_MainWP extends Abstract_Sensor {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Advanced Uptime Monitor Created.
+	 *
+	 * @param array $monitor_site – Monitor Site data array.
+	 */
+	public function aum_monitor_created( $monitor_site ) {
+		// Get monitor site url.
+		$site_url = isset( $monitor_site['url_address'] ) ? trailingslashit( $monitor_site['url_address'] ) : ( isset( $monitor_site['url_friendly_name'] ) ? trailingslashit( $monitor_site['url_friendly_name'] ) : false );
+
+		// Report event.
+		$this->report_aum_monitor_event( 7750, $site_url );
+	}
+
+	/**
+	 * Advanced Uptime Monitor Deleted.
+	 *
+	 * @param object $monitor_site – Monitor site object.
+	 */
+	public function aum_monitor_deleted( $monitor_site ) {
+		// Get monitor site url.
+		$site_url = isset( $monitor_site->url_address ) ? trailingslashit( $monitor_site->url_address ) : ( isset( $monitor_site->url_friendly_name ) ? trailingslashit( $monitor_site->url_friendly_name ) : false );
+
+		// Report event.
+		$this->report_aum_monitor_event( 7751, $site_url );
+	}
+
+	/**
+	 * Advanced Uptime Monitor Started.
+	 *
+	 * @param object $monitor_site – Monitor site object.
+	 */
+	public function aum_monitor_started( $monitor_site ) {
+		// Get monitor site url.
+		$site_url = isset( $monitor_site->url_address ) ? trailingslashit( $monitor_site->url_address ) : ( isset( $monitor_site->url_friendly_name ) ? trailingslashit( $monitor_site->url_friendly_name ) : false );
+
+		// Report event.
+		$this->report_aum_monitor_event( 7752, $site_url );
+	}
+
+	/**
+	 * Advanced Uptime Monitor Paused.
+	 *
+	 * @param object $monitor_site – Monitor site object.
+	 */
+	public function aum_monitor_paused( $monitor_site ) {
+		// Get monitor site url.
+		$site_url = isset( $monitor_site->url_address ) ? trailingslashit( $monitor_site->url_address ) : ( isset( $monitor_site->url_friendly_name ) ? trailingslashit( $monitor_site->url_friendly_name ) : false );
+
+		// Report event.
+		$this->report_aum_monitor_event( 7753, $site_url );
+	}
+
+	/**
+	 * Report Advanced Uptime Monitor Event.
+	 *
+	 * @param integer $event_id – Event ID.
+	 * @param string  $site_url – Site URL.
+	 */
+	public function report_aum_monitor_event( $event_id, $site_url ) {
+		if ( ! empty( $event_id ) && ! empty( $site_url ) ) {
+			// Search for site in MainWP sites.
+			$site = $this->activity_log->settings->get_mwp_site_by( 'url', $site_url );
+
+			// If site is found then report it as MainWP child site.
+			if ( false !== $site ) {
+				$this->activity_log->alerts->trigger( $event_id, array(
+					'friendly_name' => $site['name'],
+					'site_url'      => $site['url'],
+					'site_id'       => $site['id'],
+					'mainwp_dash'   => true,
+				) );
+			} else {
+				// Else report as other site.
+				$this->activity_log->alerts->trigger( $event_id, array(
+					'friendly_name' => $site_url,
+					'site_url'      => $site_url,
+					'mainwp_dash'   => true,
+				) );
+			}
+		}
+	}
+
+	/**
+	 * Report Advanced Uptime Monitor Auto Add Sites.
+	 */
+	public function aum_monitor_auto_add() {
+		$this->activity_log->alerts->trigger( 7754, array( 'mainwp_dash' => true ) );
 	}
 }
