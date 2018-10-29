@@ -1,19 +1,19 @@
 <?php
 /**
- * Plugin Name: Activity Log MainWP
- * Plugin URI: http://www.wpsecurityauditlog.com/
+ * Plugin Name: Activity Log for MainWP
+ * Plugin URI: https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/
  * Description: An add-on for MainWP to be able to view the activity logs of all child sites from the central MainWP dashboard.
  * Author: WP White Security
  * Version: 0.1.0
  * Text Domain: mwp-al-ext
- * Author URI: http://www.wpsecurityauditlog.com/
+ * Author URI: http://www.wpwhitesecurity.com/
  * License: GPL2
  *
  * @package mwp-al-ext
  */
 
 /*
-	MainWP Activity Log Extension
+	Activity Log for MainWP
 	Copyright(c) 2018  Robert Abela  (email : robert@wpwhitesecurity.com)
 
 	This program is free software; you can redistribute it and/or modify
@@ -49,7 +49,7 @@ class Activity_Log {
 	 *
 	 * @var string
 	 */
-	public $version = '0.1.0';
+	public $version = '1.0';
 
 	/**
 	 * Single Static Instance of the plugin.
