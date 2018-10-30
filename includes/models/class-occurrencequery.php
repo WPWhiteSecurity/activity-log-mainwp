@@ -5,6 +5,7 @@
  * OccurrenceQuery model adds or clears arguments in the Query model.
  *
  * @package mwp-al-ext
+ * @since 1.0.0
  */
 
 namespace WSAL\MainWPExtension\Models;

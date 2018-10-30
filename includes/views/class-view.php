@@ -5,6 +5,7 @@
  * View class file of the extension.
  *
  * @package mwp-al-ext
+ * @since 1.0.0
  */
 
 namespace WSAL\MainWPExtension\Views;
@@ -135,6 +136,9 @@ class View extends Abstract_View {
 					break;
 				}
 			}
+
+			// Set the menu name.
+			$mwp_sub_menu['Extensions'][ $activity_log_key ][0] = __( 'Activity Log', 'mwp-al-ext' );
 
 			$sub_menu_before = array_slice( $mwp_sub_menu['mainwp_tab'], 0, 2 );
 			$sub_menu_after  = array_splice( $mwp_sub_menu['mainwp_tab'], 2 );
@@ -787,15 +791,15 @@ class View extends Abstract_View {
 			unset( $event_meta['ReportText'] );
 
 			// Set Event_Ref class scripts and styles.
-			\Event_Ref::config( 'stylePath', trailingslashit( MWPAL_BASE_DIR ) . 'assets/css/dist/wsal-ref.css' );
-			\Event_Ref::config( 'scriptPath', trailingslashit( MWPAL_BASE_DIR ) . 'assets/js/dist/wsal-ref.js' );
+			\WSAL\MainWPExtension\Event_Ref::config( 'stylePath', trailingslashit( MWPAL_BASE_DIR ) . 'assets/css/dist/wsal-ref.css' );
+			\WSAL\MainWPExtension\Event_Ref::config( 'scriptPath', trailingslashit( MWPAL_BASE_DIR ) . 'assets/js/dist/wsal-ref.js' );
 
 			echo '<!DOCTYPE html><html><head>';
 			echo '<style type="text/css">';
 			echo 'html, body { margin: 0; padding: 0; }';
 			echo '</style>';
 			echo '</head><body>';
-			\wsal_r( $event_meta );
+			\WSAL\MainWPExtension\mwpal_r( $event_meta );
 			echo '</body></html>';
 			die;
 		}

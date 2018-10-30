@@ -6,17 +6,21 @@
  * @link https://github.com/digitalnature/php-ref GitHub Repository
  * @version 1.2
  * @package mwp-al-ext
+ * @since 1.0.0
  */
+
+namespace WSAL\MainWPExtension;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+
 /**
  * Shortcut to ref, HTML mode.
  */
-function wsal_r() {
+function mwpal_r() {
 
 	// Arguments passed to this function.
 	$args = func_get_args();
@@ -70,7 +74,7 @@ function wsal_r() {
 /**
  * Shortcut to ref, plain text mode.
  */
-function wsal_rt() {
+function mwpal_rt() {
 	$args        = func_get_args();
 	$options     = array();
 	$output      = '';
@@ -114,8 +118,6 @@ function wsal_rt() {
 class Event_Ref {
 
 	const MARKER_KEY = '_phpRefArrayMarker_';
-
-
 
 	protected static
 
@@ -258,6 +260,7 @@ class Event_Ref {
 
 		} else {
 			$format = isset( static::$config['formatters'][ $format ] ) ? static::$config['formatters'][ $format ] : 'R' . ucfirst( $format ) . 'Formatter';
+			$format = '\WSAL\MainWPExtension\\' . $format;
 
 			if ( ! class_exists( $format, false ) ) {
 				throw new \Exception( sprintf( '%s class not found', $format ) );

@@ -6,6 +6,7 @@
  * used for get the alert, set the meta fields, etc.
  *
  * @package mwp-al-ext
+ * @since 1.0.0
  */
 
 namespace WSAL\MainWPExtension\Models;

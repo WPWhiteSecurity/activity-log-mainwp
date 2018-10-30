@@ -5,6 +5,7 @@
  * Abstract class used for create the connector, only MySQL is implemented.
  *
  * @package mwp-al-ext
+ * @since 1.0.0
  */
 
 namespace WSAL\MainWPExtension\Connector;

@@ -10,6 +10,7 @@
  * License: GPL2
  *
  * @package mwp-al-ext
+ * @since 1.0.0
  */
 
 /*
@@ -147,7 +148,7 @@ class Activity_Log {
 
 		// Include autoloader.
 		require_once MWPAL_BASE_DIR . 'includes/vendors/autoload.php';
-		\AaronHolbrook\Autoload\autoload( MWPAL_BASE_DIR . 'includes' );
+		\WSAL\MainWPExtension\Autoload\mwpal_autoload( MWPAL_BASE_DIR . 'includes' );
 
 		// Initiate the view.
 		$this->extension_view = new \WSAL\MainWPExtension\Views\View( $this );
@@ -328,7 +329,7 @@ class Activity_Log {
 	public function mainwp_error_notice() {
 		global $current_screen;
 		if ( 'plugins' === $current_screen->parent_base && false === $this->mainwp_main_activated ) {
-			echo '<div class="error"><p>MainWP Hello World! Extension ' . esc_html__( 'requires ', 'mwp-al-ext' ) . '<a href="http://mainwp.com/" target="_blank">MainWP</a>' . esc_html__( ' Plugin to be activated in order to work. Please install and activate', 'mwp-al-ext' ) . '<a href="http://mainwp.com/" target="_blank">MainWP</a> ' . esc_html__( 'first.', 'mwp-al-ext' ) . '</p></div>';
+			echo '<div class="error"><p>Activity Log for MainWP Extension ' . esc_html__( 'requires ', 'mwp-al-ext' ) . '<a href="http://mainwp.com/" target="_blank">MainWP</a>' . esc_html__( ' Plugin to be activated in order to work. Please install and activate', 'mwp-al-ext' ) . '<a href="http://mainwp.com/" target="_blank">MainWP</a> ' . esc_html__( 'first.', 'mwp-al-ext' ) . '</p></div>';
 		}
 	}
 

@@ -25,6 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * alerts, there is also the function to clean up alerts.
  *
  * @package mwp-al-ext
+ * @since 1.0.0
  */
 class Database extends AbstractLogger {
 

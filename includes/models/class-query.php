@@ -5,6 +5,7 @@
  * Query model is the class for all the query conditions.
  *
  * @package mwp-al-ext
+ * @since 1.0.0
  */
 
 namespace WSAL\MainWPExtension\Models;

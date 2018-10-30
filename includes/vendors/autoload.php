@@ -6,18 +6,19 @@
  * @copyright MIT, Aaron Holbrook 2015
  * @link      https://github.com/AaronHolbrook/autoload/blob/master/autoload.php
  * @package   mwp-al-ext
+ * @since     1.0.0
  */
 
-namespace AaronHolbrook\Autoload;
+namespace WSAL\MainWPExtension\Autoload;
 
-if ( ! function_exists( 'AaronHolbrook\Autoload\autoload' ) ) :
+if ( ! function_exists( 'WSAL\MainWPExtension\Autoload\mwpal_autoload' ) ) :
 
 	/**
 	 * Recursively loads all php files in all subdirectories of the given path
 	 *
 	 * @param string $directory – Directory to autoload.
 	 */
-	function autoload( $directory ) {
+	function mwpal_autoload( $directory ) {
 
 		// Get a listing of the current directory.
 		$scanned_dir = scandir( $directory );
@@ -49,7 +50,7 @@ if ( ! function_exists( 'AaronHolbrook\Autoload\autoload' ) ) :
 
 			// If it's a directory then recursively load it.
 			if ( 'dir' === $filetype ) {
-				autoload( $real_path );
+				mwpal_autoload( $real_path );
 			} elseif ( 'file' === $filetype ) { // If it's a file, let's try to load it.
 
 				// Don't allow files that have been uploaded.

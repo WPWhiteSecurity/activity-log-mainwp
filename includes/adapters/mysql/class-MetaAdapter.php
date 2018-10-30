@@ -5,6 +5,7 @@
  * MySQL database Metadata class.
  *
  * @package mwp-al-ext
+ * @since 1.0.0
  */
 
 namespace WSAL\MainWPExtension\Adapters\MySQL;

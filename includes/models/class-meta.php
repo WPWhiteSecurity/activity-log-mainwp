@@ -6,6 +6,7 @@
  * used for save and update the metadata.
  *
  * @package mwp-al-ext
+ * @since 1.0.0
  */
 
 namespace WSAL\MainWPExtension\Models;

@@ -5,6 +5,7 @@
  * Events are defined in this file.
  *
  * @package mwp-al-ext
+ * @since 1.0.0
  */
 
 // Exit if accessed directly.
@@ -25,38 +26,13 @@ defined( 'E_DEPRECATED' ) || define( 'E_DEPRECATED', 'E_DEPRECATED' );
 defined( 'E_USER_DEPRECATED' ) || define( 'E_USER_DEPRECATED', 'E_USER_DEPRECATED' );
 
 /**
- * Load Custom Events from uploads/mainwp-activity-log-extension/custom-alerts.php if exists
- *
- * @param \WSAL\MainWPExtension\Activity_Log $activity_log - Instance of main plugin.
- */
-function load_include_custom_file( $activity_log ) {
-	$upload_dir       = wp_upload_dir();
-	$uploads_dir_path = trailingslashit( $upload_dir['basedir'] ) . 'mainwp-activity-log-extension';
-
-	// Check directory.
-	if ( is_dir( $uploads_dir_path ) && is_readable( $uploads_dir_path ) ) {
-		$file = $uploads_dir_path . DIRECTORY_SEPARATOR . 'custom-alerts.php';
-		if ( file_exists( $file ) ) {
-			require_once $file;
-			if ( is_array( $custom_alerts ) ) {
-				try {
-					$activity_log->alerts->RegisterGroup( $custom_alerts );
-				} catch ( \Exception $ex ) {
-					$activity_log->log( $ex->getMessage() );
-				}
-			}
-		}
-	}
-}
-
-/**
  * Define Default Alerts.
  *
  * Define default alerts for the plugin.
  *
  * @param \WSAL\MainWPExtension\Activity_Log $activity_log - Instance of main plugin.
  */
-function mwpaldefaults_init( \WSAL\MainWPExtension\Activity_Log $activity_log ) {
+function mwpal_defaults_init( \WSAL\MainWPExtension\Activity_Log $activity_log ) {
 	$activity_log->constants->UseConstants(
 		array(
 			// Default PHP constants.
@@ -612,7 +588,5 @@ function mwpaldefaults_init( \WSAL\MainWPExtension\Activity_Log $activity_log ) 
 			),
 		)
 	);
-	// Load Custom alerts.
-	load_include_custom_file( $activity_log );
 }
-add_action( 'mwpal_init', 'mwpaldefaults_init' );
+add_action( 'mwpal_init', 'mwpal_defaults_init' );

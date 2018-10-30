@@ -5,6 +5,7 @@
  * Interface used by the Query.
  *
  * @package mwp-al-ext
+ * @since 1.0.0
  */
 
 namespace WSAL\MainWPExtension\Adapters;

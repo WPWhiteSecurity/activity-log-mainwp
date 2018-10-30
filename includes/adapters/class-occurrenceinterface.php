@@ -5,6 +5,7 @@
  * Interface used by the Occurrence.
  *
  * @package mwp-al-ext
+ * @since 1.0.0
  */
 
 namespace WSAL\MainWPExtension\Adapters;

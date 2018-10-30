@@ -5,6 +5,7 @@
  * Helper class used for encode/decode json data.
  *
  * @package mwp-al-ext
+ * @since 1.0.0
  */
 
 namespace WSAL\MainWPExtension\Helpers;
