@@ -7,7 +7,7 @@ Tags: activity log, mainwp, mainwp extension, wordpress security, wordpress secu
 Requires at least: 3.6
 Tested up to: 4.9.8
 Stable tag: 1.0
-Requires PHP: 5.4.43
+Requires PHP: 5.5
 
 See the activity logs of all child sites & MainWP in one central location - the MainWP dashboard.
 
