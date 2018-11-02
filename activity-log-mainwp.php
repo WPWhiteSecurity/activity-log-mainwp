@@ -298,6 +298,7 @@ class Activity_Log {
 			'api'      => basename( __FILE__, '.php' ),
 			'mainwp'   => false,
 			'callback' => array( &$this, 'display_extension' ),
+			'icon'     => trailingslashit( MWPAL_BASE_URL ) . 'assets/img/activity-log-mainwp-500x500.jpg',
 		);
 		return $plugins;
 	}
