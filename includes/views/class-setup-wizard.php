@@ -226,7 +226,6 @@ final class Setup_Wizard {
 		?>
 		<p><?php esc_html_e( 'Thank you for installing the Activity Log for MainWP Extension.', 'mwp-al-ext' ); ?></p>
 		<p><?php esc_html_e( 'This extension allows you to see the activity logs of all the child websites which have WP Security Audit Log installed from the MainWP dashboard.', 'mwp-al-ext' ); ?></p>
-
 		<div class="mwpal-setup-actions">
 			<a class="button button-primary"
 				href="<?php echo esc_url( $this->get_next_step() ); ?>">
@@ -240,43 +239,53 @@ final class Setup_Wizard {
 	 * Step View: `WSAL Sites`
 	 */
 	private function step_wsal_sites() {
-		?>
-		<form method="post" class="mwpal-setup-form">
-			<?php wp_nonce_field( 'mwpal-step-wsal-sites' ); ?>
-			<p><?php esc_html_e( 'These are the child sites which have the WP Security Audit Log plugin installed. The activity log extension will automatically retrieve the logs from them to show them in the MainWP dashboard.', 'mwp-al-ext' ); ?></p>
-			<p><?php esc_html_e( 'Deselect those which you do not want to retrieve logs from:', 'mwp-al-ext' ); ?></p>
-			<?php
-			$mwp_sites  = $this->activity_log->settings->get_mwp_child_sites();
-			$wsal_sites = $this->activity_log->settings->get_wsal_child_sites();
+		$mwp_sites  = $this->activity_log->settings->get_mwp_child_sites();
+		$wsal_sites = $this->activity_log->settings->get_wsal_child_sites();
+
+		if ( ! empty( $wsal_sites ) ) :
 			?>
-			<fieldset>
-				<div class="sites-container">
-					<?php
-					foreach ( $wsal_sites as $site_id => $site ) :
-						// Search for the site data.
-						$key = array_search( $site_id, array_column( $mwp_sites, 'id' ), false );
-						if ( false !== $key && isset( $mwp_sites[ $key ] ) ) :
-							$selected_site = $mwp_sites[ $key ];
-							?>
-							<label for="<?php echo esc_attr( $selected_site['id'] ); ?>">
-								<input type="checkbox" name="mwpal-wsal-sites[]" id="<?php echo esc_attr( $selected_site['id'] ); ?>" value="<?php echo esc_attr( $selected_site['id'] ); ?>" checked /> <?php echo esc_html( $selected_site['name'] ); ?>
-							</label>
-							<br>
+			<form method="post" class="mwpal-setup-form">
+				<?php wp_nonce_field( 'mwpal-step-wsal-sites' ); ?>
+				<p><?php esc_html_e( 'These are the child sites which have the WP Security Audit Log plugin installed. The activity log extension will automatically retrieve the logs from them to show them in the MainWP dashboard.', 'mwp-al-ext' ); ?></p>
+				<p><?php esc_html_e( 'Deselect those which you do not want to retrieve logs from:', 'mwp-al-ext' ); ?></p>
+				<fieldset>
+					<div class="sites-container">
 						<?php
-						endif;
-					endforeach;
-					?>
+						foreach ( $wsal_sites as $site_id => $site ) :
+							// Search for the site data.
+							$key = array_search( $site_id, array_column( $mwp_sites, 'id' ), false );
+							if ( false !== $key && isset( $mwp_sites[ $key ] ) ) :
+								$selected_site = $mwp_sites[ $key ];
+								?>
+								<label for="<?php echo esc_attr( $selected_site['id'] ); ?>">
+									<input type="checkbox" name="mwpal-wsal-sites[]" id="<?php echo esc_attr( $selected_site['id'] ); ?>" value="<?php echo esc_attr( $selected_site['id'] ); ?>" checked /> <?php echo esc_html( $selected_site['name'] ); ?>
+								</label>
+								<br>
+							<?php
+							endif;
+						endforeach;
+						?>
+					</div>
+				</fieldset>
+				<p class="description"><?php /* translators: %s: Note */ echo sprintf( esc_html__( '%s You can add or remove child websites at a later stage from the extensions settings.', 'mwp-al-ext' ), '<strong>' . esc_html__( 'Note:', 'mwp-al-ext' ) . '</strong>' ); ?></p>
+				<div class="mwpal-setup-actions">
+					<button class="button button-primary" type="submit" name="save_step" value="<?php esc_attr_e( 'Next', 'wp-security-audit-log' ); ?>">
+						<?php esc_html_e( 'Finish', 'wp-security-audit-log' ); ?>
+					</button>
 				</div>
-			</fieldset>
-			<?php /* translators: %s: Note */ ?>
-			<p class="description"><?php echo sprintf( esc_html__( '%s You can add or remove child websites at a later stage from the extensions settings.', 'mwp-al-ext' ), '<strong>' . esc_html__( 'Note:', 'mwp-al-ext' ) . '</strong>' ); ?></p>
+			</form>
+			<?php
+		else :
+			?>
+			<p><?php /* Translators: %s: Getting started guide hyperlink */ echo sprintf( esc_html__( 'It seems that the WP Security Audit Log plugin is not installed on any of the child sites. Please exit this wizard, install the WP Security Audit Log plugin on the child sites and then add the sites from the Extensions settings. Refer to the %s for more information.', 'mwp-al-ext' ), '<a href="https://www.wpsecurityauditlog.com/support-documentation/gettting-started-activity-log-mainwp-extension/" target="_blank">' . esc_html__( 'Getting Started Guide', 'mwp-al-ext' ) . '</a>' ); ?></p>
 			<div class="mwpal-setup-actions">
-				<button class="button button-primary" type="submit" name="save_step" value="<?php esc_attr_e( 'Next', 'wp-security-audit-log' ); ?>">
-					<?php esc_html_e( 'Finish', 'wp-security-audit-log' ); ?>
-				</button>
+				<a class="button button-primary"
+					href="<?php echo esc_url( $this->get_next_step() ); ?>">
+					<?php esc_html_e( 'Exit Wizard', 'mwp-al-ext' ); ?>
+				</a>
 			</div>
-		</form>
-		<?php
+			<?php
+		endif;
 	}
 
 	/**
