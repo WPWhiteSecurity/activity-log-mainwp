@@ -164,8 +164,9 @@ class View extends Abstract_View {
 	public function mwp_sub_menu_dropdown( $mwp_dropdown_menu ) {
 		$mwp_dropdown_menu[ MWPAL_EXTENSION_NAME ] = array(
 			array(
-				'Extension Settings',
+				__( 'Extension Settings', 'mwp-al-ext' ),
 				'admin.php?page=' . MWPAL_EXTENSION_NAME . '&tab=settings',
+				'',
 			),
 		);
 		return $mwp_dropdown_menu;
