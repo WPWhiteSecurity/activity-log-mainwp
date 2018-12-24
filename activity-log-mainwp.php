@@ -217,6 +217,31 @@ class Activity_Log {
 	 * Save option that extension has been activated.
 	 */
 	public function install_extension() {
+		if ( ! is_plugin_active( 'mainwp/mainwp.php' ) ) {
+			?>
+			<html>
+				<head>
+					<style>
+						.warn-icon-tri{top:5px;left:5px;position:absolute;border-left:16px solid #FFF;border-right:16px solid #FFF;border-bottom:28px solid #C33;height:3px;width:4px}.warn-icon-chr{top:8px;left:18px;position:absolute;color:#FFF;font:26px Georgia}.warn-icon-cir{top:2px;left:0;position:absolute;overflow:hidden;border:6px solid #FFF;border-radius:32px;width:34px;height:34px}.warn-wrap{position:relative;color:#A00;font:14px Arial;padding:6px 48px}.warn-wrap a,.warn-wrap a:hover{color:#F56}
+					</style>
+				</head>
+				<body>
+					<div class="warn-wrap">
+						<div class="warn-icon-tri"></div><div class="warn-icon-chr">!</div><div class="warn-icon-cir"></div>
+						<?php
+						echo sprintf(
+							/* Translators: %s: Getting started guide hyperlink. */
+							esc_html__( 'This extension should be installed on the MainWP dashboard site. On the child sites please install the WP Security Audit Log plugin. Refer to the %s for more information.', 'mwp-al-ext' ),
+							'<a href="https://www.wpsecurityauditlog.com/support-documentation/gettting-started-activity-log-mainwp-extension/" target="_blank">' . esc_html__( 'Getting Started Guide', 'mwp-al-ext' ) . '</a>'
+						);
+						?>
+					</div>
+				</body>
+			</html>
+			<?php
+			die( 1 );
+		}
+
 		// Ensure that the system is installed and schema is correct.
 		self::get_connector()->installAll();
 
