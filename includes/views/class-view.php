@@ -213,7 +213,7 @@ class View extends Abstract_View {
 			return;
 		}
 
-		if ( 'settings' === $this->current_tab ) {
+		if ( 'activity-log' === $this->current_tab ) {
 			// Select2 styles.
 			wp_enqueue_style(
 				'mwpal-select2-css',
@@ -255,9 +255,10 @@ class View extends Abstract_View {
 			return;
 		}
 
+		// Enqueue jQuery.
 		wp_enqueue_script( 'jquery' );
 
-		if ( 'settings' === $this->current_tab ) {
+		if ( 'activity-log' === $this->current_tab ) {
 			// Select2 script.
 			wp_enqueue_script(
 				'mwpal-select2-js',

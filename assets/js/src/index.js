@@ -9,6 +9,13 @@ import '../../css/src/styles.scss';
 
 jQuery( document ).ready( function() {
 
+	// select2 for site selection select input.
+	if ( 'activity-log' === scriptData.currentTab ) {
+		jQuery( '.mwp-ssas' ).select2({
+			width: 250
+		});
+	}
+
 	/**
 	 * Site events switch handler.
 	 */
