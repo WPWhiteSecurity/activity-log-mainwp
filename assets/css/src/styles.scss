@@ -153,6 +153,10 @@ td.column-user {
 #mwpal-wcs-al,
 #mwpal-wcs {
 	flex-basis: 250px;
+
+	p {
+		min-height: 63px;
+	}
 }
 
 #mwpal-wcs-btns a {

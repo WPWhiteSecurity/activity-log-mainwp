@@ -565,6 +565,7 @@ class View extends Abstract_View {
 
 					<div id="mwpal-setting-contentbox-3" class="postbox">
 						<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'List of Child Sites in the Activity Log for MainWP', 'mwp-al-ext' ); ?></span></h2>
+						<div class="mainwp-postbox-actions-top"><p class="description"><?php esc_html_e( 'Use the below settings to add or remove child sites\' activity logs from the central activity log in the MainWP dashboard. The column on the left is a list of MainWP child sites that have the WP Security Audit Log plugin installed but their logs are not shown in the MainWP dashboard.', 'mwp-al-ext' ); ?></p></div>
 						<div class="inside">
 							<table class="form-table">
 								<tbody>
@@ -572,7 +573,7 @@ class View extends Abstract_View {
 										<td>
 											<div class="mwpal-wcs-container">
 												<div id="mwpal-wcs">
-													<p><?php esc_html_e( 'Child sites with WSAL installed', 'mwp-al-ext' ); ?></p>
+													<p><?php esc_html_e( 'Child sites with WP Security Audit Log installed but not in the MainWP Activity Log', 'mwp-al-ext' ); ?></p>
 													<div class="sites-container">
 														<?php
 														$disabled_sites = $this->activity_log->settings->get_option( 'disabled-wsal-sites', array() );
@@ -595,7 +596,7 @@ class View extends Abstract_View {
 													<a href="javascript:;" class="button-secondary" id="mwpal-wcs-remove-btn"><span class="dashicons dashicons-arrow-left-alt2"></span> <?php esc_html_e( 'Remove', 'mwp-al-ext' ); ?></a>
 												</div>
 												<div id="mwpal-wcs-al">
-													<p><?php esc_html_e( 'Child sites in the activity log', 'mwp-al-ext' ); ?></p>
+													<p><?php esc_html_e( 'Child sites which have their activity log in the central MainWP activity logs', 'mwp-al-ext' ); ?></p>
 													<div class="sites-container">
 														<?php
 														$selected_sites = array();
