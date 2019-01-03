@@ -109,6 +109,9 @@ td.column-user {
   color: #FFF;
   background: #333; }
 
+.mwp-ssas {
+  vertical-align: top; }
+
 .mwp-ipp,
 .mwp-ssa {
   display: inline-block;

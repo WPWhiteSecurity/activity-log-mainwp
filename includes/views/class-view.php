@@ -553,7 +553,6 @@ class View extends Abstract_View {
 												<?php $events_frequency = $this->activity_log->settings->get_events_frequency(); ?>
 												<input type="number" id="events-frequency" name="events-frequency" value="<?php echo esc_attr( $events_frequency ); ?>" />
 												<?php esc_html_e( 'hours', 'mwp-al-ext' ); ?>
-												<p><input type="button" class="button-primary" id="mwpal-wsal-manual-retrieve" value="<?php esc_html_e( 'Retrieve Activity Logs Now', 'mwp-al-ext' ); ?>" /></p>
 											</fieldset>
 										</td>
 									</tr>
@@ -930,14 +929,14 @@ class View extends Abstract_View {
 			if ( ! empty( $mwp_sites ) ) {
 				$trigger_retrieving = true; // Event 7711.
 				$trigger_ready      = true; // Event 7712.
-				$server_ip          = $this->settings->get_server_ip(); // Get server IP.
+				$server_ip          = $this->activity_log->settings->get_server_ip(); // Get server IP.
 
 				foreach ( $mwp_sites as $site_id => $site ) {
 					// Delete events by site id.
 					$this->activity_log->alerts->delete_site_events( $site_id );
 
 					// Fetch events by site id.
-					$sites_data = $this->activity_log->alerts->fetch_site_events( $site_id, $trigger_retrieving );
+					$sites_data[ $site_id ] = $this->activity_log->alerts->fetch_site_events( $site_id, $trigger_retrieving );
 
 					// Set $trigger_retrieving to false to avoid logging 7711 multiple times.
 					$trigger_retrieving = false;

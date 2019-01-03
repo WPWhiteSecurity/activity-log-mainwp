@@ -444,7 +444,7 @@ final class AlertManager {
 			);
 
 			// Call to child sites to fetch WSAL events.
-			$sites_data[ $site_id ] = apply_filters(
+			return apply_filters(
 				'mainwp_fetchurlauthed',
 				$this->activity_log->get_child_file(),
 				$this->activity_log->get_child_key(),

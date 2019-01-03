@@ -450,7 +450,7 @@ class Activity_Log {
 				$this->alerts->delete_site_events( $site_id );
 
 				// Fetch events by site id.
-				$sites_data = $this->alerts->fetch_site_events( $site_id, $trigger_retrieving );
+				$sites_data[ $site_id ] = $this->alerts->fetch_site_events( $site_id, $trigger_retrieving );
 
 				// Set $trigger_retrieving to false to avoid logging 7711 multiple times.
 				$trigger_retrieving = false;

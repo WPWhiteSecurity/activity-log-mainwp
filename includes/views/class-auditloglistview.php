@@ -167,6 +167,7 @@ final class AuditLogListView extends \WP_List_Table {
 						endforeach;
 						?>
 					</select>
+					<input type="button" class="button-primary" id="mwpal-wsal-manual-retrieve" value="<?php esc_html_e( 'Retrieve Activity Logs Now', 'mwp-al-ext' ); ?>" />
 				</div>
 				<?php
 			endif;
