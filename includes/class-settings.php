@@ -525,4 +525,34 @@ class Settings {
 		}
 		return false;
 	}
+
+	/**
+	 * Get last checked timestamp by site id.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @param integer $site_id - Site id.
+	 * @return mixed
+	 */
+	public function get_last_checked_by_siteid( $site_id = 0 ) {
+		if ( $site_id ) {
+			return $this->get_option( 'mwpal_last_checked_site_' . $site_id );
+		}
+		return false;
+	}
+
+	/**
+	 * Set last checked timestamp by site id.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @param integer $site_id      - Site id.
+	 * @param string  $last_checked - Last checked timestamp.
+	 */
+	public function set_last_checked_by_siteid( $site_id = 0, $last_checked ) {
+		$activity_log = \WSAL\MainWPExtension\Activity_Log::get_instance();
+		if ( $site_id ) {
+			$this->update_option( 'mwpal_last_checked_site_' . $site_id, $last_checked );
+		}
+	}
 }

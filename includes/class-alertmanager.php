@@ -396,4 +396,103 @@ final class AlertManager {
 			$logger->log( $type, $data, null, 0 );
 		}
 	}
+
+	/**
+	 * Delete Events from Child Sites.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @param integer $site_id - Child site ID.
+	 */
+	public function delete_site_events( $site_id = 0 ) {
+		if ( $site_id ) {
+			// Delete events by site id.
+			$delete_query = new \WSAL\MainWPExtension\Models\OccurrenceQuery();
+			$delete_query->addCondition( 'site_id = %s ', $site_id );
+			$delete_query->getAdapter()->Delete( $delete_query );
+		}
+	}
+
+	/**
+	 * Fetch Events from Child Sites.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @param integer $site_id - Child site id.
+	 * @return array
+	 */
+	public function fetch_site_events( $site_id = 0, $trigger_retrieving = true ) {
+		$sites_data = array();
+
+		if ( $site_id ) {
+			// Get server IP.
+			$server_ip = $this->activity_log->settings->get_server_ip();
+
+			if ( $trigger_retrieving ) {
+				// Extension has started retrieving.
+				$this->trigger( 7711, array(
+					'mainwp_dash' => true,
+					'Username'    => 'System',
+					'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
+				) );
+			}
+
+			// Post data for child sites.
+			$post_data = array(
+				'action'       => 'get_events',
+				'events_count' => $this->activity_log->settings->get_child_site_events(),
+			);
+
+			// Call to child sites to fetch WSAL events.
+			$sites_data[ $site_id ] = apply_filters(
+				'mainwp_fetchurlauthed',
+				$this->activity_log->get_child_file(),
+				$this->activity_log->get_child_key(),
+				$site_id,
+				'extra_excution',
+				$post_data
+			);
+		}
+		return $sites_data;
+	}
+
+	/**
+	 * Save Events from Child Sites.
+	 *
+	 * @since 1.0.1
+	 *
+	 * @param array $sites_data - Sites data.
+	 */
+	public function set_site_events( $sites_data = array() ) {
+		if ( ! empty( $sites_data ) && is_array( $sites_data ) ) {
+			// Get MainWP child sites.
+			$mwp_sites = $this->activity_log->settings->get_mwp_child_sites();
+
+			// Get server IP.
+			$server_ip = $this->activity_log->settings->get_server_ip();
+
+			foreach ( $sites_data as $site_id => $site_events ) {
+				// If $site_events is array, then MainWP failed to fetch logs from the child site.
+				if ( ! empty( $site_events ) && is_array( $site_events ) ) {
+					// Search for the site data.
+					$key = array_search( $site_id, array_column( $mwp_sites, 'id' ), false );
+
+					if ( false !== $key && isset( $mwp_sites[ $key ] ) ) {
+						// Extension is unable to retrieve events.
+						$this->trigger( 7710, array(
+							'friendly_name' => $mwp_sites[ $key ]['name'],
+							'site_url'      => $mwp_sites[ $key ]['url'],
+							'site_id'       => $mwp_sites[ $key ]['id'],
+							'mainwp_dash'   => true,
+							'Username'      => 'System',
+							'ClientIP'      => ! empty( $server_ip ) ? $server_ip : false,
+						) );
+					}
+				} elseif ( empty( $site_events ) || ! isset( $site_events->events ) ) {
+					continue;
+				}
+				$this->log_events( $site_events->events, $site_id );
+			}
+		}
+	}
 }

@@ -289,7 +289,7 @@ class Activity_Log {
 
 		// Plugin Min PHP Version.
 		if ( ! defined( 'MWPAL_MIN_PHP_VERSION' ) ) {
-			define( 'MWPAL_MIN_PHP_VERSION', '5.4.0' );
+			define( 'MWPAL_MIN_PHP_VERSION', '5.5.0' );
 		}
 
 		// Plugin Options Prefix.
@@ -418,30 +418,55 @@ class Activity_Log {
 	 */
 	public function events_cleanup() {
 		// Get MainWP sites.
-		$mwp_sites = $this->settings->get_wsal_child_sites();
+		$child_sites = $this->settings->get_wsal_child_sites();
+		$server_ip   = $this->settings->get_server_ip(); // Get server IP.
 
-		foreach ( $mwp_sites as $site_id => $site ) {
-			$event = $this->get_latest_event_by_siteid( $site_id );
+		if ( ! empty( $child_sites ) && is_array( $child_sites ) ) {
+			$sites_data         = array();
+			$trigger_retrieving = true; // Event 7711.
+			$trigger_ready      = true; // Event 7712.
 
-			if ( $event ) {
-				$hrs_diff = $this->settings->get_hours_since_last_alert( $event->created_on );
+			foreach ( $child_sites as $site_id => $site ) {
+				$event    = $this->get_latest_event_by_siteid( $site_id );
+				$hrs_diff = 0;
+				if ( $event ) {
+					$hrs_diff = $this->settings->get_hours_since_last_alert( $event->created_on );
+				}
 
-				// If the hours difference is more than the selected frequency.
-				if ( $hrs_diff > $this->settings->get_events_frequency() ) {
-					// Get latest event from child site.
-					$live_event = $this->get_live_event_by_siteid( $site_id );
+				// If the hours difference is less than the selected frequency then skip this site.
+				if ( 0 !== $hrs_diff && $hrs_diff < $this->settings->get_events_frequency() ) {
+					continue;
+				}
 
-					// If the latest event on the dashboard matches the timestamp of the latest event on child site, then skip.
-					if ( $live_event && $event->created_on === $live_event->created_on ) {
-						continue;
-					}
+				// Get latest event from child site.
+				$live_event = $this->get_live_event_by_siteid( $site_id );
 
-					// Delete events by site id.
-					$delete_query = new \WSAL\MainWPExtension\Models\OccurrenceQuery();
-					$delete_query->addCondition( 'site_id = %s ', $site_id );
-					$delete_query->getAdapter()->Delete( $delete_query );
+				// If the latest event on the dashboard matches the timestamp of the latest event on child site, then skip.
+				if ( $live_event && $event && $event->created_on === $live_event->created_on ) {
+					continue;
+				}
+
+				// Delete events by site id.
+				$this->alerts->delete_site_events( $site_id );
+
+				// Fetch events by site id.
+				$sites_data = $this->alerts->fetch_site_events( $site_id, $trigger_retrieving );
+
+				// Set $trigger_retrieving to false to avoid logging 7711 multiple times.
+				$trigger_retrieving = false;
+
+				if ( $trigger_ready && isset( $sites_data[ $site_id ]->events ) ) {
+					// Extension is ready after retrieving.
+					$this->alerts->trigger( 7712, array(
+						'mainwp_dash' => true,
+						'Username'    => 'System',
+						'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
+					) );
+					$trigger_ready = false;
 				}
 			}
+			// Set child site events.
+			$this->alerts->set_site_events( $sites_data );
 		}
 	}
 
@@ -465,7 +490,20 @@ class Activity_Log {
 		$event = $event_query->getAdapter()->Execute( $event_query );
 
 		if ( isset( $event[0] ) ) {
+			// Event is found.
 			return $event[0];
+		} else {
+			// Check the last checked timestamp against this site id.
+			$last_checked = $this->settings->get_last_checked_by_siteid( $site_id );
+
+			if ( ! $last_checked ) {
+				$next_update = time() + ( $this->settings->get_events_frequency() * 60 * 60 ) + 1;
+				$this->settings->set_last_checked_by_siteid( $site_id, $next_update );
+			} else {
+				$last_event             = new \stdClass();
+				$last_event->created_on = $last_checked;
+				return $last_event;
+			}
 		}
 		return false;
 	}

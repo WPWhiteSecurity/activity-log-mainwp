@@ -370,10 +370,8 @@ class View extends Abstract_View {
 		// Fetch all child-sites.
 		$this->mwp_child_sites  = $this->activity_log->settings->get_mwp_child_sites(); // Get MainWP child sites.
 		$this->wsal_child_sites = $this->activity_log->settings->get_wsal_child_sites(); // Get child sites with WSAL installed.
-		$this->query_child_site_events(); // Query events from child sites with WSAL.
 
 		if ( $this->activity_log->is_child_enabled() ) {
-			$this->get_list_view()->prepare_items();
 			?>
 			<div class="mwpal-content-wrapper">
 				<?php
@@ -399,6 +397,7 @@ class View extends Abstract_View {
 	 * Tab: `Activity Log`
 	 */
 	public function tab_activity_log() {
+		$this->get_list_view()->prepare_items();
 		$site_id = $this->activity_log->settings->get_view_site_id();
 		// @codingStandardsIgnoreStart
 		$mwp_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // Admin WSAL Page.
@@ -711,7 +710,7 @@ class View extends Abstract_View {
 
 				foreach ( $sites_data as $site_id => $site_events ) {
 					// If $site_events is array, then MainWP failed to fetch logs from the child site.
-					if ( is_array( $site_events ) ) {
+					if ( ! empty( $site_events ) && is_array( $site_events ) ) {
 						// Search for the site data.
 						$key = array_search( $site_id, array_column( $mwp_sites, 'id' ), false );
 
@@ -726,7 +725,7 @@ class View extends Abstract_View {
 								'ClientIP'      => ! empty( $server_ip ) ? $server_ip : false,
 							) );
 						}
-					} elseif ( ! isset( $site_events->events ) ) {
+					} elseif ( empty( $site_events ) || ! isset( $site_events->events ) ) {
 						continue;
 					}
 					$this->activity_log->alerts->log_events( $site_events->events, $site_id );
@@ -929,12 +928,32 @@ class View extends Abstract_View {
 			$mwp_sites = $this->activity_log->settings->get_wsal_child_sites();
 
 			if ( ! empty( $mwp_sites ) ) {
+				$trigger_retrieving = true; // Event 7711.
+				$trigger_ready      = true; // Event 7712.
+				$server_ip          = $this->settings->get_server_ip(); // Get server IP.
+
 				foreach ( $mwp_sites as $site_id => $site ) {
 					// Delete events by site id.
-					$delete_query = new \WSAL\MainWPExtension\Models\OccurrenceQuery();
-					$delete_query->addCondition( 'site_id = %s ', $site_id );
-					$delete_query->getAdapter()->Delete( $delete_query );
+					$this->activity_log->alerts->delete_site_events( $site_id );
+
+					// Fetch events by site id.
+					$sites_data = $this->activity_log->alerts->fetch_site_events( $site_id, $trigger_retrieving );
+
+					// Set $trigger_retrieving to false to avoid logging 7711 multiple times.
+					$trigger_retrieving = false;
+
+					if ( $trigger_ready && isset( $sites_data[ $site_id ]->events ) ) {
+						// Extension is ready after retrieving.
+						$this->activity_log->alerts->trigger( 7712, array(
+							'mainwp_dash' => true,
+							'Username'    => 'System',
+							'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
+						) );
+						$trigger_ready = false;
+					}
 				}
+				// Set child site events.
+				$this->activity_log->alerts->set_site_events( $sites_data );
 			}
 			die();
 		}
