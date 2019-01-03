@@ -608,7 +608,7 @@ final class AuditLogListView extends \WP_List_Table {
 					$site_id = $this->activity_log->settings->get_view_site_id(); // Site id for multisite.
 					return '<a href="javascript:;" onclick="download_404_log( this )" data-log-file="' . esc_attr( $value ) . '" data-site-id="' . esc_attr( $site_id ) . '" data-nonce-404="' . esc_attr( wp_create_nonce( 'wsal-download-404-log-' . $value ) ) . '" title="' . esc_html__( 'Download the log file', 'mwp-al-ext' ) . '">' . esc_html__( 'Download the log file', 'mwp-al-ext' ) . '</a>';
 				} else {
-					return 'Click <a href="' . esc_url( admin_url( 'admin.php?page=wsal-togglealerts#tab-system-activity' ) ) . '">here</a> to log such requests to file';
+					return 'Click <a href="' . esc_url( add_query_arg( 'page', 'wsal-togglealerts', admin_url( 'admin.php' ) ) ) . '">here</a> to log such requests to file';
 				}
 
 			case '%URL%' === $name:
@@ -656,6 +656,28 @@ final class AuditLogListView extends \WP_List_Table {
 				$url = admin_url( 'admin-ajax.php' ) . '?action=AjaxInspector&amp;occurrence=' . $this->current_alert_id;
 				return ' View the changes in <a class="thickbox"  title="' . __( 'Alert Data Inspector', 'mwp-al-ext' ) . '"'
 				. ' href="' . $url . '&amp;TB_iframe=true&amp;width=600&amp;height=550">data inspector.</a>';
+
+			case '%ScanError%' === $name:
+				if ( 'NULL' === $value ) {
+					return false;
+				}
+				/* translators: Mailto link for support. */
+				return ' with errors. ' . sprintf( __( 'Contact us on %s for assistance', 'mwp-al-ext' ), '<a href="mailto:support@wpsecurityauditlog.com" target="_blank">support@wpsecurityauditlog.com</a>' );
+
+			case '%TableNames%' === $name:
+				$value = str_replace( ',', ', ', $value );
+				return '<strong>' . esc_html( $value ) . '</strong>';
+
+			case '%FileSettings%' === $name:
+				$file_settings_args = array(
+					'page' => 'wsal-settings',
+					'tab'  => 'file-changes',
+				);
+				$file_settings      = add_query_arg( $file_settings_args, admin_url( 'admin.php' ) );
+				return '<a href="' . esc_url( $file_settings ) . '">' . esc_html__( 'plugin settings', 'mwp-al-ext' ) . '</a>';
+
+			case '%ContactSupport%' === $name:
+				return '<a href="https://www.wpsecurityauditlog.com/contact/" target="_blank">' . esc_html__( 'contact our support', 'mwp-al-ext' ) . '</a>';
 
 			default:
 				return '<strong>' . esc_html( $value ) . '</strong>';
