@@ -180,7 +180,7 @@ class Activity_Log {
 			// listening to the 'mainwp-activated' action. This action is triggered by MainWP after initialisation.
 			add_action( 'mainwp-activated', array( &$this, 'activate_this_plugin' ) );
 		}
-		add_action( 'admin_init', array( &$this, 'redirect_to_extensions' ) );
+		add_action( 'admin_init', array( &$this, 'redirect_on_activate' ) );
 		add_action( 'admin_notices', array( &$this, 'mainwp_error_notice' ) );
 
 		if ( false === $this->settings->get_option( 'setup-complete' ) ) {
@@ -303,11 +303,21 @@ class Activity_Log {
 	 *
 	 * @return void
 	 */
-	public function redirect_to_extensions() {
+	public function redirect_on_activate() {
+		$redirect_url = false;
 		if ( 'yes' === $this->settings->is_extension_activated() ) {
 			$this->settings->delete_option( 'activity-extension-activated' );
-			wp_safe_redirect( add_query_arg( 'page', 'activity-log-mainwp-setup', admin_url( 'index.php' ) ) );
-			return;
+
+			if ( ! $this->settings->get_option( 'setup-complete' ) ) {
+				$redirect_url = add_query_arg( 'page', 'activity-log-mainwp-setup', admin_url( 'index.php' ) );
+			} else {
+				$redirect_url = add_query_arg( 'page', MWPAL_EXTENSION_NAME, admin_url( 'admin.php' ) );
+			}
+		}
+
+		if ( $redirect_url ) {
+			wp_safe_redirect( $redirect_url );
+			exit();
 		}
 	}
 
