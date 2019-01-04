@@ -1,8 +1,7 @@
 <h1 align="center">Activity Log for MainWP</h1>
 
 <p align="center">See the activity logs of all child sites & MainWP in one central location - the MainWP dashboard.
-<br/>
-<a href="https://wordpress.org/plugins/activity-log-mainwp/">👉 https://wordpress.org/plugins/activity-log-mainwp/</a>
+<br/>👉 <a href="https://wordpress.org/plugins/activity-log-mainwp/">https://wordpress.org/plugins/activity-log-mainwp/</a>
 </p>
 
 <p align="center">
