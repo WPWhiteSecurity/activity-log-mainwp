@@ -160,9 +160,10 @@ class Occurrence extends ActiveRecord {
 	 *
 	 * @see \WSAL\MainWPExtension\Alert::GetMessage()
 	 * @param callable|null $meta_formatter (Optional) – Meta formatter callback.
+	 * @param array         $meta           (Optional) - Occurrence meta array.
 	 * @return string Full-formatted message.
 	 */
-	public function GetMessage( $meta_formatter = null ) {
+	public function GetMessage( $meta_formatter = null, $meta = null ) {
 		if ( ! isset( $this->_cachedmessage ) ) {
 			// Get correct message entry.
 			if ( $this->is_migrated ) {
@@ -172,7 +173,8 @@ class Occurrence extends ActiveRecord {
 				$this->_cachedmessage = $this->GetAlert()->mesg;
 			}
 			// Fill variables in message.
-			$this->_cachedmessage = $this->GetAlert()->GetMessage( $this->GetMetaArray(), $meta_formatter, $this->_cachedmessage );
+			$meta_array           = null === $meta ? $this->GetMetaArray() : $meta;
+			$this->_cachedmessage = $this->GetAlert()->GetMessage( $meta_array, $meta_formatter, $this->_cachedmessage );
 		}
 		return $this->_cachedmessage;
 	}
@@ -194,17 +196,29 @@ class Occurrence extends ActiveRecord {
 	 * Gets the username.
 	 *
 	 * @see \WSAL\MainWPExtension\Adapters\MySQL\Occurrence::GetFirstNamedMeta()
+	 *
+	 * @param array $meta - (Optional) Occurrence meta array.
 	 * @return string User's username.
 	 */
-	public function GetUsername() {
-		$meta = $this->getAdapter()->GetFirstNamedMeta( $this, array( 'Username', 'CurrentUserID' ) );
-		if ( $meta ) {
-			switch ( true ) {
-				case 'Username' === $meta->name:
-					return $meta->value;
-				case 'CurrentUserID' === $meta->name:
-					$data = get_userdata( $meta->value );
-					return $data ? $data->user_login : null;
+	public function GetUsername( $meta = null ) {
+		if ( null === $meta ) {
+			$meta = $this->getAdapter()->GetFirstNamedMeta( $this, array( 'Username', 'CurrentUserID' ) );
+
+			if ( $meta ) {
+				switch ( true ) {
+					case 'Username' === $meta->name:
+						return $meta->value;
+					case 'CurrentUserID' === $meta->name:
+						$data = get_userdata( $meta->value );
+						return $data ? $data->user_login : null;
+				}
+			}
+		} else {
+			if ( isset( $meta['Username'] ) ) {
+				return $meta['Username'];
+			} elseif ( isset( $meta['CurrentUserID'] ) ) {
+				$data = get_userdata( $meta['CurrentUserID'] );
+				return $data ? $data->user_login : null;
 			}
 		}
 		return null;
@@ -214,19 +228,28 @@ class Occurrence extends ActiveRecord {
 	 * Gets the user data.
 	 *
 	 * @see \WSAL\MainWPExtension\Adapters\MySQL\Occurrence::GetFirstNamedMeta()
+	 *
+	 * @param array $meta - (Optional) Occurrence meta array.
 	 * @return mixed User's data.
 	 */
-	public function get_user_data() {
-		return $this->GetMetaValue( 'UserData', false );
+	public function get_user_data( $meta = null ) {
+		if ( null === $meta ) {
+			return $this->GetMetaValue( 'UserData', false );
+		}
+		return isset( $meta['UserData'] ) ? $meta['UserData'] : false;
 	}
 
 	/**
 	 * Gets the Client IP.
 	 *
+	 * @param array $meta - (Optional) Occurrence meta array.
 	 * @return string IP address of request.
 	 */
-	public function GetSourceIP() {
-		return $this->GetMetaValue( 'ClientIP', '' );
+	public function GetSourceIP( $meta = null ) {
+		if ( null === $meta ) {
+			return $this->GetMetaValue( 'ClientIP', '' );
+		}
+		return isset( $meta['ClientIP'] ) ? $meta['ClientIP'] : '';
 	}
 
 	/**
@@ -236,7 +259,7 @@ class Occurrence extends ActiveRecord {
 	 */
 	public function GetOtherIPs() {
 		$result = array();
-		$data = (array) $this->GetMetaValue( 'OtherIPs', array() );
+		$data   = (array) $this->GetMetaValue( 'OtherIPs', array() );
 		foreach ( $data as $ips ) {
 			foreach ( $ips as $ip ) {
 				$result[] = $ip;
@@ -248,10 +271,14 @@ class Occurrence extends ActiveRecord {
 	/**
 	 * Gets user roles.
 	 *
+	 * @param array $meta - (Optional) Occurrence meta array.
 	 * @return array Array of user roles.
 	 */
-	public function GetUserRoles() {
-		return $this->GetMetaValue( 'CurrentUserRoles', array() );
+	public function GetUserRoles( $meta = null ) {
+		if ( null === $meta ) {
+			return $this->GetMetaValue( 'CurrentUserRoles', array() );
+		}
+		return isset( $meta['CurrentUserRoles'] ) ? $meta['CurrentUserRoles'] : array();
 	}
 
 	/**

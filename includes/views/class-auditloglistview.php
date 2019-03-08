@@ -56,6 +56,15 @@ final class AuditLogListView extends \WP_List_Table {
 	protected $mwp_child_sites;
 
 	/**
+	 * Events Meta.
+	 *
+	 * @since 1.1
+	 *
+	 * @var array
+	 */
+	private $item_meta = array();
+
+	/**
 	 * Method: Constructor.
 	 *
 	 * @param object $activity_log - Instance of Activity_Log.
@@ -195,6 +204,10 @@ final class AuditLogListView extends \WP_List_Table {
 		$type_username   = $this->activity_log->settings->get_type_username(); // Get username type to display.
 		$mwp_child_sites = $this->mwp_child_sites; // Get MainWP child sites.
 
+		if ( ! isset( $this->item_meta[ $item->getId() ] ) ) {
+			$this->item_meta[ $item->getId() ] = $item->GetMetaArray();
+		}
+
 		switch ( $column_name ) {
 			case 'site':
 				$site_id    = (string) $item->site_id;
@@ -242,8 +255,8 @@ final class AuditLogListView extends \WP_List_Table {
 				) : '<i>' . __( 'Unknown', 'mwp-al-ext' ) . '</i>';
 
 			case 'user':
-				$username  = $item->GetUsername(); // Get username.
-				$user_data = $item->get_user_data(); // Get user data.
+				$username  = $item->GetUsername( $this->item_meta[ $item->getId() ] ); // Get username.
+				$user_data = $item->get_user_data( $this->item_meta[ $item->getId() ] ); // Get user data.
 				if ( empty( $user_data ) ) {
 					$user_data = get_user_by( 'login', $username );
 				}
@@ -294,7 +307,7 @@ final class AuditLogListView extends \WP_List_Table {
 					// User html.
 					$uhtml = '<a href="' . esc_url( $user_url ) . '" target="_blank">' . esc_html( $display_name ) . '</a>';
 
-					$roles = $item->GetUserRoles();
+					$roles = $item->GetUserRoles( $this->item_meta[ $item->getId() ] );
 					if ( is_array( $roles ) && count( $roles ) ) {
 						$roles = esc_html( ucwords( implode( ', ', $roles ) ) );
 					} elseif ( is_string( $roles ) && '' != $roles ) {
@@ -310,7 +323,7 @@ final class AuditLogListView extends \WP_List_Table {
 				return $image . $uhtml . '<br/>' . $roles;
 
 			case 'scip':
-				$scip = $item->GetSourceIP();
+				$scip = $item->GetSourceIP( $this->item_meta[ $item->getId() ] );
 				if ( is_string( $scip ) ) {
 					$scip = str_replace( array( '"', '[', ']' ), '', $scip );
 				}
@@ -360,7 +373,7 @@ final class AuditLogListView extends \WP_List_Table {
 				}
 
 			case 'mesg':
-				return '<div id="Event' . $item->id . '">' . $item->GetMessage( array( $this, 'meta_formatter' ) ) . '</div>';
+				return '<div id="Event' . $item->id . '">' . $item->GetMessage( array( $this, 'meta_formatter' ), $this->item_meta[ $item->getId() ] ) . '</div>';
 
 			case 'data':
 				$url_args = array(
