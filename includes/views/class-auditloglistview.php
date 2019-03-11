@@ -56,6 +56,15 @@ final class AuditLogListView extends \WP_List_Table {
 	protected $mwp_child_sites;
 
 	/**
+	 * Events Query Arguments.
+	 *
+	 * @since 1.1
+	 *
+	 * @var stdClass
+	 */
+	private $query_args;
+
+	/**
 	 * Events Meta.
 	 *
 	 * @since 1.1
@@ -67,10 +76,12 @@ final class AuditLogListView extends \WP_List_Table {
 	/**
 	 * Method: Constructor.
 	 *
-	 * @param object $activity_log - Instance of Activity_Log.
+	 * @param object   $activity_log - Instance of Activity_Log.
+	 * @param stdClass $query_args   - Events query arguments.
 	 */
-	public function __construct( $activity_log ) {
+	public function __construct( $activity_log, $query_args ) {
 		$this->activity_log = $activity_log;
+		$this->query_args   = $query_args;
 
 		// Set GMT offset.
 		$timezone = $this->activity_log->settings->get_timezone();
@@ -127,7 +138,7 @@ final class AuditLogListView extends \WP_List_Table {
 	 */
 	public function extra_tablenav( $which ) {
 		// If the position is not top then render.
-		if ( 'top' !== $which ) :
+		if ( 'top' !== $which && ! $this->activity_log->settings->is_infinite_scroll() ) :
 			// Items-per-page widget.
 			$per_page = $this->activity_log->settings->get_view_per_page();
 			$items    = array( 5, 10, 15, 30, 50 );
@@ -149,6 +160,13 @@ final class AuditLogListView extends \WP_List_Table {
 				</select>
 				<?php esc_html_e( ' Items', 'mwp-al-ext' ); ?>
 			</div>
+			<?php
+		endif;
+
+		if ( 'top' !== $which && $this->activity_log->settings->is_infinite_scroll() ) :
+			?>
+			<div id="mwpal-auditlog-end"><p><?php esc_html_e( '— End of Activity Log —', 'mwp-al-ext' ); ?></p></div>
+			<div id="mwpal-event-loader"><div class="mwpal-lds-ellipsis"><div></div><div></div><div></div><div></div></div></div>
 			<?php
 		endif;
 
@@ -470,20 +488,41 @@ final class AuditLogListView extends \WP_List_Table {
 	 * Method: Prepare items.
 	 */
 	public function prepare_items() {
-		// Per page views.
-		$per_page = $this->activity_log->settings->get_view_per_page();
-
-		$columns  = $this->get_columns();
-		$hidden   = array();
-		$sortable = $this->get_sortable_columns();
-
+		$columns               = $this->get_columns();
+		$hidden                = array();
+		$sortable              = $this->get_sortable_columns();
 		$this->_column_headers = array( $columns, $hidden, $sortable );
 
+		$query_events = $this->query_events();
+		$this->items  = isset( $query_events['items'] ) ? $query_events['items'] : false;
+		$total_items  = isset( $query_events['total_items'] ) ? $query_events['total_items'] : false;
+		$per_page     = isset( $query_events['per_page'] ) ? $query_events['per_page'] : false;
+
+		if ( ! $this->activity_log->settings->is_infinite_scroll() ) {
+			$this->set_pagination_args(
+				array(
+					'total_items' => $total_items,
+					'per_page'    => $per_page,
+					'total_pages' => ceil( $total_items / $per_page ),
+				)
+			);
+		}
+	}
+
+	/**
+	 * Query Events from WSAL DB.
+	 *
+	 * @since 1.1
+	 *
+	 * @param integer $paged - Page number.
+	 * @return array
+	 */
+	public function query_events( $paged = 0 ) {
 		// Query for events.
 		$events_query = new \WSAL\MainWPExtension\Models\OccurrenceQuery();
 
 		// Get site id for specific site events.
-		$bid = $this->activity_log->settings->get_view_site_id();
+		$bid = $this->query_args->site_id;
 		if ( $bid && 'dashboard' !== $bid ) {
 			$events_query->addCondition( 'site_id = %s ', $bid );
 		} elseif ( 'dashboard' === $bid ) {
@@ -501,12 +540,21 @@ final class AuditLogListView extends \WP_List_Table {
 		 */
 		$events_query = apply_filters( 'mwpal_auditlog_query', $events_query );
 
-		// @codingStandardsIgnoreStart
-		$orderby = isset( $_GET['orderby'] ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) : false;
-		$order   = isset( $_GET['order'] ) ? sanitize_text_field( wp_unslash( $_GET['order'] ) ) : false;
-		// @codingStandardsIgnoreEnd
+		if ( ! $this->activity_log->settings->is_infinite_scroll() ) {
+			$total_items = $events_query->getAdapter()->Count( $events_query );
+			$per_page    = $this->activity_log->settings->get_view_per_page();
+			$offset      = ( $this->get_pagenum() - 1 ) * $per_page;
+		} else {
+			$total_items = false;
+			$per_page    = 25; // Manually set per page events for infinite scroll.
+			$offset      = ( max( 1, $paged ) - 1 ) * $per_page;
+		}
 
-		if ( empty( $orderby ) ) {
+		// Set query order arguments.
+		$order_by = isset( $this->query_args->order_by ) ? $this->query_args->order_by : false;
+		$order    = isset( $this->query_args->order ) ? $this->query_args->order : false;
+
+		if ( ! $order_by ) {
 			$events_query->addOrderBy( 'created_on', true );
 		} else {
 			$is_descending = true;
@@ -515,20 +563,20 @@ final class AuditLogListView extends \WP_List_Table {
 			}
 
 			// TO DO: Allow order by meta values.
-			if ( 'scip' === $orderby ) {
+			if ( 'scip' === $order_by ) {
 				$events_query->addMetaJoin(); // Since LEFT JOIN clause causes the result values to duplicate.
 				$events_query->addCondition( 'meta.name = %s', 'ClientIP' ); // A where condition is added to make sure that we're only requesting the relevant meta data rows from metadata table.
 				$events_query->addOrderBy( 'CASE WHEN meta.name = "ClientIP" THEN meta.value END', $is_descending );
-			} elseif ( 'user' === $orderby ) {
+			} elseif ( 'user' === $order_by ) {
 				$events_query->addMetaJoin(); // Since LEFT JOIN clause causes the result values to duplicate.
 				$events_query->addCondition( 'meta.name = %s', 'CurrentUserID' ); // A where condition is added to make sure that we're only requesting the relevant meta data rows from metadata table.
 				$events_query->addOrderBy( 'CASE WHEN meta.name = "CurrentUserID" THEN meta.value END', $is_descending );
 			} else {
 				$tmp = new \WSAL\MainWPExtension\Models\Occurrence();
 				// Making sure the field exists to order by.
-				if ( isset( $tmp->{$orderby} ) ) {
+				if ( isset( $tmp->{$order_by} ) ) {
 					// TODO: We used to use a custom comparator ... is it safe to let MySQL do the ordering now?.
-					$events_query->addOrderBy( $orderby, $is_descending );
+					$events_query->addOrderBy( $order_by, $is_descending );
 
 				} else {
 					$events_query->addOrderBy( 'created_on', true );
@@ -536,18 +584,12 @@ final class AuditLogListView extends \WP_List_Table {
 			}
 		}
 
-		$total_items = $events_query->getAdapter()->Count( $events_query );
-		$events_query->setOffset( ( $this->get_pagenum() - 1 ) * $per_page );
-		$events_query->setLimit( $per_page );
-
-		$this->items = $events_query->getAdapter()->Execute( $events_query );
-
-		$this->set_pagination_args(
-			array(
-				'total_items' => $total_items,
-				'per_page'    => $per_page,
-				'total_pages' => ceil( $total_items / $per_page ),
-			)
+		$events_query->setOffset( $offset );  // Set query offset.
+		$events_query->setLimit( $per_page ); // Set number of events per page.
+		return array(
+			'total_items' => $total_items,
+			'per_page'    => $per_page,
+			'items'       => $events_query->getAdapter()->Execute( $events_query ),
 		);
 	}
 

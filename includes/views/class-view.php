@@ -58,6 +58,15 @@ class View extends Abstract_View {
 	private $current_tab = '';
 
 	/**
+	 * Audit Log View Arguments.
+	 *
+	 * @since 1.1
+	 *
+	 * @var stdClass
+	 */
+	private $page_args;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param Activity_Log $activity_log – Instance of Activity_Log.
@@ -75,6 +84,10 @@ class View extends Abstract_View {
 		add_action( 'wp_ajax_refresh_child_sites', array( $this, 'refresh_child_sites' ) );
 		add_action( 'wp_ajax_update_active_wsal_sites', array( $this, 'update_active_wsal_sites' ) );
 		add_action( 'wp_ajax_retrieve_events_manually', array( $this, 'retrieve_events_manually' ) );
+
+		if ( $this->activity_log->settings->is_infinite_scroll() ) {
+			add_action( 'wp_ajax_mwpal_infinite_scroll_events', array( $this, 'infinite_scroll_events' ) );
+		}
 
 		// Extension view URL.
 		$extension_url = add_query_arg( 'page', MWPAL_EXTENSION_NAME, admin_url( 'admin.php' ) );
@@ -279,12 +292,17 @@ class View extends Abstract_View {
 
 		// JS data.
 		$script_data = array(
-			'ajaxURL'     => admin_url( 'admin-ajax.php' ),
-			'scriptNonce' => wp_create_nonce( 'mwp-activitylog-nonce' ),
-			'currentTab'  => $this->current_tab,
-			'selectSites' => __( 'Select Child Site(s)', 'mwp-al-ext' ),
-			'refreshing'  => __( 'Refreshing Child Sites...', 'mwp-al-ext' ),
-			'retrieving'  => __( 'Retrieving Logs...', 'mwp-al-ext' ),
+			'ajaxURL'        => admin_url( 'admin-ajax.php' ),
+			'scriptNonce'    => wp_create_nonce( 'mwp-activitylog-nonce' ),
+			'currentTab'     => $this->current_tab,
+			'selectSites'    => __( 'Select Child Site(s)', 'mwp-al-ext' ),
+			'refreshing'     => __( 'Refreshing Child Sites...', 'mwp-al-ext' ),
+			'retrieving'     => __( 'Retrieving Logs...', 'mwp-al-ext' ),
+			'page'           => isset( $this->page_args->page ) ? $this->page_args->page : false,
+			'siteId'         => isset( $this->page_args->site_id ) ? $this->page_args->site_id : false,
+			'orderBy'        => isset( $this->page_args->order_by ) ? $this->page_args->order_by : false,
+			'order'          => isset( $this->page_args->order ) ? $this->page_args->order : false,
+			'infiniteScroll' => $this->activity_log->settings->is_infinite_scroll(),
 		);
 		wp_localize_script( 'mwpal-view-script', 'scriptData', $script_data );
 		wp_enqueue_script( 'mwpal-view-script' );
@@ -336,15 +354,15 @@ class View extends Abstract_View {
 			check_admin_referer( 'mwpal-settings-nonce' );
 
 			// Get form options.
+			$events_nav_type   = isset( $_POST['events-nav-type'] ) ? sanitize_text_field( wp_unslash( $_POST['events-nav-type'] ) ) : false;
 			$timezone          = isset( $_POST['timezone'] ) ? sanitize_text_field( wp_unslash( $_POST['timezone'] ) ) : false;
 			$type_username     = isset( $_POST['type_username'] ) ? sanitize_text_field( wp_unslash( $_POST['type_username'] ) ) : false;
 			$child_site_events = isset( $_POST['child-site-events'] ) ? (int) sanitize_text_field( wp_unslash( $_POST['child-site-events'] ) ) : false;
 			$events_frequency  = isset( $_POST['events-frequency'] ) ? (int) sanitize_text_field( wp_unslash( $_POST['events-frequency'] ) ) : false;
-			// @codingStandardsIgnoreStart
-			$columns          = isset( $_POST['columns'] ) ? array_map( 'sanitize_text_field', $_POST['columns'] ) : false;
-			$wsal_child_sites = isset( $_POST['mwpal-wsal-child-sites'] ) ? sanitize_text_field( wp_unslash( $_POST['mwpal-wsal-child-sites'] ) ) : false;
-			// @codingStandardsIgnoreEnd
+			$columns           = isset( $_POST['columns'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['columns'] ) ) : false;
+			$wsal_child_sites  = isset( $_POST['mwpal-wsal-child-sites'] ) ? sanitize_text_field( wp_unslash( $_POST['mwpal-wsal-child-sites'] ) ) : false;
 
+			$this->activity_log->settings->set_events_type_nav( $events_nav_type );
 			$this->activity_log->settings->set_timezone( $timezone );
 			$this->activity_log->settings->set_type_username( $type_username );
 			$this->activity_log->settings->set_child_site_events( $child_site_events );
@@ -452,6 +470,25 @@ class View extends Abstract_View {
 						<div class="inside">
 							<table class="form-table">
 								<tbody>
+									<tr>
+										<th scope="row"><label for="infinite-scroll"><?php esc_html_e( 'Event Viewer View Type', 'mwp-al-ext' ); ?></label></th>
+										<td>
+											<fieldset>
+												<?php $nav_type = $this->activity_log->settings->get_events_type_nav(); ?>
+												<label for="infinite-scroll">
+													<input type="radio" name="events-nav-type" id="infinite-scroll" style="margin-top: -2px;" <?php checked( $nav_type, 'infinite-scroll' ); ?> value="infinite-scroll">
+													<?php esc_html_e( 'Infinite Scroll', 'mwp-al-ext' ); ?>
+												</label>
+												<br/>
+												<label for="pagination">
+													<input type="radio" name="events-nav-type" id="pagination" style="margin-top: -2px;" <?php checked( $nav_type, 'pagination' ); ?> value="pagination">
+													<?php esc_html_e( 'Pagination', 'mwp-al-ext' ); ?>
+												</label>
+											</fieldset>
+										</td>
+									</tr>
+									<!-- Event Viewer View Type -->
+
 									<tr>
 										<th scope="row"><label for="utc"><?php esc_html_e( 'Events Timestamp', 'mwp-al-ext' ); ?></label></th>
 										<td>
@@ -668,11 +705,13 @@ class View extends Abstract_View {
 
 				if ( ! $logged_retrieving ) {
 					// Extension has started retrieving.
-					$this->activity_log->alerts->trigger( 7711, array(
-						'mainwp_dash' => true,
-						'Username'    => 'System',
-						'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
-					) );
+					$this->activity_log->alerts->trigger(
+						7711, array(
+							'mainwp_dash' => true,
+							'Username'    => 'System',
+							'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
+						)
+					);
 					$logged_retrieving = true;
 				}
 
@@ -694,11 +733,13 @@ class View extends Abstract_View {
 
 				if ( ! $logged_ready && isset( $sites_data[ $site_id ]->events ) ) {
 					// Extension is ready after retrieving.
-					$this->activity_log->alerts->trigger( 7712, array(
-						'mainwp_dash' => true,
-						'Username'    => 'System',
-						'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
-					) );
+					$this->activity_log->alerts->trigger(
+						7712, array(
+							'mainwp_dash' => true,
+							'Username'    => 'System',
+							'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
+						)
+					);
 					$logged_ready = true;
 				}
 			}
@@ -715,14 +756,16 @@ class View extends Abstract_View {
 
 						if ( false !== $key && isset( $mwp_sites[ $key ] ) ) {
 							// Extension is unable to retrieve events.
-							$this->activity_log->alerts->trigger( 7710, array(
-								'friendly_name' => $mwp_sites[ $key ]['name'],
-								'site_url'      => $mwp_sites[ $key ]['url'],
-								'site_id'       => $mwp_sites[ $key ]['id'],
-								'mainwp_dash'   => true,
-								'Username'      => 'System',
-								'ClientIP'      => ! empty( $server_ip ) ? $server_ip : false,
-							) );
+							$this->activity_log->alerts->trigger(
+								7710, array(
+									'friendly_name' => $mwp_sites[ $key ]['name'],
+									'site_url'      => $mwp_sites[ $key ]['url'],
+									'site_id'       => $mwp_sites[ $key ]['id'],
+									'mainwp_dash'   => true,
+									'Username'      => 'System',
+									'ClientIP'      => ! empty( $server_ip ) ? $server_ip : false,
+								)
+							);
 						}
 					} elseif ( empty( $site_events ) || ! isset( $site_events->events ) ) {
 						continue;
@@ -739,8 +782,22 @@ class View extends Abstract_View {
 	 * @return AuditLogListView
 	 */
 	private function get_list_view() {
+		// Set page arguments.
+		if ( ! $this->page_args ) {
+			$this->page_args = new \stdClass();
+
+			// @codingStandardsIgnoreStart
+			$this->page_args->page    = isset( $_REQUEST['page'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['page'] ) ) : false;
+			$this->page_args->site_id = $this->activity_log->settings->get_view_site_id();
+
+			// Order arguments.
+			$this->page_args->order_by = isset( $_REQUEST['orderby'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['orderby'] ) ) : false;
+			$this->page_args->order    = isset( $_REQUEST['order'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['order'] ) ) : false;
+			// @codingStandardsIgnoreEnd
+		}
+
 		if ( is_null( $this->list_view ) ) {
-			$this->list_view = new AuditLogListView( $this->activity_log );
+			$this->list_view = new AuditLogListView( $this->activity_log, $this->page_args );
 		}
 		return $this->list_view;
 	}
@@ -857,10 +914,12 @@ class View extends Abstract_View {
 	 */
 	public function update_active_wsal_sites() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			echo wp_json_encode( array(
-				'success' => false,
-				'message' => esc_html__( 'Access denied.', 'mwp-al-ext' ),
-			) );
+			echo wp_json_encode(
+				array(
+					'success' => false,
+					'message' => esc_html__( 'Access denied.', 'mwp-al-ext' ),
+				)
+			);
 			exit();
 		}
 
@@ -880,10 +939,12 @@ class View extends Abstract_View {
 					}
 				}
 
-				echo wp_json_encode( array(
-					'success'     => true,
-					'activeSites' => implode( ',', $active_sites ),
-				) );
+				echo wp_json_encode(
+					array(
+						'success'     => true,
+						'activeSites' => implode( ',', $active_sites ),
+					)
+				);
 			} elseif ( 'add-sites' === $transfer_action && ! empty( $request_sites ) ) {
 				foreach ( $request_sites as $site ) {
 					$key = array_search( $site, $active_sites, true );
@@ -892,21 +953,27 @@ class View extends Abstract_View {
 					}
 				}
 
-				echo wp_json_encode( array(
-					'success'     => true,
-					'activeSites' => implode( ',', $active_sites ),
-				) );
+				echo wp_json_encode(
+					array(
+						'success'     => true,
+						'activeSites' => implode( ',', $active_sites ),
+					)
+				);
 			} else {
-				echo wp_json_encode( array(
-					'success' => false,
-					'message' => esc_html__( 'Invalid action.', 'mwp-al-ext' ),
-				) );
+				echo wp_json_encode(
+					array(
+						'success' => false,
+						'message' => esc_html__( 'Invalid action.', 'mwp-al-ext' ),
+					)
+				);
 			}
 		} else {
-			echo wp_json_encode( array(
-				'success' => false,
-				'message' => esc_html__( 'Access denied.', 'mwp-al-ext' ),
-			) );
+			echo wp_json_encode(
+				array(
+					'success' => false,
+					'message' => esc_html__( 'Access denied.', 'mwp-al-ext' ),
+				)
+			);
 		}
 		exit();
 	}
@@ -943,11 +1010,13 @@ class View extends Abstract_View {
 
 					if ( $trigger_ready && isset( $sites_data[ $site_id ]->events ) ) {
 						// Extension is ready after retrieving.
-						$this->activity_log->alerts->trigger( 7712, array(
-							'mainwp_dash' => true,
-							'Username'    => 'System',
-							'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
-						) );
+						$this->activity_log->alerts->trigger(
+							7712, array(
+								'mainwp_dash' => true,
+								'Username'    => 'System',
+								'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
+							)
+						);
 						$trigger_ready = false;
 					}
 				}
@@ -957,5 +1026,34 @@ class View extends Abstract_View {
 			die();
 		}
 		die( esc_html__( 'Nonce verification failed.', 'mwp-al-ext' ) );
+	}
+
+	/**
+	 * Infinite Scroll Events AJAX Hanlder.
+	 *
+	 * @since 3.3.1.1
+	 */
+	public function infinite_scroll_events() {
+		// Check user permissions.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			die( esc_html__( 'Access Denied', 'mwp-al-ext' ) );
+		}
+
+		// Verify nonce.
+		if ( isset( $_POST['mwpal_viewer_security'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['mwpal_viewer_security'] ) ), 'mwp-activitylog-nonce' ) ) {
+			// Get $_POST arguments.
+			$paged = isset( $_POST['page_number'] ) ? sanitize_text_field( wp_unslash( $_POST['page_number'] ) ) : 0;
+
+			// Query events.
+			$events_query = $this->get_list_view()->query_events( $paged );
+			if ( ! empty( $events_query['items'] ) ) {
+				foreach ( $events_query['items'] as $event ) {
+					$this->get_list_view()->single_row( $event );
+				}
+			}
+			exit();
+		} else {
+			die( esc_html__( 'Nonce verification failed.', 'mwp-al-ext' ) );
+		}
 	}
 }
