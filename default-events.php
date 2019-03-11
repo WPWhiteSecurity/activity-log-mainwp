@@ -571,6 +571,8 @@ function mwpal_defaults_init( \WSAL\MainWPExtension\Activity_Log $activity_log )
 					array( 9039, E_WARNING, __( 'User permanently deleted a WooCommerce order', 'mwp-al-ext' ), __( 'Permanently deleted the WooCommerce order %OrderTitle%.', 'mwp-al-ext' ) ),
 					array( 9040, E_NOTICE, __( 'User edited a WooCommerce order', 'mwp-al-ext' ), __( 'Edited the WooCommerce order %OrderTitle%.', 'mwp-al-ext' ) ),
 					array( 9041, E_WARNING, __( 'User refunded a WooCommerce order', 'mwp-al-ext' ), __( 'Refunded the WooCommerce order %OrderTitle%.', 'mwp-al-ext' ) ),
+					array( 9083, E_NOTICE, __( 'User changed the billing address', 'mwp-al-ext' ), __( 'Changed the billing address of the user %TargetUsername%.%ChangeText%', 'mwp-al-ext' ) ),
+					array( 9084, E_NOTICE, __( 'User changed the shipping address', 'mwp-al-ext' ), __( 'Changed the shipping address of the user %TargetUsername%.%ChangeText%', 'mwp-al-ext' ) ),
 				),
 
 				/**
