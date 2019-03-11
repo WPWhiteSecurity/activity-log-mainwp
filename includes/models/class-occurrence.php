@@ -169,12 +169,19 @@ class Occurrence extends ActiveRecord {
 			if ( $this->is_migrated ) {
 				$this->_cachedmessage = $this->GetMetaValue( 'MigratedMesg', false );
 			}
+
 			if ( ! $this->is_migrated || ! $this->_cachedmessage ) {
-				$this->_cachedmessage = $this->GetAlert()->mesg;
+				$event                = $this->GetAlert();
+				$this->_cachedmessage = $event ? $event->mesg : '';
 			}
+
 			// Fill variables in message.
-			$meta_array           = null === $meta ? $this->GetMetaArray() : $meta;
-			$this->_cachedmessage = $this->GetAlert()->GetMessage( $meta_array, $meta_formatter, $this->_cachedmessage );
+			$meta_array = null === $meta ? $this->GetMetaArray() : $meta;
+			$event      = $this->GetAlert();
+
+			if ( $event ) {
+				$this->_cachedmessage = $event->GetMessage( $meta_array, $meta_formatter, $this->_cachedmessage );
+			}
 		}
 		return $this->_cachedmessage;
 	}
