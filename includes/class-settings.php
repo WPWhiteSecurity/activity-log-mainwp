@@ -550,9 +550,41 @@ class Settings {
 	 * @param string  $last_checked - Last checked timestamp.
 	 */
 	public function set_last_checked_by_siteid( $site_id = 0, $last_checked ) {
-		$activity_log = \WSAL\MainWPExtension\Activity_Log::get_instance();
 		if ( $site_id ) {
 			$this->update_option( 'mwpal_last_checked_site_' . $site_id, $last_checked );
 		}
+	}
+
+	/**
+	 * Return Events Navigation Type.
+	 *
+	 * @since 1.1
+	 *
+	 * @return string
+	 */
+	public function get_events_type_nav() {
+		return $this->get_option( 'events-nav-type', 'pagination' );
+	}
+
+	/**
+	 * Sets Events Navigation Type.
+	 *
+	 * @since 1.1
+	 *
+	 * @param string $nav_type - Navigation type.
+	 */
+	public function set_events_type_nav( $nav_type ) {
+		$this->update_option( 'events-nav-type', $nav_type );
+	}
+
+	/**
+	 * Returns true if infinite scroll, otherwise false.
+	 *
+	 * @since 1.1
+	 *
+	 * @return boolean
+	 */
+	public function is_infinite_scroll() {
+		return 'infinite-scroll' === $this->get_events_type_nav();
 	}
 }
