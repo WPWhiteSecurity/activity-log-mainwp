@@ -9,6 +9,8 @@ import '../../css/src/styles.scss';
 
 jQuery( document ).ready( function() {
 
+	var mwpalLoadEventsResponse = true; // Global variable to check events loading response.
+
 	// select2 for site selection select input.
 	if ( 'activity-log' === scriptData.currentTab ) {
 		jQuery( '.mwp-ssas' ).select2({
@@ -161,6 +163,65 @@ jQuery( document ).ready( function() {
 				console.log( xhr.statusText );
 				console.log( textStatus );
 				console.log( error );
+			}
+		});
+	}
+
+	/**
+	 * Load Events for Infinite Scroll.
+	 *
+	 * @since 1.1
+	 *
+	 * @param {integer} pageNumber - Log viewer page number.
+	 */
+	function mwpalLoadEvents( pageNumber ) {
+		jQuery( '#mwpal-event-loader' ).show( 'fast' );
+		jQuery.ajax({
+			type: 'POST',
+			url: ajaxurl,
+			data: {
+				action: 'mwpal_infinite_scroll_events',
+				mwpal_viewer_security: scriptData.scriptNonce,
+				page_number: pageNumber,
+				page: scriptData.page,
+				'mwpal-site-id': scriptData.siteId,
+				orderby: scriptData.orderBy,
+				order: scriptData.order
+			},
+			success: function( html ) {
+				jQuery( '#mwpal-event-loader' ).hide( '1000' );
+				if ( html ) {
+					mwpalLoadEventsResponse = true;
+					jQuery( '#audit-log-viewer #the-list' ).append( html ); // This will be the div where our content will be loaded.
+				} else {
+					mwpalLoadEventsResponse = false;
+					jQuery( '#mwpal-auditlog-end' ).show( 'fast' );
+				}
+			},
+			error: function( xhr, textStatus, error ) {
+				console.log( xhr.statusText );
+				console.log( textStatus );
+				console.log( error );
+			}
+		});
+		if ( mwpalLoadEventsResponse ) {
+			return pageNumber + 1;
+		}
+		return 0;
+	}
+
+	/**
+	 * Load events for Infinite Scroll.
+	 *
+	 * @since 1.1
+	 */
+	if ( scriptData.infiniteScroll ) {
+		var count = 2;
+		jQuery( window ).scroll( function() {
+			if ( jQuery( window ).scrollTop() === jQuery( document ).height() - jQuery( window ).height() ) {
+				if ( 0 !== count ) {
+					count = mwpalLoadEvents( count );
+				}
 			}
 		});
 	}
