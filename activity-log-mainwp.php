@@ -151,11 +151,11 @@ class Activity_Log {
 		\WSAL\MainWPExtension\Autoload\mwpal_autoload( MWPAL_BASE_DIR . 'includes' );
 
 		// Initiate the view.
-		$this->extension_view = new \WSAL\MainWPExtension\Views\View( $this );
 		$this->settings       = new \WSAL\MainWPExtension\Settings();
 		$this->constants      = new \WSAL\MainWPExtension\ConstantManager( $this );
 		$this->alerts         = new \WSAL\MainWPExtension\AlertManager( $this );
 		$this->sensor_mainwp  = new \WSAL\MainWPExtension\Sensors\Sensor_MainWP( $this );
+		$this->extension_view = new \WSAL\MainWPExtension\Views\View( $this );
 
 		// Start listening to events.
 		add_action( 'init', array( $this, 'mwpal_init' ) );
@@ -467,11 +467,13 @@ class Activity_Log {
 
 				if ( $trigger_ready && isset( $sites_data[ $site_id ]->events ) ) {
 					// Extension is ready after retrieving.
-					$this->alerts->trigger( 7712, array(
-						'mainwp_dash' => true,
-						'Username'    => 'System',
-						'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
-					) );
+					$this->alerts->trigger(
+						7712, array(
+							'mainwp_dash' => true,
+							'Username'    => 'System',
+							'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
+						)
+					);
 					$trigger_ready = false;
 				}
 			}
