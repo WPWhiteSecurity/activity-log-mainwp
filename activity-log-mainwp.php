@@ -138,37 +138,40 @@ class Activity_Log {
 	 * Constructor.
 	 */
 	public function __construct() {
-		// Define plugin constants.
-		$this->define_constants();
+		$this->child_file = __FILE__; // Set child file.
+		$this->define_constants(); // Define plugin constants.
+		$this->includes(); // Include files.
+		$this->init_hooks(); // Initialize hooks.
+	}
 
+	/**
+	 * Include Files.
+	 *
+	 * @since 1.1
+	 */
+	public function includes() {
 		require_once MWPAL_BASE_DIR . 'includes/helpers/class-datahelper.php';
 		require_once MWPAL_BASE_DIR . 'includes/models/class-activerecord.php';
 		require_once MWPAL_BASE_DIR . 'includes/models/class-query.php';
 		require_once MWPAL_BASE_DIR . 'includes/models/class-occurrencequery.php';
-
-		// Include autoloader.
 		require_once MWPAL_BASE_DIR . 'includes/vendors/autoload.php';
+
+		// Autoload files.
 		\WSAL\MainWPExtension\Autoload\mwpal_autoload( MWPAL_BASE_DIR . 'includes' );
+	}
 
-		// Initiate the view.
-		$this->settings       = new \WSAL\MainWPExtension\Settings();
-		$this->constants      = new \WSAL\MainWPExtension\ConstantManager( $this );
-		$this->alerts         = new \WSAL\MainWPExtension\AlertManager( $this );
-		$this->sensor_mainwp  = new \WSAL\MainWPExtension\Sensors\Sensor_MainWP( $this );
-		$this->extension_view = new \WSAL\MainWPExtension\Views\View( $this );
-
-		// Start listening to events.
-		add_action( 'init', array( $this, 'mwpal_init' ) );
-
-		// Installation routine.
-		register_activation_hook( __FILE__, array( $this, 'install_extension' ) );
-
-		// Schedule hook for refreshing events.
-		add_action( 'mwp_events_cleanup', array( $this, 'events_cleanup' ) );
-
-		// Set child file.
-		$this->child_file = __FILE__;
+	/**
+	 * Initialize Plugin Hooks.
+	 *
+	 * @since 1.1
+	 */
+	public function init_hooks() {
+		add_action( 'init', array( $this, 'mwpal_init' ) ); // Start listening to events.
+		register_activation_hook( __FILE__, array( $this, 'install_extension' ) ); // Installation routine.
+		add_action( 'mwp_events_cleanup', array( $this, 'events_cleanup' ) ); // Schedule hook for refreshing events.
 		add_filter( 'mainwp-getextensions', array( &$this, 'get_this_extension' ) );
+		add_action( 'admin_init', array( &$this, 'redirect_on_activate' ) );
+		add_action( 'admin_notices', array( &$this, 'mainwp_error_notice' ) );
 
 		// This filter will return true if the main plugin is activated.
 		$this->mainwp_main_activated = apply_filters( 'mainwp-activated-check', false );
@@ -180,18 +183,24 @@ class Activity_Log {
 			// listening to the 'mainwp-activated' action. This action is triggered by MainWP after initialisation.
 			add_action( 'mainwp-activated', array( &$this, 'activate_this_plugin' ) );
 		}
-		add_action( 'admin_init', array( &$this, 'redirect_on_activate' ) );
-		add_action( 'admin_notices', array( &$this, 'mainwp_error_notice' ) );
-
-		if ( false === $this->settings->get_option( 'setup-complete' ) ) {
-			new \WSAL\MainWPExtension\Views\Setup_Wizard( $this );
-		}
 	}
 
 	/**
 	 * Start listening to events.
 	 */
 	public function mwpal_init() {
+		// Initalize the classes.
+		$this->settings       = new \WSAL\MainWPExtension\Settings();
+		$this->constants      = new \WSAL\MainWPExtension\ConstantManager( $this );
+		$this->alerts         = new \WSAL\MainWPExtension\AlertManager( $this );
+		$this->sensor_mainwp  = new \WSAL\MainWPExtension\Sensors\Sensor_MainWP( $this );
+		$this->extension_view = new \WSAL\MainWPExtension\Views\View( $this );
+
+		if ( false === $this->settings->get_option( 'setup-complete' ) ) {
+			new \WSAL\MainWPExtension\Views\Setup_Wizard( $this );
+		}
+
+		// Hook extension events.
 		$this->sensor_mainwp->hook_events();
 	}
 
@@ -240,6 +249,10 @@ class Activity_Log {
 			</html>
 			<?php
 			die( 1 );
+		}
+
+		if ( empty( $this->settings ) ) {
+			$this->settings = new \WSAL\MainWPExtension\Settings();
 		}
 
 		// Ensure that the system is installed and schema is correct.

@@ -29,10 +29,18 @@ defined( 'E_USER_DEPRECATED' ) || define( 'E_USER_DEPRECATED', 'E_USER_DEPRECATE
  * Define Default Alerts.
  *
  * Define default alerts for the plugin.
- *
- * @param \WSAL\MainWPExtension\Activity_Log $activity_log - Instance of main plugin.
  */
-function mwpal_defaults_init( \WSAL\MainWPExtension\Activity_Log $activity_log ) {
+function mwpal_defaults_init() {
+	$activity_log = \WSAL\MainWPExtension\Activity_Log::get_instance();
+
+	if ( ! isset( $activity_log->constants ) ) {
+		$activity_log->constants = new \WSAL\MainWPExtension\ConstantManager( $activity_log );
+	}
+
+	if ( ! isset( $activity_log->alerts ) ) {
+		$activity_log->alerts = new \WSAL\MainWPExtension\AlertManager( $activity_log );
+	}
+
 	$activity_log->constants->UseConstants(
 		array(
 			// Default PHP constants.
@@ -633,4 +641,4 @@ function mwpal_defaults_init( \WSAL\MainWPExtension\Activity_Log $activity_log )
 		)
 	);
 }
-add_action( 'mwpal_init', 'mwpal_defaults_init' );
+add_action( 'init', 'mwpal_defaults_init' );
