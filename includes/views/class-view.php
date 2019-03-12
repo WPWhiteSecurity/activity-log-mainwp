@@ -354,19 +354,22 @@ class View extends Abstract_View {
 			check_admin_referer( 'mwpal-settings-nonce' );
 
 			// Get form options.
-			$events_nav_type   = isset( $_POST['events-nav-type'] ) ? sanitize_text_field( wp_unslash( $_POST['events-nav-type'] ) ) : false;
-			$timezone          = isset( $_POST['timezone'] ) ? sanitize_text_field( wp_unslash( $_POST['timezone'] ) ) : false;
-			$type_username     = isset( $_POST['type_username'] ) ? sanitize_text_field( wp_unslash( $_POST['type_username'] ) ) : false;
-			$child_site_events = isset( $_POST['child-site-events'] ) ? (int) sanitize_text_field( wp_unslash( $_POST['child-site-events'] ) ) : false;
-			$events_frequency  = isset( $_POST['events-frequency'] ) ? (int) sanitize_text_field( wp_unslash( $_POST['events-frequency'] ) ) : false;
-			$columns           = isset( $_POST['columns'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['columns'] ) ) : false;
-			$wsal_child_sites  = isset( $_POST['mwpal-wsal-child-sites'] ) ? sanitize_text_field( wp_unslash( $_POST['mwpal-wsal-child-sites'] ) ) : false;
+			$events_nav_type    = isset( $_POST['events-nav-type'] ) ? sanitize_text_field( wp_unslash( $_POST['events-nav-type'] ) ) : false;
+			$timezone           = isset( $_POST['timezone'] ) ? sanitize_text_field( wp_unslash( $_POST['timezone'] ) ) : false;
+			$type_username      = isset( $_POST['type_username'] ) ? sanitize_text_field( wp_unslash( $_POST['type_username'] ) ) : false;
+			$child_site_events  = isset( $_POST['child-site-events'] ) ? (int) sanitize_text_field( wp_unslash( $_POST['child-site-events'] ) ) : false;
+			$events_frequency   = isset( $_POST['events-frequency'] ) ? (int) sanitize_text_field( wp_unslash( $_POST['events-frequency'] ) ) : false;
+			$events_global_sync = isset( $_POST['global-sync-events'] );
+			$columns            = isset( $_POST['columns'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['columns'] ) ) : false;
+			$wsal_child_sites   = isset( $_POST['mwpal-wsal-child-sites'] ) ? sanitize_text_field( wp_unslash( $_POST['mwpal-wsal-child-sites'] ) ) : false;
 
+			// Set options.
 			$this->activity_log->settings->set_events_type_nav( $events_nav_type );
 			$this->activity_log->settings->set_timezone( $timezone );
 			$this->activity_log->settings->set_type_username( $type_username );
 			$this->activity_log->settings->set_child_site_events( $child_site_events );
 			$this->activity_log->settings->set_events_frequency( $events_frequency );
+			$this->activity_log->settings->set_events_global_sync( $events_global_sync );
 			$this->activity_log->settings->set_columns( $columns );
 			$this->activity_log->settings->set_wsal_child_sites( ! empty( $wsal_child_sites ) ? explode( ',', $wsal_child_sites ) : false );
 		}
@@ -590,6 +593,17 @@ class View extends Abstract_View {
 												<?php $events_frequency = $this->activity_log->settings->get_events_frequency(); ?>
 												<input type="number" id="events-frequency" name="events-frequency" value="<?php echo esc_attr( $events_frequency ); ?>" />
 												<?php esc_html_e( 'hours', 'mwp-al-ext' ); ?>
+											</fieldset>
+										</td>
+									</tr>
+
+									<tr>
+										<th scope="row"><label for="global-sync-events"><?php esc_html_e( 'Sync Events', 'mwp-al-ext' ); ?></label></th>
+										<td>
+											<fieldset>
+												<?php $events_global_sync = $this->activity_log->settings->is_events_global_sync(); ?>
+												<input type="checkbox" id="global-sync-events" name="global-sync-events" value="1" <?php checked( $events_global_sync ); ?> />
+												<?php esc_html_e( 'Retrieve activity logs from child sites when I sync data with child sites.', 'mwp-al-ext' ); ?>
 											</fieldset>
 										</td>
 									</tr>

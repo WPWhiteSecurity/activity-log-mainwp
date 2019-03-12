@@ -587,4 +587,26 @@ class Settings {
 	public function is_infinite_scroll() {
 		return 'infinite-scroll' === $this->get_events_type_nav();
 	}
+
+	/**
+	 * Sets Events Global Sync Option.
+	 *
+	 * @since 1.1
+	 *
+	 * @param bool $enabled - True if enabled, false otherwise.
+	 */
+	public function set_events_global_sync( $enabled ) {
+		$this->update_option( 'events-global-sync', $enabled );
+	}
+
+	/**
+	 * Returns true if events global sync is set, otherwise false.
+	 *
+	 * @since 1.1
+	 *
+	 * @return boolean
+	 */
+	public function is_events_global_sync() {
+		return $this->get_option( 'events-global-sync' );
+	}
 }
