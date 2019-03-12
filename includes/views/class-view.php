@@ -1004,39 +1004,7 @@ class View extends Abstract_View {
 		}
 
 		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'mwp-activitylog-nonce' ) ) {
-			// Get MainWP sites.
-			$mwp_sites = $this->activity_log->settings->get_wsal_child_sites();
-
-			if ( ! empty( $mwp_sites ) ) {
-				$trigger_retrieving = true; // Event 7711.
-				$trigger_ready      = true; // Event 7712.
-				$server_ip          = $this->activity_log->settings->get_server_ip(); // Get server IP.
-
-				foreach ( $mwp_sites as $site_id => $site ) {
-					// Delete events by site id.
-					$this->activity_log->alerts->delete_site_events( $site_id );
-
-					// Fetch events by site id.
-					$sites_data[ $site_id ] = $this->activity_log->alerts->fetch_site_events( $site_id, $trigger_retrieving );
-
-					// Set $trigger_retrieving to false to avoid logging 7711 multiple times.
-					$trigger_retrieving = false;
-
-					if ( $trigger_ready && isset( $sites_data[ $site_id ]->events ) ) {
-						// Extension is ready after retrieving.
-						$this->activity_log->alerts->trigger(
-							7712, array(
-								'mainwp_dash' => true,
-								'Username'    => 'System',
-								'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
-							)
-						);
-						$trigger_ready = false;
-					}
-				}
-				// Set child site events.
-				$this->activity_log->alerts->set_site_events( $sites_data );
-			}
+			$this->activity_log->alerts->retrieve_events_manually();
 			die();
 		}
 		die( esc_html__( 'Nonce verification failed.', 'mwp-al-ext' ) );

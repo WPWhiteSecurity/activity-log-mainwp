@@ -414,11 +414,53 @@ final class AlertManager {
 	}
 
 	/**
+	 * Retrieve Events Manually.
+	 *
+	 * @since 1.1
+	 */
+	public function retrieve_events_manually() {
+		// Get MainWP sites.
+		$mwp_sites = $this->activity_log->settings->get_wsal_child_sites();
+
+		if ( ! empty( $mwp_sites ) ) {
+			$trigger_retrieving = true; // Event 7711.
+			$trigger_ready      = true; // Event 7712.
+			$server_ip          = $this->activity_log->settings->get_server_ip(); // Get server IP.
+
+			foreach ( $mwp_sites as $site_id => $site ) {
+				// Delete events by site id.
+				$this->delete_site_events( $site_id );
+
+				// Fetch events by site id.
+				$sites_data[ $site_id ] = $this->fetch_site_events( $site_id, $trigger_retrieving );
+
+				// Set $trigger_retrieving to false to avoid logging 7711 multiple times.
+				$trigger_retrieving = false;
+
+				if ( $trigger_ready && isset( $sites_data[ $site_id ]->events ) ) {
+					// Extension is ready after retrieving.
+					$this->trigger(
+						7712, array(
+							'mainwp_dash' => true,
+							'Username'    => 'System',
+							'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
+						)
+					);
+					$trigger_ready = false;
+				}
+			}
+			// Set child site events.
+			$this->set_site_events( $sites_data );
+		}
+	}
+
+	/**
 	 * Fetch Events from Child Sites.
 	 *
 	 * @since 1.0.1
 	 *
-	 * @param integer $site_id - Child site id.
+	 * @param integer $site_id            - Child site id.
+	 * @param bool    $trigger_retrieving - True if trigger retrieve events alert.
 	 * @return array
 	 */
 	public function fetch_site_events( $site_id = 0, $trigger_retrieving = true ) {
@@ -430,11 +472,13 @@ final class AlertManager {
 
 			if ( $trigger_retrieving ) {
 				// Extension has started retrieving.
-				$this->trigger( 7711, array(
-					'mainwp_dash' => true,
-					'Username'    => 'System',
-					'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
-				) );
+				$this->trigger(
+					7711, array(
+						'mainwp_dash' => true,
+						'Username'    => 'System',
+						'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
+					)
+				);
 			}
 
 			// Post data for child sites.
@@ -479,14 +523,16 @@ final class AlertManager {
 
 					if ( false !== $key && isset( $mwp_sites[ $key ] ) ) {
 						// Extension is unable to retrieve events.
-						$this->trigger( 7710, array(
-							'friendly_name' => $mwp_sites[ $key ]['name'],
-							'site_url'      => $mwp_sites[ $key ]['url'],
-							'site_id'       => $mwp_sites[ $key ]['id'],
-							'mainwp_dash'   => true,
-							'Username'      => 'System',
-							'ClientIP'      => ! empty( $server_ip ) ? $server_ip : false,
-						) );
+						$this->trigger(
+							7710, array(
+								'friendly_name' => $mwp_sites[ $key ]['name'],
+								'site_url'      => $mwp_sites[ $key ]['url'],
+								'site_id'       => $mwp_sites[ $key ]['id'],
+								'mainwp_dash'   => true,
+								'Username'      => 'System',
+								'ClientIP'      => ! empty( $server_ip ) ? $server_ip : false,
+							)
+						);
 					}
 				} elseif ( empty( $site_events ) || ! isset( $site_events->events ) ) {
 					continue;

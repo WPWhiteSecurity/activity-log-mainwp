@@ -99,11 +99,13 @@ class Sensor_MainWP extends Abstract_Sensor {
 		if ( $this->activity_log->settings->is_login_super_admin( $user_login ) ) {
 			$user_roles[] = 'superadmin';
 		}
-		$this->activity_log->alerts->trigger( 1000, array(
-			'mainwp_dash'      => true,
-			'Username'         => $user_login,
-			'CurrentUserRoles' => $user_roles,
-		) );
+		$this->activity_log->alerts->trigger(
+			1000, array(
+				'mainwp_dash'      => true,
+				'Username'         => $user_login,
+				'CurrentUserRoles' => $user_roles,
+			)
+		);
 	}
 
 	/**
@@ -111,11 +113,13 @@ class Sensor_MainWP extends Abstract_Sensor {
 	 */
 	public function event_logout() {
 		if ( 0 !== $this->current_user->ID ) {
-			$this->activity_log->alerts->Trigger( 1001, array(
-				'mainwp_dash'      => true,
-				'CurrentUserID'    => $this->current_user->ID,
-				'CurrentUserRoles' => $this->activity_log->settings->get_current_user_roles( $this->current_user->roles ),
-			) );
+			$this->activity_log->alerts->Trigger(
+				1001, array(
+					'mainwp_dash'      => true,
+					'CurrentUserID'    => $this->current_user->ID,
+					'CurrentUserRoles' => $this->activity_log->settings->get_current_user_roles( $this->current_user->roles ),
+				)
+			);
 		}
 	}
 
@@ -138,12 +142,14 @@ class Sensor_MainWP extends Abstract_Sensor {
 		$key = array_search( $new_site_id, array_column( $mwp_sites, 'id' ), false );
 
 		if ( false !== $key && isset( $mwp_sites[ $key ] ) ) {
-			$this->activity_log->alerts->trigger( 7700, array(
-				'friendly_name' => $mwp_sites[ $key ]['name'],
-				'site_url'      => $mwp_sites[ $key ]['url'],
-				'site_id'       => $mwp_sites[ $key ]['id'],
-				'mainwp_dash'   => true,
-			) );
+			$this->activity_log->alerts->trigger(
+				7700, array(
+					'friendly_name' => $mwp_sites[ $key ]['name'],
+					'site_url'      => $mwp_sites[ $key ]['url'],
+					'site_id'       => $mwp_sites[ $key ]['id'],
+					'mainwp_dash'   => true,
+				)
+			);
 		}
 	}
 
@@ -161,12 +167,14 @@ class Sensor_MainWP extends Abstract_Sensor {
 		}
 
 		if ( isset( $website->name ) ) {
-			$this->activity_log->alerts->trigger( 7701, array(
-				'friendly_name' => $website->name,
-				'site_url'      => $website->url,
-				'site_id'       => $website->id,
-				'mainwp_dash'   => true,
-			) );
+			$this->activity_log->alerts->trigger(
+				7701, array(
+					'friendly_name' => $website->name,
+					'site_url'      => $website->url,
+					'site_id'       => $website->id,
+					'mainwp_dash'   => true,
+				)
+			);
 		}
 	}
 
@@ -189,12 +197,14 @@ class Sensor_MainWP extends Abstract_Sensor {
 		$key = array_search( $site_id, array_column( $mwp_sites, 'id' ), false );
 
 		if ( false !== $key && isset( $mwp_sites[ $key ] ) ) {
-			$this->activity_log->alerts->trigger( 7702, array(
-				'friendly_name' => $mwp_sites[ $key ]['name'],
-				'site_url'      => $mwp_sites[ $key ]['url'],
-				'site_id'       => $mwp_sites[ $key ]['id'],
-				'mainwp_dash'   => true,
-			) );
+			$this->activity_log->alerts->trigger(
+				7702, array(
+					'friendly_name' => $mwp_sites[ $key ]['name'],
+					'site_url'      => $mwp_sites[ $key ]['url'],
+					'site_id'       => $mwp_sites[ $key ]['id'],
+					'mainwp_dash'   => true,
+				)
+			);
 		}
 	}
 
@@ -220,12 +230,14 @@ class Sensor_MainWP extends Abstract_Sensor {
 		}
 
 		if ( isset( $website->name ) ) {
-			$this->activity_log->alerts->trigger( 7703, array(
-				'friendly_name' => $website->name,
-				'site_url'      => $website->url,
-				'site_id'       => $website->id,
-				'mainwp_dash'   => true,
-			) );
+			$this->activity_log->alerts->trigger(
+				7703, array(
+					'friendly_name' => $website->name,
+					'site_url'      => $website->url,
+					'site_id'       => $website->id,
+					'mainwp_dash'   => true,
+				)
+			);
 		}
 	}
 
@@ -241,6 +253,10 @@ class Sensor_MainWP extends Abstract_Sensor {
 
 		if ( 'true' !== $is_global_sync ) { // Check if global sync is false.
 			return;
+		}
+
+		if ( $this->activity_log->settings->is_events_global_sync() ) {
+			$this->activity_log->alerts->retrieve_events_manually();
 		}
 
 		// Trigger global sync event.
@@ -280,12 +296,14 @@ class Sensor_MainWP extends Abstract_Sensor {
 	public function extension_menu_edited( $slug, $action ) {
 		// Check if the slug is not empty and it is active.
 		if ( ! empty( $slug ) && \is_plugin_active( $slug ) ) {
-			$this->activity_log->alerts->trigger( 7709, array(
-				'mainwp_dash' => true,
-				'extension'   => $slug,
-				'action'      => $action,
-				'option'      => 'Added' === $action ? 'to' : 'from',
-			) );
+			$this->activity_log->alerts->trigger(
+				7709, array(
+					'mainwp_dash' => true,
+					'extension'   => $slug,
+					'action'      => $action,
+					'option'      => 'Added' === $action ? 'to' : 'from',
+				)
+			);
 		}
 	}
 
@@ -478,19 +496,23 @@ class Sensor_MainWP extends Abstract_Sensor {
 
 			// If site is found then report it as MainWP child site.
 			if ( false !== $site ) {
-				$this->activity_log->alerts->trigger( $event_id, array(
-					'friendly_name' => $site['name'],
-					'site_url'      => $site['url'],
-					'site_id'       => $site['id'],
-					'mainwp_dash'   => true,
-				) );
+				$this->activity_log->alerts->trigger(
+					$event_id, array(
+						'friendly_name' => $site['name'],
+						'site_url'      => $site['url'],
+						'site_id'       => $site['id'],
+						'mainwp_dash'   => true,
+					)
+				);
 			} else {
 				// Else report as other site.
-				$this->activity_log->alerts->trigger( $event_id, array(
-					'friendly_name' => $site_url,
-					'site_url'      => $site_url,
-					'mainwp_dash'   => true,
-				) );
+				$this->activity_log->alerts->trigger(
+					$event_id, array(
+						'friendly_name' => $site_url,
+						'site_url'      => $site_url,
+						'mainwp_dash'   => true,
+					)
+				);
 			}
 		}
 	}
