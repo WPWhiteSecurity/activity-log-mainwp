@@ -86,11 +86,26 @@ class Settings {
 			$date_time_format = $this->get_date_format() . ' ' . $this->get_time_format();
 		}
 
-		$wp_time_format = get_option( 'time_format' );
-		if ( stripos( $wp_time_format, 'A' ) !== false ) {
-			$date_time_format .= '.$$$&\n\b\s\p;A';
+		$wp_time_format = get_option( 'time_format' ); // WP Time format.
+
+		// Check if the time format does not have seconds.
+		if ( stripos( $wp_time_format, 's' ) === false ) {
+			if ( stripos( $wp_time_format, '.v' ) !== false ) {
+				$date_time_format = str_replace( '.v', '', $date_time_format );
+			}
+			$date_time_format .= ':s'; // Add seconds to time format.
+			$date_time_format .= '.$$$'; // Add milliseconds to time format.
 		} else {
-			$date_time_format .= '.$$$';
+			// Check if the time format does have milliseconds.
+			if ( stripos( $wp_time_format, '.v' ) !== false ) {
+				$date_time_format = str_replace( '.v', '.$$$', $date_time_format );
+			} else {
+				$date_time_format .= '.$$$';
+			}
+		}
+
+		if ( stripos( $wp_time_format, 'A' ) !== false ) {
+			$date_time_format .= '&\n\b\s\p;A';
 		}
 		return $date_time_format;
 	}
