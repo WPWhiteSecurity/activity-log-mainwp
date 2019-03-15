@@ -183,6 +183,18 @@ class Activity_Log {
 			// listening to the 'mainwp-activated' action. This action is triggered by MainWP after initialisation.
 			add_action( 'mainwp-activated', array( &$this, 'activate_this_plugin' ) );
 		}
+
+		// Initialize freemius.
+		$this->init_freemius();
+	}
+
+	/**
+	 * Initialize Freemius and its hooks.
+	 */
+	public function init_freemius() {
+		if ( is_admin() && file_exists( trailingslashit( MWPAL_BASE_DIR ) . 'sdk/freemius-init.php' ) ) {
+			require_once trailingslashit( MWPAL_BASE_DIR ) . 'sdk/freemius-init.php';
+		}
 	}
 
 	/**
