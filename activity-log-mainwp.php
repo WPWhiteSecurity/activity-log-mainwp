@@ -172,6 +172,7 @@ class Activity_Log {
 		add_filter( 'mainwp-getextensions', array( &$this, 'get_this_extension' ) );
 		add_action( 'admin_init', array( &$this, 'redirect_on_activate' ) );
 		add_action( 'admin_notices', array( &$this, 'mainwp_error_notice' ) );
+		add_filter( 'plugin_action_links_' . MWPAL_BASE_NAME, array( $this, 'add_plugin_page_links' ), 20, 1 );
 
 		// This filter will return true if the main plugin is activated.
 		$this->mainwp_main_activated = apply_filters( 'mainwp-activated-check', false );
@@ -572,6 +573,27 @@ class Activity_Log {
 			$post_data
 		);
 		return $latest_event;
+	}
+
+	/**
+	 * Add Plugin Shortcut Links.
+	 *
+	 * @since 1.1
+	 *
+	 * @param array $old_links - Old links.
+	 * @return array
+	 */
+	public function add_plugin_page_links( $old_links ) {
+		// Extension view URL.
+		$extension_url = add_query_arg( 'page', MWPAL_EXTENSION_NAME, admin_url( 'admin.php' ) );
+
+		// New plugin links.
+		$new_links = array(
+			'mwpal-view'     => '<a href="' . add_query_arg( 'tab', 'activity-log', $extension_url ) . '">' . __( 'View Activity Log', 'wp-security-audit-log' ) . '</a>',
+			'mwpal-settings' => '<a href="' . add_query_arg( 'tab', 'settings', $extension_url ) . '">' . __( 'Settings', 'wp-security-audit-log' ) . '</a>',
+			'deactivate'     => $old_links['deactivate'],
+		);
+		return $new_links;
 	}
 }
 
