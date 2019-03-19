@@ -6,7 +6,7 @@ License URI: http://www.gnu.org/licenses/gpl.html
 Tags: activity log, mainwp, mainwp extension, wordpress security, wordpress security audit log, audit log, mainwp user tracking, wordpress activity log, security activity log, wordpress admin, mainwp admin, user tracking
 Requires at least: 3.6
 Tested up to: 5.0.3
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 Requires PHP: 5.5
 
 See the activity logs of all child sites & MainWP in one central location - the MainWP dashboard.
@@ -110,6 +110,18 @@ Please refer to our [Support & Documentation pages](https://www.wpsecurityauditl
 
 == Changelog ==
 
+= 1.0.3 (2019-03-19) =
+
+* **New Feature**
+	* Infinite Scroll in the activity log viewer (switch between pagination and infinite scroll in the extension settings).
+	* Integrated Freemius SDK (preparation for the premium features).
+	
+* **Performance Update**
+	* Improved several queries and improved activity log viewer performance.
+	
+* **Improvement**
+	* New setting to retrieve activity logs when MainWP syncs website data (default: Off).
+	
 = 1.0.2 (2019-02-08) =
 
 * **Security Fix**
