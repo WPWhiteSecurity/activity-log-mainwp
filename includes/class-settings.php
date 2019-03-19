@@ -578,7 +578,7 @@ class Settings {
 	 * @return string
 	 */
 	public function get_events_type_nav() {
-		return $this->get_option( 'events-nav-type', 'pagination' );
+		return $this->get_option( 'events-nav-type', 'infinite-scroll' );
 	}
 
 	/**
