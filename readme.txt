@@ -5,7 +5,7 @@ License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 Tags: activity log, mainwp, mainwp extension, wordpress security, wordpress security audit log, audit log, mainwp user tracking, wordpress activity log, security activity log, wordpress admin, mainwp admin, user tracking
 Requires at least: 3.6
-Tested up to: 5.0.3
+Tested up to: 5.2
 Stable tag: 1.0.3
 Requires PHP: 5.5
 
