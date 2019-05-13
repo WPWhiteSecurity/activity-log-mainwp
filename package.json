@@ -1,6 +1,6 @@
 {
-  "name": "mainwp-activity-log-extension",
-  "version": "0.1.0",
+  "name": "activity-log-for-mainwp",
+  "version": "1.0.3",
   "description": "An add-on for MainWP to be able to view the activity logs of all child sites from the central MainWP dashboard.",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/WPWhiteSecurity/mainwp-activity-log-extension.git"
+    "url": "git+https://github.com/WPWhiteSecurity/activity-log-mainwp.git"
   },
   "keywords": [
     "wsal",
@@ -19,12 +19,9 @@
   "author": "WP White Security",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/WPWhiteSecurity/mainwp-activity-log-extension/issues"
+    "url": "https://github.com/WPWhiteSecurity/activity-log-mainwp/issues"
   },
-  "homepage": "https://github.com/WPWhiteSecurity/mainwp-activity-log-extension#readme",
-  "dependencies": {
-    "npm": "^6.7.0"
-  },
+  "homepage": "https://github.com/WPWhiteSecurity/activity-log-mainwp#readme",
   "devDependencies": {
     "@babel/core": "^7.4.4",
     "@babel/preset-env": "^7.4.4",
