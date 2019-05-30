@@ -123,6 +123,15 @@ class Activity_Log {
 	public $sensor_mainwp;
 
 	/**
+	 * Clean up hooks.
+	 *
+	 * @since 1.0.4
+	 *
+	 * @var array
+	 */
+	public $cleanup_hooks = array();
+
+	/**
 	 * Returns the singular instance of the plugin.
 	 *
 	 * @return Activity_Log
@@ -466,6 +475,7 @@ class Activity_Log {
 			foreach ( $child_sites as $site_id => $site ) {
 				$event    = $this->get_latest_event_by_siteid( $site_id );
 				$hrs_diff = 0;
+
 				if ( $event ) {
 					$hrs_diff = $this->settings->get_hours_since_last_alert( $event->created_on );
 				}
@@ -505,8 +515,13 @@ class Activity_Log {
 					$trigger_ready = false;
 				}
 			}
+
 			// Set child site events.
 			$this->alerts->set_site_events( $sites_data );
+		}
+
+		foreach ( $this->cleanup_hooks as $hook ) {
+			call_user_func( $hook );
 		}
 	}
 
@@ -580,7 +595,7 @@ class Activity_Log {
 	/**
 	 * Add Plugin Shortcut Links.
 	 *
-	 * @since 1.1
+	 * @since 1.0.3
 	 *
 	 * @param array $old_links - Old links.
 	 * @return array
@@ -596,6 +611,15 @@ class Activity_Log {
 			'deactivate'     => $old_links['deactivate'],
 		);
 		return $new_links;
+	}
+
+	/**
+	 * Add callback to be called when a cleanup operation is required.
+	 *
+	 * @param callable $hook - Hook name.
+	 */
+	public function add_cleanup_hook( $hook ) {
+		$this->cleanup_hooks[] = $hook;
 	}
 }
 
