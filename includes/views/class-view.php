@@ -359,6 +359,9 @@ class View extends Abstract_View {
 			$events_global_sync = isset( $_POST['global-sync-events'] );
 			$columns            = isset( $_POST['columns'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['columns'] ) ) : false;
 			$wsal_child_sites   = isset( $_POST['mwpal-wsal-child-sites'] ) ? sanitize_text_field( wp_unslash( $_POST['mwpal-wsal-child-sites'] ) ) : false;
+			$events_pruning     = isset( $_POST['events-pruning'] ) ? sanitize_text_field( wp_unslash( $_POST['events-pruning'] ) ) : false;
+			$pruning_date       = ( isset( $_POST['events-pruning-date'] ) && 'enabled' === $events_pruning ) ? sanitize_text_field( wp_unslash( $_POST['events-pruning-date'] ) ) : false;
+			$pruning_unit       = ( isset( $_POST['events-pruning-unit'] ) && 'enabled' === $events_pruning ) ? sanitize_text_field( wp_unslash( $_POST['events-pruning-unit'] ) ) : false;
 
 			// Get enabled events.
 			$enabled    = isset( $_POST['mwpal-event'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['mwpal-event'] ) ) : array();
@@ -382,6 +385,8 @@ class View extends Abstract_View {
 			MWPAL_Extension\mwpal_extension()->settings->set_columns( $columns );
 			MWPAL_Extension\mwpal_extension()->settings->set_wsal_child_sites( ! empty( $wsal_child_sites ) ? explode( ',', $wsal_child_sites ) : false );
 			MWPAL_Extension\mwpal_extension()->settings->set_disabled_events( $disabled );
+			MWPAL_Extension\mwpal_extension()->settings->set_events_pruning( $events_pruning );
+			MWPAL_Extension\mwpal_extension()->settings->set_pruning_date( $pruning_date, $pruning_unit );
 		}
 	}
 
@@ -623,10 +628,41 @@ class View extends Abstract_View {
 									<?php endforeach; ?>
 								</tbody>
 							</table>
+
+							<table class="form-table">
+								<tr>
+									<th><label for="events-pruning"><?php esc_html_e( 'MainWP Network Activity Log Events Pruning', 'mwp-al-ext' ); ?></label></th>
+									<td>
+										<fieldset>
+											<?php
+											$events_pruning = MWPAL_Extension\mwpal_extension()->settings->is_events_pruning();
+											$pruning_date   = MWPAL_Extension\mwpal_extension()->settings->get_pruning_date();
+											?>
+											<label for="pruning-enabled">
+												<input type="radio" name="events-pruning" id="pruning-enabled" value="enabled" style="margin-top:-2px" <?php checked( $events_pruning ); ?>>
+												<span>
+													<?php esc_html_e( 'Prune events older than:', 'mwp-al-ext' ); ?>
+													<input type="number" name="events-pruning-date" value="<?php echo esc_html( $pruning_date->date ); ?>">
+													<select name="events-pruning-unit" style="margin-top: -2px;">
+														<option value="months" <?php selected( $pruning_date->unit, 'months' ); ?>><?php esc_html_e( 'Months', 'mwp-al-ext' ); ?></option>
+														<option value="years" <?php selected( $pruning_date->unit, 'years' ); ?>><?php esc_html_e( 'Years', 'mwp-al-ext' ); ?></option>
+													</select>
+												</span>
+											</label>
+											<br>
+											<label for="pruning-disabled">
+												<input type="radio" name="events-pruning" id="pruning-disabled" value="disabled" style="margin-top:-2px" <?php checked( $events_pruning, false ); ?>>
+												<span><?php esc_html_e( 'Do not prune any events', 'mwp-al-ext' ); ?></span>
+											</label>
+										</fieldset>
+									</td>
+								</tr>
+							</table>
 						</div>
 					</div>
+					<!-- MainWP Network Activity Logs -->
 
-					<div id="mwpal-setting-contentbox-2" class="postbox">
+					<div id="mwpal-setting-contentbox-3" class="postbox">
 						<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'Activity Log Retrieval Settings', 'mwp-al-ext' ); ?></span></h2>
 						<div class="mainwp-postbox-actions-top"><p class="description"><?php esc_html_e( 'The Activity Log for MainWP extension retrieves events directly from the child sites\' activity logs. Use the below settings to specify how many events the extension should retrieve and store from a child site, and how often it should do it.', 'mwp-al-ext' ); ?></p></div>
 						<div class="inside">
