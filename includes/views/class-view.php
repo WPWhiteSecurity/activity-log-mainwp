@@ -10,7 +10,7 @@
 
 namespace WSAL\MainWPExtension\Views;
 
-use \WSAL\MainWPExtension\Activity_Log as Activity_Log;
+use \WSAL\MainWPExtension as MWPAL_Extension;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -68,11 +68,8 @@ class View extends Abstract_View {
 
 	/**
 	 * Constructor.
-	 *
-	 * @param Activity_Log $activity_log – Instance of Activity_Log.
 	 */
-	public function __construct( Activity_Log $activity_log ) {
-		parent::__construct( $activity_log );
+	public function __construct() {
 		add_filter( 'mainwp_left_menu_sub', array( $this, 'mwp_left_menu_sub' ), 10, 1 );
 		add_filter( 'mainwp_subleft_menu_sub', array( $this, 'mwp_sub_menu_dropdown' ), 10, 1 );
 		add_action( 'mainwp_extensions_top_header_after_tab', array( $this, 'activitylog_settings_tab' ), 10, 1 );
@@ -85,7 +82,7 @@ class View extends Abstract_View {
 		add_action( 'wp_ajax_update_active_wsal_sites', array( $this, 'update_active_wsal_sites' ) );
 		add_action( 'wp_ajax_retrieve_events_manually', array( $this, 'retrieve_events_manually' ) );
 
-		if ( $this->activity_log->settings->is_infinite_scroll() ) {
+		if ( MWPAL_Extension\mwpal_extension()->settings->is_infinite_scroll() ) {
 			add_action( 'wp_ajax_mwpal_infinite_scroll_events', array( $this, 'infinite_scroll_events' ) );
 		}
 
@@ -302,7 +299,7 @@ class View extends Abstract_View {
 			'siteId'         => isset( $this->page_args->site_id ) ? $this->page_args->site_id : false,
 			'orderBy'        => isset( $this->page_args->order_by ) ? $this->page_args->order_by : false,
 			'order'          => isset( $this->page_args->order ) ? $this->page_args->order : false,
-			'infiniteScroll' => $this->activity_log->settings->is_infinite_scroll(),
+			'infiniteScroll' => MWPAL_Extension\mwpal_extension()->settings->is_infinite_scroll(),
 		);
 		wp_localize_script( 'mwpal-view-script', 'scriptData', $script_data );
 		wp_enqueue_script( 'mwpal-view-script' );
@@ -364,14 +361,14 @@ class View extends Abstract_View {
 			$wsal_child_sites   = isset( $_POST['mwpal-wsal-child-sites'] ) ? sanitize_text_field( wp_unslash( $_POST['mwpal-wsal-child-sites'] ) ) : false;
 
 			// Set options.
-			$this->activity_log->settings->set_events_type_nav( $events_nav_type );
-			$this->activity_log->settings->set_timezone( $timezone );
-			$this->activity_log->settings->set_type_username( $type_username );
-			$this->activity_log->settings->set_child_site_events( $child_site_events );
-			$this->activity_log->settings->set_events_frequency( $events_frequency );
-			$this->activity_log->settings->set_events_global_sync( $events_global_sync );
-			$this->activity_log->settings->set_columns( $columns );
-			$this->activity_log->settings->set_wsal_child_sites( ! empty( $wsal_child_sites ) ? explode( ',', $wsal_child_sites ) : false );
+			MWPAL_Extension\mwpal_extension()->settings->set_events_type_nav( $events_nav_type );
+			MWPAL_Extension\mwpal_extension()->settings->set_timezone( $timezone );
+			MWPAL_Extension\mwpal_extension()->settings->set_type_username( $type_username );
+			MWPAL_Extension\mwpal_extension()->settings->set_child_site_events( $child_site_events );
+			MWPAL_Extension\mwpal_extension()->settings->set_events_frequency( $events_frequency );
+			MWPAL_Extension\mwpal_extension()->settings->set_events_global_sync( $events_global_sync );
+			MWPAL_Extension\mwpal_extension()->settings->set_columns( $columns );
+			MWPAL_Extension\mwpal_extension()->settings->set_wsal_child_sites( ! empty( $wsal_child_sites ) ? explode( ',', $wsal_child_sites ) : false );
 		}
 	}
 
@@ -381,7 +378,7 @@ class View extends Abstract_View {
 	public function header() {
 		// The "mainwp-pageheader-extensions" action is used to render the tabs on the Extensions screen.
 		// It's used together with mainwp-pagefooter-extensions and mainwp-getextensions.
-		do_action( 'mainwp-pageheader-extensions', $this->activity_log->get_child_file() );
+		do_action( 'mainwp-pageheader-extensions', MWPAL_Extension\mwpal_extension()->get_child_file() );
 	}
 
 	/**
@@ -389,10 +386,10 @@ class View extends Abstract_View {
 	 */
 	public function content() {
 		// Fetch all child-sites.
-		$this->mwp_child_sites  = $this->activity_log->settings->get_mwp_child_sites(); // Get MainWP child sites.
-		$this->wsal_child_sites = $this->activity_log->settings->get_wsal_child_sites(); // Get child sites with WSAL installed.
+		$this->mwp_child_sites  = MWPAL_Extension\mwpal_extension()->settings->get_mwp_child_sites(); // Get MainWP child sites.
+		$this->wsal_child_sites = MWPAL_Extension\mwpal_extension()->settings->get_wsal_child_sites(); // Get child sites with WSAL installed.
 
-		if ( $this->activity_log->is_child_enabled() ) {
+		if ( MWPAL_Extension\mwpal_extension()->is_child_enabled() ) {
 			?>
 			<div class="mwpal-content-wrapper">
 				<?php
@@ -419,7 +416,7 @@ class View extends Abstract_View {
 	 */
 	public function tab_activity_log() {
 		$this->get_list_view()->prepare_items();
-		$site_id = $this->activity_log->settings->get_view_site_id();
+		$site_id = MWPAL_Extension\mwpal_extension()->settings->get_view_site_id();
 		// @codingStandardsIgnoreStart
 		$mwp_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // Admin WSAL Page.
 		// @codingStandardsIgnoreEnd
@@ -477,7 +474,7 @@ class View extends Abstract_View {
 										<th scope="row"><label for="infinite-scroll"><?php esc_html_e( 'Event Viewer View Type', 'mwp-al-ext' ); ?></label></th>
 										<td>
 											<fieldset>
-												<?php $nav_type = $this->activity_log->settings->get_events_type_nav(); ?>
+												<?php $nav_type = MWPAL_Extension\mwpal_extension()->settings->get_events_type_nav(); ?>
 												<label for="infinite-scroll">
 													<input type="radio" name="events-nav-type" id="infinite-scroll" style="margin-top: -2px;" <?php checked( $nav_type, 'infinite-scroll' ); ?> value="infinite-scroll">
 													<?php esc_html_e( 'Infinite Scroll', 'mwp-al-ext' ); ?>
@@ -496,7 +493,7 @@ class View extends Abstract_View {
 										<th scope="row"><label for="utc"><?php esc_html_e( 'Events Timestamp', 'mwp-al-ext' ); ?></label></th>
 										<td>
 											<fieldset>
-												<?php $timezone = $this->activity_log->settings->get_timezone(); ?>
+												<?php $timezone = MWPAL_Extension\mwpal_extension()->settings->get_timezone(); ?>
 												<label for="utc">
 													<input type="radio" name="timezone" id="utc" style="margin-top: -2px;" <?php checked( $timezone, 'utc' ); ?> value="utc">
 													<?php esc_html_e( 'UTC', 'mwp-al-ext' ); ?>
@@ -515,7 +512,7 @@ class View extends Abstract_View {
 										<th scope="row"><label for="column_username"><?php esc_html_e( 'Display this user information in activity log', 'mwp-al-ext' ); ?></label></th>
 										<td>
 											<fieldset>
-												<?php $type_username = $this->activity_log->settings->get_type_username(); ?>
+												<?php $type_username = MWPAL_Extension\mwpal_extension()->settings->get_type_username(); ?>
 												<label for="column_username">
 													<input type="radio" name="type_username" id="column_username" style="margin-top: -2px;" <?php checked( $type_username, 'username' ); ?> value="username">
 													<span><?php esc_html_e( 'WordPress Username', 'mwp-al-ext' ); ?></span>
@@ -539,7 +536,7 @@ class View extends Abstract_View {
 										<th><label for="columns"><?php esc_html_e( 'Activity Log Columns Selection', 'mwp-al-ext' ); ?></label></th>
 										<td>
 											<fieldset>
-												<?php $columns = $this->activity_log->settings->get_columns(); ?>
+												<?php $columns = MWPAL_Extension\mwpal_extension()->settings->get_columns(); ?>
 												<?php foreach ( $columns as $key => $value ) { ?>
 													<label for="columns">
 														<input type="checkbox" name="columns[<?php echo esc_attr( $key ); ?>]" id="<?php echo esc_attr( $key ); ?>" class="sel-columns" style="margin-top: -2px;"
@@ -580,7 +577,7 @@ class View extends Abstract_View {
 										<th scope="row"><label for="child-site-events"><?php esc_html_e( 'Number of Events to Retrieve from Child Sites', 'mwp-al-ext' ); ?></label></th>
 										<td>
 											<fieldset>
-												<?php $child_site_events = $this->activity_log->settings->get_child_site_events(); ?>
+												<?php $child_site_events = MWPAL_Extension\mwpal_extension()->settings->get_child_site_events(); ?>
 												<input type="number" id="child-site-events" name="child-site-events" value="<?php echo esc_attr( $child_site_events ); ?>" />
 											</fieldset>
 										</td>
@@ -590,7 +587,7 @@ class View extends Abstract_View {
 										<th scope="row"><label for="events-frequency"><?php esc_html_e( 'Events Retrieval Frequency', 'mwp-al-ext' ); ?></label></th>
 										<td>
 											<fieldset>
-												<?php $events_frequency = $this->activity_log->settings->get_events_frequency(); ?>
+												<?php $events_frequency = MWPAL_Extension\mwpal_extension()->settings->get_events_frequency(); ?>
 												<input type="number" id="events-frequency" name="events-frequency" value="<?php echo esc_attr( $events_frequency ); ?>" />
 												<?php esc_html_e( 'hours', 'mwp-al-ext' ); ?>
 											</fieldset>
@@ -601,7 +598,7 @@ class View extends Abstract_View {
 										<th scope="row"><label for="global-sync-events"><?php esc_html_e( 'Sync Events', 'mwp-al-ext' ); ?></label></th>
 										<td>
 											<fieldset>
-												<?php $events_global_sync = $this->activity_log->settings->is_events_global_sync(); ?>
+												<?php $events_global_sync = MWPAL_Extension\mwpal_extension()->settings->is_events_global_sync(); ?>
 												<input type="checkbox" id="global-sync-events" name="global-sync-events" value="1" <?php checked( $events_global_sync ); ?> />
 												<?php esc_html_e( 'Retrieve activity logs from child sites when I sync data with child sites.', 'mwp-al-ext' ); ?>
 											</fieldset>
@@ -626,7 +623,7 @@ class View extends Abstract_View {
 													<p><?php esc_html_e( 'Child sites with WP Security Audit Log installed but not in the MainWP Activity Log', 'mwp-al-ext' ); ?></p>
 													<div class="sites-container">
 														<?php
-														$disabled_sites = $this->activity_log->settings->get_option( 'disabled-wsal-sites', array() );
+														$disabled_sites = MWPAL_Extension\mwpal_extension()->settings->get_option( 'disabled-wsal-sites', array() );
 														foreach ( $this->mwp_child_sites as $site ) :
 															if ( isset( $disabled_sites[ $site['id'] ] ) ) :
 																?>
@@ -688,7 +685,7 @@ class View extends Abstract_View {
 	 * Render Footer.
 	 */
 	public function footer() {
-		do_action( 'mainwp-pagefooter-extensions', $this->activity_log->get_child_file() );
+		do_action( 'mainwp-pagefooter-extensions', MWPAL_Extension\mwpal_extension()->get_child_file() );
 	}
 
 	/**
@@ -698,8 +695,8 @@ class View extends Abstract_View {
 	 */
 	private function query_child_site_events() {
 		// Check if the WSAL child sites option exists.
-		$child_sites = $this->activity_log->settings->get_wsal_child_sites();
-		$server_ip   = $this->activity_log->settings->get_server_ip(); // Get server IP.
+		$child_sites = MWPAL_Extension\mwpal_extension()->settings->get_wsal_child_sites();
+		$server_ip   = MWPAL_Extension\mwpal_extension()->settings->get_server_ip(); // Get server IP.
 
 		if ( ! empty( $child_sites ) && is_array( $child_sites ) ) {
 			$sites_data        = array();
@@ -719,8 +716,9 @@ class View extends Abstract_View {
 
 				if ( ! $logged_retrieving ) {
 					// Extension has started retrieving.
-					$this->activity_log->alerts->trigger(
-						7711, array(
+					MWPAL_Extension\mwpal_extension()->alerts->trigger(
+						7711,
+						array(
 							'mainwp_dash' => true,
 							'Username'    => 'System',
 							'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
@@ -732,14 +730,14 @@ class View extends Abstract_View {
 				// Post data for child sites.
 				$post_data = array(
 					'action'       => 'get_events',
-					'events_count' => $this->activity_log->settings->get_child_site_events(),
+					'events_count' => MWPAL_Extension\mwpal_extension()->settings->get_child_site_events(),
 				);
 
 				// Call to child sites to fetch WSAL events.
 				$sites_data[ $site_id ] = apply_filters(
 					'mainwp_fetchurlauthed',
-					$this->activity_log->get_child_file(),
-					$this->activity_log->get_child_key(),
+					MWPAL_Extension\mwpal_extension()->get_child_file(),
+					MWPAL_Extension\mwpal_extension()->get_child_key(),
 					$site_id,
 					'extra_excution',
 					$post_data
@@ -747,8 +745,9 @@ class View extends Abstract_View {
 
 				if ( ! $logged_ready && isset( $sites_data[ $site_id ]->events ) ) {
 					// Extension is ready after retrieving.
-					$this->activity_log->alerts->trigger(
-						7712, array(
+					MWPAL_Extension\mwpal_extension()->alerts->trigger(
+						7712,
+						array(
 							'mainwp_dash' => true,
 							'Username'    => 'System',
 							'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
@@ -760,7 +759,7 @@ class View extends Abstract_View {
 
 			if ( ! empty( $sites_data ) && is_array( $sites_data ) ) {
 				// Get MainWP child sites.
-				$mwp_sites = $this->activity_log->settings->get_mwp_child_sites();
+				$mwp_sites = MWPAL_Extension\mwpal_extension()->settings->get_mwp_child_sites();
 
 				foreach ( $sites_data as $site_id => $site_events ) {
 					// If $site_events is array, then MainWP failed to fetch logs from the child site.
@@ -770,8 +769,9 @@ class View extends Abstract_View {
 
 						if ( false !== $key && isset( $mwp_sites[ $key ] ) ) {
 							// Extension is unable to retrieve events.
-							$this->activity_log->alerts->trigger(
-								7710, array(
+							MWPAL_Extension\mwpal_extension()->alerts->trigger(
+								7710,
+								array(
 									'friendly_name' => $mwp_sites[ $key ]['name'],
 									'site_url'      => $mwp_sites[ $key ]['url'],
 									'site_id'       => $mwp_sites[ $key ]['id'],
@@ -784,7 +784,7 @@ class View extends Abstract_View {
 					} elseif ( empty( $site_events ) || ! isset( $site_events->events ) ) {
 						continue;
 					}
-					$this->activity_log->alerts->log_events( $site_events->events, $site_id );
+					MWPAL_Extension\mwpal_extension()->alerts->log_events( $site_events->events, $site_id );
 				}
 			}
 		}
@@ -802,7 +802,7 @@ class View extends Abstract_View {
 
 			// @codingStandardsIgnoreStart
 			$this->page_args->page    = isset( $_REQUEST['page'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['page'] ) ) : false;
-			$this->page_args->site_id = $this->activity_log->settings->get_view_site_id();
+			$this->page_args->site_id = MWPAL_Extension\mwpal_extension()->settings->get_view_site_id();
 
 			// Order arguments.
 			$this->page_args->order_by = isset( $_REQUEST['orderby'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['orderby'] ) ) : false;
@@ -811,7 +811,7 @@ class View extends Abstract_View {
 		}
 
 		if ( is_null( $this->list_view ) ) {
-			$this->list_view = new AuditLogListView( $this->activity_log, $this->page_args );
+			$this->list_view = new AuditLogListView( MWPAL_Extension\mwpal_extension(), $this->page_args );
 		}
 		return $this->list_view;
 	}
@@ -833,7 +833,7 @@ class View extends Abstract_View {
 			if ( empty( $per_page_events ) ) {
 				die( esc_html__( 'Count parameter expected.', 'mwp-al-ext' ) );
 			}
-			$this->activity_log->settings->set_view_per_page( (int) $per_page_events );
+			MWPAL_Extension\mwpal_extension()->settings->set_view_per_page( (int) $per_page_events );
 			die();
 		}
 		die( esc_html__( 'Nonce verification failed.', 'mwp-al-ext' ) );
@@ -887,9 +887,9 @@ class View extends Abstract_View {
 		}
 
 		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'mwp-activitylog-nonce' ) ) {
-			$mwp_child_sites  = $this->activity_log->settings->get_mwp_child_sites(); // Get MainWP child sites.
-			$wsal_child_sites = $this->activity_log->settings->get_option( 'wsal-child-sites', array() ); // Get activity log sites.
-			$disabled_sites   = $this->activity_log->settings->get_option( 'disabled-wsal-sites', array() ); // Get disabled WSAL sites.
+			$mwp_child_sites  = MWPAL_Extension\mwpal_extension()->settings->get_mwp_child_sites(); // Get MainWP child sites.
+			$wsal_child_sites = MWPAL_Extension\mwpal_extension()->settings->get_option( 'wsal-child-sites', array() ); // Get activity log sites.
+			$disabled_sites   = MWPAL_Extension\mwpal_extension()->settings->get_option( 'disabled-wsal-sites', array() ); // Get disabled WSAL sites.
 			$wsal_site_ids    = array_merge( array_keys( $wsal_child_sites ), array_keys( $disabled_sites ) ); // Merge arrays active & disabled WSAL child sites.
 			$mwp_site_ids     = array_column( $mwp_child_sites, 'id' ); // Get MainWP child site ids.
 			$diff             = array_diff( $mwp_site_ids, $wsal_site_ids ); // Compute the difference.
@@ -902,8 +902,8 @@ class View extends Abstract_View {
 					// Call to child sites to check if WSAL is installed on them or not.
 					$response = apply_filters(
 						'mainwp_fetchurlauthed',
-						$this->activity_log->get_child_file(),
-						$this->activity_log->get_child_key(),
+						MWPAL_Extension\mwpal_extension()->get_child_file(),
+						MWPAL_Extension\mwpal_extension()->get_child_key(),
 						$site_id,
 						'extra_excution',
 						$post_data
@@ -916,7 +916,7 @@ class View extends Abstract_View {
 				}
 
 				// Update disabled sites.
-				$this->activity_log->settings->update_option( 'disabled-wsal-sites', $disabled_sites );
+				MWPAL_Extension\mwpal_extension()->settings->update_option( 'disabled-wsal-sites', $disabled_sites );
 			}
 			die();
 		}
@@ -1004,7 +1004,7 @@ class View extends Abstract_View {
 		}
 
 		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'mwp-activitylog-nonce' ) ) {
-			$this->activity_log->alerts->retrieve_events_manually();
+			MWPAL_Extension\mwpal_extension()->alerts->retrieve_events_manually();
 			die();
 		}
 		die( esc_html__( 'Nonce verification failed.', 'mwp-al-ext' ) );

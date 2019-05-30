@@ -9,7 +9,6 @@
 
 namespace WSAL\MainWPExtension\Loggers;
 
-use \WSAL\MainWPExtension\Activity_Log as Activity_Log;
 use \WSAL\MainWPExtension\Loggers\AbstractLogger as AbstractLogger;
 use \WSAL\MainWPExtension\Models\Occurrence as Occurrence;
 
@@ -28,16 +27,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 class Database extends AbstractLogger {
-
-	/**
-	 * Method: Constructor.
-	 *
-	 * @param Activity_Log $activity_log - Instance of Activity_Log.
-	 */
-	public function __construct( Activity_Log $activity_log ) {
-		parent::__construct( $activity_log );
-		// $activity_log->AddCleanupHook( array( $this, 'CleanUp' ) );
-	}
 
 	/**
 	 * Log an event.

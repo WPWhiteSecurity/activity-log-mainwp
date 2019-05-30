@@ -25,22 +25,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 abstract class AbstractLogger {
 
 	/**
-	 * Instance of Activity_Log.
-	 *
-	 * @var Activity_Log
-	 */
-	protected $activity_log;
-
-	/**
-	 * Method: Constructor.
-	 *
-	 * @param Activity_Log $activity_log - Instance of Activity_Log.
-	 */
-	public function __construct( Activity_Log $activity_log ) {
-		$this->activity_log = $activity_log;
-	}
-
-	/**
 	 * Log alert abstract.
 	 *
 	 * @param integer $type                - Alert code.
