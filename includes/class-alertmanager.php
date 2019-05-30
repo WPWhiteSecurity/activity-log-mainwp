@@ -335,20 +335,35 @@ final class AlertManager {
 	 */
 	protected function commit_event( $type, $data, $cond, $retry = true ) {
 		if ( ! $cond || ! ! call_user_func( $cond, $this ) ) {
-			if ( isset( $this->alerts[ $type ] ) ) {
-				// Ok, convert alert to a log entry.
-				$this->triggered_types[] = $type;
-				$this->log( $type, $data );
-			} elseif ( $retry ) {
-				// This is the last attempt at loading alerts from default file.
-				$this->activity_log->load_events();
-				return $this->commit_event( $type, $data, $cond, false );
-			} else {
-				// In general this shouldn't happen, but it could, so we handle it here.
-				/* translators: Event ID */
-				throw new Exception( sprintf( esc_html__( 'Event with code %d has not be registered.', 'mwp-al-ext' ), $type ) );
+			if ( $this->is_enabled( $type ) ) {
+				if ( isset( $this->alerts[ $type ] ) ) {
+					// Ok, convert alert to a log entry.
+					$this->triggered_types[] = $type;
+					$this->log( $type, $data );
+				} elseif ( $retry ) {
+					// This is the last attempt at loading alerts from default file.
+					MWPAL_Extension\mwpal_extension()->load_events();
+					return $this->commit_event( $type, $data, $cond, false );
+				} else {
+					// In general this shouldn't happen, but it could, so we handle it here.
+					/* translators: Event ID */
+					throw new Exception( sprintf( esc_html__( 'Event with code %d has not be registered.', 'mwp-al-ext' ), $type ) );
+				}
 			}
 		}
+	}
+
+	/**
+	 * Returns whether alert of type $type is enabled or not.
+	 *
+	 * @since 1.0.4
+	 *
+	 * @param integer $type - Alert type.
+	 * @return boolean - True if enabled, false otherwise.
+	 */
+	public function is_enabled( $type ) {
+		$disabled_events = MWPAL_Extension\mwpal_extension()->settings->get_disabled_events();
+		return ! in_array( $type, $disabled_events, true );
 	}
 
 	/**
