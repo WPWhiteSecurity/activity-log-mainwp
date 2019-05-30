@@ -360,6 +360,18 @@ class View extends Abstract_View {
 			$columns            = isset( $_POST['columns'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['columns'] ) ) : false;
 			$wsal_child_sites   = isset( $_POST['mwpal-wsal-child-sites'] ) ? sanitize_text_field( wp_unslash( $_POST['mwpal-wsal-child-sites'] ) ) : false;
 
+			// Get enabled events.
+			$enabled    = isset( $_POST['mwpal-event'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['mwpal-event'] ) ) : array();
+			$enabled    = array_map( 'intval', $enabled );
+			$disabled   = array();
+			$mwp_events = MWPAL_Extension\mwpal_extension()->alerts->get_alerts_by_sub_category( __( 'MainWP', 'mwp-al-ext' ) );
+
+			foreach ( $mwp_events as $event ) {
+				if ( ! in_array( $event->type, $enabled, true ) ) {
+					$disabled[] = $event->type;
+				}
+			}
+
 			// Set options.
 			MWPAL_Extension\mwpal_extension()->settings->set_events_type_nav( $events_nav_type );
 			MWPAL_Extension\mwpal_extension()->settings->set_timezone( $timezone );
@@ -369,6 +381,7 @@ class View extends Abstract_View {
 			MWPAL_Extension\mwpal_extension()->settings->set_events_global_sync( $events_global_sync );
 			MWPAL_Extension\mwpal_extension()->settings->set_columns( $columns );
 			MWPAL_Extension\mwpal_extension()->settings->set_wsal_child_sites( ! empty( $wsal_child_sites ) ? explode( ',', $wsal_child_sites ) : false );
+			MWPAL_Extension\mwpal_extension()->settings->set_disabled_events( $disabled );
 		}
 	}
 
@@ -417,6 +430,7 @@ class View extends Abstract_View {
 	public function tab_activity_log() {
 		$this->get_list_view()->prepare_items();
 		$site_id = MWPAL_Extension\mwpal_extension()->settings->get_view_site_id();
+
 		// @codingStandardsIgnoreStart
 		$mwp_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // Admin WSAL Page.
 		// @codingStandardsIgnoreEnd
@@ -459,6 +473,9 @@ class View extends Abstract_View {
 		// @codingStandardsIgnoreStart
 		$mwp_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // Admin WSAL Page.
 		// @codingStandardsIgnoreEnd
+
+		$mwp_events = MWPAL_Extension\mwpal_extension()->alerts->get_alerts_by_sub_category( __( 'MainWP', 'mwp-al-ext' ) );
+		$disabled   = MWPAL_Extension\mwpal_extension()->settings->get_disabled_events();
 		?>
 		<div class="metabox-holder columns-1">
 			<form method="post" id="mwpal-settings">
@@ -566,6 +583,48 @@ class View extends Abstract_View {
 						</div>
 					</div>
 					<!-- Activity Log Settings -->
+
+					<div id="mwpal-setting-contentbox-2" class="postbox">
+						<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'MainWP Network Activity Logs', 'mwp-al-ext' ); ?></span></h2>
+						<div class="mainwp-postbox-actions-top"><p class="description"><?php esc_html_e( 'Use the below settings to disable / re-enable activity log events that are specific to the MainWP network and to also configure the pruning of such events.', 'mwp-al-ext' ); ?></p></div>
+						<div class="inside">
+							<h3><?php esc_html_e( 'Enable / Disable MainWP Network Activity Log Events', 'mwp-al-ext' ); ?></h3>
+							<table class="wp-list-table widefat" id="mwpal-toggle-events-table">
+								<thead>
+									<tr>
+										<th width="48"><input type="checkbox" id="mwpal-toggle-allchecked" <?php checked( ! $disabled ); ?>></td>
+										<th width="80"><?php esc_html_e( 'Code', 'mwp-al-ext' ); ?></td>
+										<th width="100"><?php esc_html_e( 'Severity', 'mwp-al-ext' ); ?></td>
+										<th><?php esc_html_e( 'Description', 'mwp-al-ext' ); ?></th>
+									</tr>
+								</thead>
+								<tbody>
+									<?php foreach ( $mwp_events as $event ) : ?>
+										<tr>
+											<th><input type="checkbox" name="mwpal-event[]" class="sel-columns" style="margin-top: -2px;" value="<?php echo esc_attr( $event->type ); ?>" <?php echo ! in_array( $event->type, $disabled, true ) ? 'checked' : false; ?>></th>
+											<td><?php echo esc_html( $event->type ); ?></td>
+											<td>
+												<?php
+												$severity_obj = MWPAL_Extension\mwpal_extension()->constants->GetConstantBy( 'value', $event->code );
+
+												if ( 'E_CRITICAL' === $severity_obj->name ) {
+													esc_html_e( 'Critical', 'mwp-al-ext' );
+												} elseif ( 'E_WARNING' === $severity_obj->name ) {
+													esc_html_e( 'Warning', 'mwp-al-ext' );
+												} elseif ( 'E_NOTICE' === $severity_obj->name ) {
+													esc_html_e( 'Notification', 'mwp-al-ext' );
+												} else {
+													esc_html_e( 'Notification', 'mwp-al-ext' );
+												}
+												?>
+											</td>
+											<td><?php echo esc_html( $event->desc ); ?></td>
+										</tr>
+									<?php endforeach; ?>
+								</tbody>
+							</table>
+						</div>
+					</div>
 
 					<div id="mwpal-setting-contentbox-2" class="postbox">
 						<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'Activity Log Retrieval Settings', 'mwp-al-ext' ); ?></span></h2>

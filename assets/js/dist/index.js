@@ -272,7 +272,7 @@ jQuery(document).ready(function () {
 	/**
   * Load Events for Infinite Scroll.
   *
-  * @since 1.1
+  * @since 1.0.3
   *
   * @param {integer} pageNumber - Log viewer page number.
   */
@@ -315,7 +315,7 @@ jQuery(document).ready(function () {
 	/**
   * Load events for Infinite Scroll.
   *
-  * @since 1.1
+  * @since 1.0.3
   */
 	if (scriptData.infiniteScroll) {
 		var count = 2;
@@ -327,6 +327,25 @@ jQuery(document).ready(function () {
 			}
 		});
 	}
+
+	/**
+  * Select all events toggle handling code.
+  *
+  * @since 1.0.4
+  */
+	jQuery('#mwpal-toggle-events-table>thead>tr>th>:checkbox').change(function () {
+		jQuery(this).parents('table:first').find('tbody>tr>th>:checkbox').attr('checked', this.checked);
+	});
+
+	/**
+  * Events toggle handling code.
+  *
+  * @since 1.0.4
+  */
+	jQuery('#mwpal-toggle-events-table>tbody>tr>th>:checkbox').change(function () {
+		var allchecked = 0 === jQuery(this).parents('tbody:first').find('th>:checkbox:not(:checked)').length;
+		jQuery(this).parents('table:first').find('thead>tr>th:first>:checkbox:first').attr('checked', allchecked);
+	});
 }); /**
      * Entry Point
      *
