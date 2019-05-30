@@ -624,4 +624,26 @@ class Settings {
 	public function is_events_global_sync() {
 		return $this->get_option( 'events-global-sync' );
 	}
+
+	/**
+	 * Set disabled alerts.
+	 *
+	 * @param array $types - IDs alerts to disable.
+	 */
+	public function set_disabled_events( $types ) {
+		$disabled = array_unique( array_map( 'intval', $types ) );
+		$this->update_option( 'disabled-alerts', implode( ',', $disabled ) );
+	}
+
+	/**
+	 * Return IDs of disabled alerts.
+	 *
+	 * @return array
+	 */
+	public function get_disabled_events() {
+		$disabled = $this->get_option( 'disabled-alerts', false );
+		$disabled = ! $disabled ? array() : explode( ',', $disabled );
+		$disabled = array_map( 'intval', $disabled );
+		return $disabled;
+	}
 }
