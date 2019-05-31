@@ -1,6 +1,6 @@
 {
   "name": "mainwp-activity-log-extension",
-  "version": "0.1.0",
+  "version": "1.0.4",
   "description": "An add-on for MainWP to be able to view the activity logs of all child sites from the central MainWP dashboard.",
   "main": "index.js",
   "scripts": {
@@ -22,9 +22,6 @@
     "url": "https://github.com/WPWhiteSecurity/mainwp-activity-log-extension/issues"
   },
   "homepage": "https://github.com/WPWhiteSecurity/mainwp-activity-log-extension#readme",
-  "dependencies": {
-    "npm": "^6.7.0"
-  },
   "devDependencies": {
     "autoprefixer": "^9.4.7",
     "babel-core": "^6.26.3",
@@ -34,17 +31,13 @@
     "eslint-config-wordpress": "^2.0.0",
     "eslint-plugin-wordpress": "^0.1.0",
     "extract-text-webpack-plugin": "^4.0.0-alpha.0",
-    "gulp": "^3.9.1",
-    "gulp-notify": "^3.2.0",
-    "gulp-sort": "^2.0.0",
-    "gulp-wp-pot": "^2.3.3",
-    "gulp-zip": "^4.2.0",
     "lodash": "^4.17.11",
     "node-sass": "^4.11.0",
     "node.extend": "^2.0.2",
     "postcss-loader": "^3.0.0",
     "raw-loader": "^0.5.1",
     "sass-loader": "^7.1.0",
+    "tar": "^4.4.8",
     "webpack": "^4.29.3",
     "webpack-cli": "^3.2.3"
   }
