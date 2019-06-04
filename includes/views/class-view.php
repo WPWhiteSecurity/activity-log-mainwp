@@ -90,6 +90,7 @@ class View extends Abstract_View {
 
 		if ( \version_compare( \MainWP_System::$version, '4.0-beta', '<' ) ) {
 			add_action( 'mainwp_extensions_top_header_after_tab', array( $this, 'activitylog_settings_tab' ), 10, 1 );
+			add_action( 'admin_print_styles', array( $this, 'admin_print_styles' ) );
 		} else {
 			add_filter( 'mainwp_page_navigation', array( $this, 'mwpal_extension_tabs' ), 10, 1 );
 		}
@@ -257,6 +258,28 @@ class View extends Abstract_View {
 		<a class="nav-tab pos-nav-tab echo <?php echo ( 'settings' === $this->current_tab ) ? 'nav-tab-active' : false; ?>" href="<?php echo esc_url( $settings_tab_url ); ?>">
 			<?php esc_html_e( 'Extension Settings', 'mwp-al-ext' ); ?>
 		</a>
+		<?php
+	}
+
+	/**
+	 * Print admin styles for MainWP versions earlier than 4.0.
+	 */
+	public function admin_print_styles() {
+		// Global WP page now variable.
+		global $pagenow;
+
+		// Only run the function on audit log custom page.
+		// @codingStandardsIgnoreStart
+		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // Current page.
+		// @codingStandardsIgnoreEnd
+
+		if ( 'admin.php' !== $pagenow ) {
+			return;
+		} elseif ( MWPAL_EXTENSION_NAME !== $page ) { // Page is admin.php, now check auditlog page.
+			return; // Return if the current page is not auditlog's.
+		}
+		?>
+		<style>th#data, td.data.column-data { width: 16px; }</style>
 		<?php
 	}
 
