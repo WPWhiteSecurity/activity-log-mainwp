@@ -70,12 +70,14 @@ class View extends Abstract_View {
 	 * Constructor.
 	 */
 	public function __construct() {
+		add_action( 'admin_init', array( $this, 'setup_extension_tabs' ), 10 );
 		add_filter( 'mainwp_left_menu_sub', array( $this, 'mwp_left_menu_sub' ), 10, 1 );
 		add_filter( 'mainwp_subleft_menu_sub', array( $this, 'mwp_sub_menu_dropdown' ), 10, 1 );
-		add_action( 'mainwp_extensions_top_header_after_tab', array( $this, 'activitylog_settings_tab' ), 10, 1 );
+		add_filter( 'mainwp_main_menu', array( $this, 'mwpal_main_menu' ), 10, 1 );
+		add_filter( 'mainwp_main_menu_submenu', array( $this, 'mwpal_main_menu_submenu' ), 10, 1 );
 		add_action( 'mainwp-pageheader-extensions', array( $this, 'enqueue_styles' ), 10 );
 		add_action( 'mainwp-pagefooter-extensions', array( $this, 'enqueue_scripts' ), 10 );
-		add_action( 'admin_init', array( $this, 'handle_auditlog_form_submission' ) );
+		add_action( 'admin_init', array( $this, 'handle_auditlog_form_submission' ), 20 );
 		add_action( 'wp_ajax_set_per_page_events', array( $this, 'set_per_page_events' ) );
 		add_action( 'wp_ajax_metadata_inspector', array( $this, 'metadata_inspector' ) );
 		add_action( 'wp_ajax_refresh_child_sites', array( $this, 'refresh_child_sites' ) );
@@ -86,6 +88,20 @@ class View extends Abstract_View {
 			add_action( 'wp_ajax_mwpal_infinite_scroll_events', array( $this, 'infinite_scroll_events' ) );
 		}
 
+		if ( \version_compare( \MainWP_System::$version, '4.0-beta', '<' ) ) {
+			add_action( 'mainwp_extensions_top_header_after_tab', array( $this, 'activitylog_settings_tab' ), 10, 1 );
+		} else {
+			add_filter( 'mainwp_page_navigation', array( $this, 'mwpal_extension_tabs' ), 10, 1 );
+		}
+	}
+
+	/**
+	 * Setup extension tabs.
+	 */
+	public function setup_extension_tabs() {
+		global $_mainwp_menu_active_slugs;
+		$_mainwp_menu_active_slugs[ MWPAL_EXTENSION_NAME ] = MWPAL_EXTENSION_NAME;
+
 		// Extension view URL.
 		$extension_url = add_query_arg( 'page', MWPAL_EXTENSION_NAME, admin_url( 'admin.php' ) );
 
@@ -93,7 +109,7 @@ class View extends Abstract_View {
 		$mwpal_extension_tabs = array(
 			'activity-log' => array(
 				'name'   => __( 'Activity Log', 'mwp-al-ext' ),
-				'link'   => add_query_arg( 'tab', 'activity-log', $extension_url ),
+				'link'   => $extension_url,
 				'render' => array( $this, 'tab_activity_log' ),
 				'save'   => array( $this, 'tab_activity_log_save' ),
 			),
@@ -175,11 +191,49 @@ class View extends Abstract_View {
 		$mwp_dropdown_menu[ MWPAL_EXTENSION_NAME ] = array(
 			array(
 				__( 'Extension Settings', 'mwp-al-ext' ),
-				'admin.php?page=' . MWPAL_EXTENSION_NAME . '&tab=settings',
+				$this->mwpal_extension_tabs['settings']['link'],
 				'',
 			),
 		);
 		return $mwp_dropdown_menu;
+	}
+
+	/**
+	 * Extension left menu for MainWP v4 or later.
+	 *
+	 * @param array $mwpal_left_menu - Left menu array.
+	 * @return array
+	 */
+	public function mwpal_main_menu( $mwpal_left_menu ) {
+		$sub_menu_before = array_slice( $mwpal_left_menu['mainwp_tab'], 0, 2 );
+		$sub_menu_after  = array_splice( $mwpal_left_menu['mainwp_tab'], 2 );
+
+		$activity_log   = array();
+		$activity_log[] = __( 'Activity Log', 'mwp-al-ext' );
+		$activity_log[] = MWPAL_EXTENSION_NAME;
+		$activity_log[] = $this->mwpal_extension_tabs['activity-log']['link'];
+
+		$mwpal_left_menu['mainwp_tab'][] = $activity_log;
+		$mwpal_left_menu['mainwp_tab']   = array_merge( $mwpal_left_menu['mainwp_tab'], $sub_menu_after );
+
+		return $mwpal_left_menu;
+	}
+
+	/**
+	 * Extension sub left menu for MainWP v4 or later.
+	 *
+	 * @param array $mwpal_sub_left_menu - Left menu array.
+	 * @return array
+	 */
+	public function mwpal_main_menu_submenu( $mwpal_sub_left_menu ) {
+		$mwpal_sub_left_menu[ MWPAL_EXTENSION_NAME ] = array(
+			array(
+				__( 'Extension Settings', 'mwp-al-ext' ),
+				$this->mwpal_extension_tabs['settings']['link'],
+				'manage_options',
+			),
+		);
+		return $mwpal_sub_left_menu;
 	}
 
 	/**
@@ -204,6 +258,34 @@ class View extends Abstract_View {
 			<?php esc_html_e( 'Extension Settings', 'mwp-al-ext' ); ?>
 		</a>
 		<?php
+	}
+
+	/**
+	 * Add extension tabs to extension page.
+	 *
+	 * @param array $page_tabs - Array of page tabs.
+	 * @return array
+	 */
+	public function mwpal_extension_tabs( $page_tabs ) {
+		global $pagenow;
+
+		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // phpcs:ignore
+
+		if ( 'admin.php' !== $pagenow ) {
+			return;
+		} elseif ( MWPAL_EXTENSION_NAME !== $page ) {
+			return;
+		}
+
+		$page_tabs[1]['active'] = 'activity-log' === $this->current_tab;
+
+		$page_tabs[] = array(
+			'title'  => __( 'Extension Settings', 'mwp-al-ext' ),
+			'href'   => $this->mwpal_extension_tabs['settings']['link'],
+			'active' => 'settings' === $this->current_tab,
+		);
+
+		return $page_tabs;
 	}
 
 	/**

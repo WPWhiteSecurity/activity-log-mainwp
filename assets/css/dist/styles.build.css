@@ -8,7 +8,7 @@ td.code.column-code a {
 .column-read,
 .column-more,
 .column-data {
-  width: 16px; }
+  width: 40px; }
 
 .column-type {
   width: 87px; }
@@ -264,5 +264,3 @@ td.column-user {
   100% {
     -webkit-transform: translate(19px, 0);
             transform: translate(19px, 0); } }
-
-/*# sourceMappingURL=styles.build.css.map*/
