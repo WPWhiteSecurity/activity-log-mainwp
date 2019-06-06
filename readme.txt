@@ -115,6 +115,9 @@ Please refer to our [Support & Documentation pages](https://www.wpsecurityauditl
 * **New Feature**
 	* New pruning setting for [MainWP dashboard & network activity log events](https://www.wpsecurityauditlog.com/support-documentation/list-wordpress-audit-trail-alerts/#mainwp).
 	* Settings to disable / enable specific MainWP dashboard & network event IDs.
+	
+* **Improvement**
+	* Fixed UI issues to support MainWP 4.
 
 = 1.0.3 (2019-03-19) =
 
