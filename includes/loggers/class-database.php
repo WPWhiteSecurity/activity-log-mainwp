@@ -9,9 +9,10 @@
 
 namespace WSAL\MainWPExtension\Loggers;
 
-use \WSAL\MainWPExtension\Activity_Log as Activity_Log;
+use WSAL\MainWPExtension as MWPAL_Extension;
 use \WSAL\MainWPExtension\Loggers\AbstractLogger as AbstractLogger;
 use \WSAL\MainWPExtension\Models\Occurrence as Occurrence;
+use \WSAL\MainWPExtension\Models\OccurrenceQuery as OccurrenceQuery;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -30,13 +31,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Database extends AbstractLogger {
 
 	/**
-	 * Method: Constructor.
-	 *
-	 * @param Activity_Log $activity_log - Instance of Activity_Log.
+	 * Constructor.
 	 */
-	public function __construct( Activity_Log $activity_log ) {
-		parent::__construct( $activity_log );
-		// $activity_log->AddCleanupHook( array( $this, 'CleanUp' ) );
+	public function __construct() {
+		MWPAL_Extension\mwpal_extension()->add_cleanup_hook( array( $this, 'cleanup' ) );
 	}
 
 	/**
@@ -69,7 +67,26 @@ class Database extends AbstractLogger {
 	}
 
 	/**
-	 * Clean Up alerts by date OR by max number.
+	 * Clean up alerts by date.
 	 */
-	public function CleanUp() {}
+	public function cleanup() {
+		$mwpal_extension = MWPAL_Extension\mwpal_extension();
+		$now             = current_time( 'timestamp' );
+		$is_pruning      = $mwpal_extension->settings->is_events_pruning();
+		$pruning_date    = $mwpal_extension->settings->get_pruning_date();
+		$pruning_date    = $pruning_date->date . $pruning_date->unit;
+
+		if ( ! $is_pruning ) {
+			return;
+		}
+
+		// Calculate max timestamp.
+		$max_timestamp = $now - ( strtotime( $pruning_date ) - $now );
+
+		$query = new OccurrenceQuery();
+		$query->addOrderBy( 'created_on', false );
+		$query->addCondition( 'created_on <= %s', intval( $max_timestamp ) );
+		$query->addCondition( 'site_id = %s ', '0' );
+		$query->getAdapter()->Delete( $query );
+	}
 }

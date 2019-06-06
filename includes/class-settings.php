@@ -624,4 +624,70 @@ class Settings {
 	public function is_events_global_sync() {
 		return $this->get_option( 'events-global-sync' );
 	}
+
+	/**
+	 * Set disabled events.
+	 *
+	 * @param array $types - IDs events to disable.
+	 */
+	public function set_disabled_events( $types ) {
+		$disabled = array_unique( array_map( 'intval', $types ) );
+		$this->update_option( 'disabled-events', implode( ',', $disabled ) );
+	}
+
+	/**
+	 * Return IDs of disabled events.
+	 *
+	 * @return array
+	 */
+	public function get_disabled_events() {
+		$disabled = $this->get_option( 'disabled-events', false );
+		$disabled = ! $disabled ? array() : explode( ',', $disabled );
+		$disabled = array_map( 'intval', $disabled );
+		return $disabled;
+	}
+
+	/**
+	 * Set events pruning.
+	 *
+	 * @param string $state - Enabled or disabled state.
+	 */
+	public function set_events_pruning( $state ) {
+		$this->update_option( 'events-pruning', $state );
+	}
+
+	/**
+	 * Checks if events pruning is enabled or disabled.
+	 *
+	 * @return boolean
+	 */
+	public function is_events_pruning() {
+		$pruning = $this->get_option( 'events-pruning', 'disabled' );
+		return 'enabled' === $pruning ? true : false;
+	}
+
+	/**
+	 * Set events pruning date.
+	 *
+	 * @param string $date - Date.
+	 * @param string $unit - Time unit.
+	 */
+	public function set_pruning_date( $date, $unit ) {
+		$date_obj       = new \stdClass();
+		$date_obj->date = $date;
+		$date_obj->unit = $unit;
+		$this->update_option( 'pruning-date', $date_obj );
+	}
+
+	/**
+	 * Get events pruning date.
+	 *
+	 * @return stdClass|bool
+	 */
+	public function get_pruning_date() {
+		$default       = new \stdClass();
+		$default->date = false;
+		$default->unit = false;
+		return $this->get_option( 'pruning-date', $default );
+	}
 }

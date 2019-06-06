@@ -4,7 +4,7 @@
  * Plugin URI: https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/
  * Description: This extension for MainWP enables you to view the activity logs of all child sites in one central location, the MainWP dashboard.
  * Author: WP White Security
- * Version: 1.0.3
+ * Version: 1.0.4
  * Text Domain: mwp-al-ext
  * Author URI: http://www.wpwhitesecurity.com/
  * License: GPL2
@@ -50,7 +50,7 @@ class Activity_Log {
 	 *
 	 * @var string
 	 */
-	public $version = '1.0.3';
+	public $version = '1.0.4';
 
 	/**
 	 * Single Static Instance of the plugin.
@@ -123,6 +123,15 @@ class Activity_Log {
 	public $sensor_mainwp;
 
 	/**
+	 * Clean up hooks.
+	 *
+	 * @since 1.0.4
+	 *
+	 * @var array
+	 */
+	public $cleanup_hooks = array();
+
+	/**
 	 * Returns the singular instance of the plugin.
 	 *
 	 * @return Activity_Log
@@ -173,6 +182,7 @@ class Activity_Log {
 		add_action( 'admin_init', array( &$this, 'redirect_on_activate' ) );
 		add_action( 'admin_notices', array( &$this, 'mainwp_error_notice' ) );
 		add_filter( 'plugin_action_links_' . MWPAL_BASE_NAME, array( $this, 'add_plugin_page_links' ), 20, 1 );
+		add_action( 'plugins_loaded', array( $this, 'load_mwpal_extension' ) );
 
 		// This filter will return true if the main plugin is activated.
 		$this->mainwp_main_activated = apply_filters( 'mainwp-activated-check', false );
@@ -205,9 +215,9 @@ class Activity_Log {
 		// Initalize the classes.
 		$this->settings       = new \WSAL\MainWPExtension\Settings();
 		$this->constants      = new \WSAL\MainWPExtension\ConstantManager( $this );
-		$this->alerts         = new \WSAL\MainWPExtension\AlertManager( $this );
+		$this->alerts         = new \WSAL\MainWPExtension\AlertManager();
 		$this->sensor_mainwp  = new \WSAL\MainWPExtension\Sensors\Sensor_MainWP( $this );
-		$this->extension_view = new \WSAL\MainWPExtension\Views\View( $this );
+		$this->extension_view = new \WSAL\MainWPExtension\Views\View();
 
 		if ( false === $this->settings->get_option( 'setup-complete' ) ) {
 			new \WSAL\MainWPExtension\Views\Setup_Wizard( $this );
@@ -465,6 +475,7 @@ class Activity_Log {
 			foreach ( $child_sites as $site_id => $site ) {
 				$event    = $this->get_latest_event_by_siteid( $site_id );
 				$hrs_diff = 0;
+
 				if ( $event ) {
 					$hrs_diff = $this->settings->get_hours_since_last_alert( $event->created_on );
 				}
@@ -494,7 +505,8 @@ class Activity_Log {
 				if ( $trigger_ready && isset( $sites_data[ $site_id ]->events ) ) {
 					// Extension is ready after retrieving.
 					$this->alerts->trigger(
-						7712, array(
+						7712,
+						array(
 							'mainwp_dash' => true,
 							'Username'    => 'System',
 							'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
@@ -503,8 +515,13 @@ class Activity_Log {
 					$trigger_ready = false;
 				}
 			}
+
 			// Set child site events.
 			$this->alerts->set_site_events( $sites_data );
+		}
+
+		foreach ( $this->cleanup_hooks as $hook ) {
+			call_user_func( $hook );
 		}
 	}
 
@@ -578,7 +595,7 @@ class Activity_Log {
 	/**
 	 * Add Plugin Shortcut Links.
 	 *
-	 * @since 1.1
+	 * @since 1.0.3
 	 *
 	 * @param array $old_links - Old links.
 	 * @return array
@@ -595,6 +612,15 @@ class Activity_Log {
 		);
 		return $new_links;
 	}
+
+	/**
+	 * Add callback to be called when a cleanup operation is required.
+	 *
+	 * @param callable $hook - Hook name.
+	 */
+	public function add_cleanup_hook( $hook ) {
+		$this->cleanup_hooks[] = $hook;
+	}
 }
 
 /**
@@ -602,15 +628,12 @@ class Activity_Log {
  *
  * @return \WSAL\MainWPExtension\Activity_Log
  */
-function mwpal_extension_load() {
+function mwpal_extension() {
 	return \WSAL\MainWPExtension\Activity_Log::get_instance();
 }
 
 // Initiate the plugin.
-$mwpal_extension = mwpal_extension_load();
-
-// Load MainWP Activity Log Extension.
-add_action( 'plugins_loaded', array( $mwpal_extension, 'load_mwpal_extension' ) );
+$mwpal_extension = mwpal_extension();
 
 // Include events for extension.
 $mwpal_extension->load_events();

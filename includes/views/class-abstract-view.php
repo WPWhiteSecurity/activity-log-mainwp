@@ -23,22 +23,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 abstract class Abstract_View {
 
 	/**
-	 * Instance of main plugin class.
-	 *
-	 * @var \WSAL\MainWPExtension\Activity_Log
-	 */
-	public $activity_log;
-
-	/**
-	 * Constructor.
-	 *
-	 * @param Activity_Log $activity_log – Instance of main class.
-	 */
-	public function __construct( Activity_Log $activity_log ) {
-		$this->activity_log = $activity_log;
-	}
-
-	/**
 	 * Render Header.
 	 */
 	abstract public function header();

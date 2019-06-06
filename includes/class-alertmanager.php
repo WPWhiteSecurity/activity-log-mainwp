@@ -10,7 +10,7 @@
 
 namespace WSAL\MainWPExtension;
 
-use \WSAL\MainWPExtension\Activity_Log as Activity_Log;
+use \WSAL\MainWPExtension as MWPAL_Extension;
 use \WSAL\MainWPExtension\Alert as Alert;
 use \WSAL\MainWPExtension\Loggers\AbstractLogger as AbstractLogger;
 
@@ -25,13 +25,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Alert manager class of the extension.
  */
 final class AlertManager {
-
-	/**
-	 * Activity Log Instance.
-	 *
-	 * @var \WSAL\MainWPExtension\Activity_Log
-	 */
-	protected $activity_log;
 
 	/**
 	 * Extension Alerts.
@@ -57,13 +50,9 @@ final class AlertManager {
 	protected $triggered_types = array();
 
 	/**
-	 * Constructor: AlertManager instance.
-	 *
-	 * @param Activity_Log $activity_log – Activity log instance.
+	 * Constructor.
 	 */
-	public function __construct( Activity_Log $activity_log ) {
-		$this->activity_log = $activity_log;
-
+	public function __construct() {
 		foreach ( glob( MWPAL_BASE_DIR . 'includes/loggers/*.php' ) as $file ) {
 			$this->add_from_file( $file );
 		}
@@ -84,13 +73,13 @@ final class AlertManager {
 	 * @param string $class Class name.
 	 */
 	public function add_from_class( $class ) {
-		$this->add_instance( new $class( $this->activity_log ) );
+		$this->add_instance( new $class() );
 	}
 
 	/**
 	 * Add newly created logger to list.
 	 *
-	 * @param AbstractLogger[] $logger - The new logger.
+	 * @param AbstractLogger $logger - The new logger.
 	 */
 	public function add_instance( AbstractLogger $logger ) {
 		$this->loggers[] = $logger;
@@ -313,7 +302,7 @@ final class AlertManager {
 		}
 
 		// Get current user roles.
-		$roles = $this->activity_log->settings->get_current_user_roles();
+		$roles = MWPAL_Extension\mwpal_extension()->settings->get_current_user_roles();
 		if ( empty( $roles ) && ! empty( $data['CurrentUserRoles'] ) ) {
 			$roles = $data['CurrentUserRoles'];
 		}
@@ -335,20 +324,35 @@ final class AlertManager {
 	 */
 	protected function commit_event( $type, $data, $cond, $retry = true ) {
 		if ( ! $cond || ! ! call_user_func( $cond, $this ) ) {
-			if ( isset( $this->alerts[ $type ] ) ) {
-				// Ok, convert alert to a log entry.
-				$this->triggered_types[] = $type;
-				$this->log( $type, $data );
-			} elseif ( $retry ) {
-				// This is the last attempt at loading alerts from default file.
-				$this->activity_log->load_events();
-				return $this->commit_event( $type, $data, $cond, false );
-			} else {
-				// In general this shouldn't happen, but it could, so we handle it here.
-				/* translators: Event ID */
-				throw new Exception( sprintf( esc_html__( 'Event with code %d has not be registered.', 'mwp-al-ext' ), $type ) );
+			if ( $this->is_enabled( $type ) ) {
+				if ( isset( $this->alerts[ $type ] ) ) {
+					// Ok, convert alert to a log entry.
+					$this->triggered_types[] = $type;
+					$this->log( $type, $data );
+				} elseif ( $retry ) {
+					// This is the last attempt at loading alerts from default file.
+					MWPAL_Extension\mwpal_extension()->load_events();
+					return $this->commit_event( $type, $data, $cond, false );
+				} else {
+					// In general this shouldn't happen, but it could, so we handle it here.
+					/* translators: Event ID */
+					throw new Exception( sprintf( esc_html__( 'Event with code %d has not be registered.', 'mwp-al-ext' ), $type ) );
+				}
 			}
 		}
+	}
+
+	/**
+	 * Returns whether alert of type $type is enabled or not.
+	 *
+	 * @since 1.0.4
+	 *
+	 * @param integer $type - Alert type.
+	 * @return boolean - True if enabled, false otherwise.
+	 */
+	public function is_enabled( $type ) {
+		$disabled_events = MWPAL_Extension\mwpal_extension()->settings->get_disabled_events();
+		return ! in_array( $type, $disabled_events, true );
 	}
 
 	/**
@@ -363,7 +367,7 @@ final class AlertManager {
 	protected function log( $type, $data = array() ) {
 		// Client IP.
 		if ( ! isset( $data['ClientIP'] ) ) {
-			$client_ip = $this->activity_log->settings->get_main_client_ip();
+			$client_ip = MWPAL_Extension\mwpal_extension()->settings->get_main_client_ip();
 			if ( ! empty( $client_ip ) ) {
 				$data['ClientIP'] = $client_ip;
 			}
@@ -385,7 +389,7 @@ final class AlertManager {
 
 		// Current user roles.
 		if ( ! isset( $data['CurrentUserRoles'] ) && function_exists( 'is_user_logged_in' ) && is_user_logged_in() ) {
-			$current_user_roles = $this->activity_log->settings->get_current_user_roles();
+			$current_user_roles = MWPAL_Extension\mwpal_extension()->settings->get_current_user_roles();
 			if ( ! empty( $current_user_roles ) ) {
 				$data['CurrentUserRoles'] = $current_user_roles;
 			}
@@ -420,12 +424,12 @@ final class AlertManager {
 	 */
 	public function retrieve_events_manually() {
 		// Get MainWP sites.
-		$mwp_sites = $this->activity_log->settings->get_wsal_child_sites();
+		$mwp_sites = MWPAL_Extension\mwpal_extension()->settings->get_wsal_child_sites();
 
 		if ( ! empty( $mwp_sites ) ) {
 			$trigger_retrieving = true; // Event 7711.
 			$trigger_ready      = true; // Event 7712.
-			$server_ip          = $this->activity_log->settings->get_server_ip(); // Get server IP.
+			$server_ip          = MWPAL_Extension\mwpal_extension()->settings->get_server_ip(); // Get server IP.
 
 			foreach ( $mwp_sites as $site_id => $site ) {
 				// Delete events by site id.
@@ -440,7 +444,8 @@ final class AlertManager {
 				if ( $trigger_ready && isset( $sites_data[ $site_id ]->events ) ) {
 					// Extension is ready after retrieving.
 					$this->trigger(
-						7712, array(
+						7712,
+						array(
 							'mainwp_dash' => true,
 							'Username'    => 'System',
 							'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
@@ -468,12 +473,13 @@ final class AlertManager {
 
 		if ( $site_id ) {
 			// Get server IP.
-			$server_ip = $this->activity_log->settings->get_server_ip();
+			$server_ip = MWPAL_Extension\mwpal_extension()->settings->get_server_ip();
 
 			if ( $trigger_retrieving ) {
 				// Extension has started retrieving.
 				$this->trigger(
-					7711, array(
+					7711,
+					array(
 						'mainwp_dash' => true,
 						'Username'    => 'System',
 						'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
@@ -484,14 +490,14 @@ final class AlertManager {
 			// Post data for child sites.
 			$post_data = array(
 				'action'       => 'get_events',
-				'events_count' => $this->activity_log->settings->get_child_site_events(),
+				'events_count' => MWPAL_Extension\mwpal_extension()->settings->get_child_site_events(),
 			);
 
 			// Call to child sites to fetch WSAL events.
 			return apply_filters(
 				'mainwp_fetchurlauthed',
-				$this->activity_log->get_child_file(),
-				$this->activity_log->get_child_key(),
+				MWPAL_Extension\mwpal_extension()->get_child_file(),
+				MWPAL_Extension\mwpal_extension()->get_child_key(),
 				$site_id,
 				'extra_excution',
 				$post_data
@@ -510,10 +516,10 @@ final class AlertManager {
 	public function set_site_events( $sites_data = array() ) {
 		if ( ! empty( $sites_data ) && is_array( $sites_data ) ) {
 			// Get MainWP child sites.
-			$mwp_sites = $this->activity_log->settings->get_mwp_child_sites();
+			$mwp_sites = MWPAL_Extension\mwpal_extension()->settings->get_mwp_child_sites();
 
 			// Get server IP.
-			$server_ip = $this->activity_log->settings->get_server_ip();
+			$server_ip = MWPAL_Extension\mwpal_extension()->settings->get_server_ip();
 
 			foreach ( $sites_data as $site_id => $site_events ) {
 				// If $site_events is array, then MainWP failed to fetch logs from the child site.
@@ -524,7 +530,8 @@ final class AlertManager {
 					if ( false !== $key && isset( $mwp_sites[ $key ] ) ) {
 						// Extension is unable to retrieve events.
 						$this->trigger(
-							7710, array(
+							7710,
+							array(
 								'friendly_name' => $mwp_sites[ $key ]['name'],
 								'site_url'      => $mwp_sites[ $key ]['url'],
 								'site_id'       => $mwp_sites[ $key ]['id'],
