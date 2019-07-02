@@ -175,21 +175,20 @@ class Activity_Log {
 	 * @since 1.1
 	 */
 	public function init_hooks() {
-		add_action( 'init', array( $this, 'mwpal_init' ) ); // Start listening to events.
-		register_activation_hook( __FILE__, array( $this, 'install_extension' ) ); // Installation routine.
-		add_action( 'mwp_events_cleanup', array( $this, 'events_cleanup' ) ); // Schedule hook for refreshing events.
-		add_filter( 'mainwp-getextensions', array( &$this, 'get_this_extension' ) );
-		add_action( 'admin_init', array( &$this, 'redirect_on_activate' ) );
-		add_action( 'admin_notices', array( &$this, 'mainwp_error_notice' ) );
-		add_filter( 'plugin_action_links_' . MWPAL_BASE_NAME, array( $this, 'add_plugin_page_links' ), 20, 1 );
-		add_action( 'plugins_loaded', array( $this, 'load_mwpal_extension' ) );
-
 		// This filter will return true if the main plugin is activated.
 		$this->mainwp_main_activated = apply_filters( 'mainwp-activated-check', false );
 
 		if ( false !== $this->mainwp_main_activated ) {
+			add_action( 'init', array( $this, 'mwpal_init' ) ); // Start listening to events.
+			register_activation_hook( __FILE__, array( $this, 'install_extension' ) ); // Installation routine.
+			add_action( 'mwp_events_cleanup', array( $this, 'events_cleanup' ) ); // Schedule hook for refreshing events.
+			add_filter( 'mainwp-getextensions', array( &$this, 'get_this_extension' ) );
+			add_action( 'admin_init', array( &$this, 'redirect_on_activate' ) );
+			add_filter( 'plugin_action_links_' . MWPAL_BASE_NAME, array( $this, 'add_plugin_page_links' ), 20, 1 );
+			add_action( 'plugins_loaded', array( $this, 'load_mwpal_extension' ) );
 			$this->activate_this_plugin();
 		} else {
+			add_action( 'admin_notices', array( &$this, 'mainwp_error_notice' ) );
 			// Because sometimes our main plugin is activated after the extension plugin is activated we also have a second step,
 			// listening to the 'mainwp-activated' action. This action is triggered by MainWP after initialisation.
 			add_action( 'mainwp-activated', array( &$this, 'activate_this_plugin' ) );
