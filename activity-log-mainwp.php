@@ -400,7 +400,8 @@ class Activity_Log {
 	public function mainwp_error_notice() {
 		global $current_screen;
 		if ( 'plugins' === $current_screen->parent_base && false === $this->mainwp_main_activated ) {
-			echo '<div class="error"><p>Activity Log for MainWP Extension ' . esc_html__( 'requires ', 'mwp-al-ext' ) . '<a href="http://mainwp.com/" target="_blank">MainWP</a>' . esc_html__( ' Plugin to be activated in order to work. Please install and activate', 'mwp-al-ext' ) . '<a href="http://mainwp.com/" target="_blank">MainWP</a> ' . esc_html__( 'first.', 'mwp-al-ext' ) . '</p></div>';
+			/* Translators: MainWP website hyperlink */
+			echo '<div class="error"><p>' . sprintf( esc_html__( 'Activity Log for MainWP Extension requires %1$s plugin to be activated in order to work. Please install and activate %2$s first.', 'mwp-al-ext' ), '<a href="http://mainwp.com/" target="_blank">MainWP</a>', '<a href="http://mainwp.com/" target="_blank">MainWP</a>' ) . '</p></div>';
 		}
 	}
 
