@@ -100,7 +100,8 @@ class Sensor_MainWP extends Abstract_Sensor {
 			$user_roles[] = 'superadmin';
 		}
 		$this->activity_log->alerts->trigger(
-			1000, array(
+			1000,
+			array(
 				'mainwp_dash'      => true,
 				'Username'         => $user_login,
 				'CurrentUserRoles' => $user_roles,
@@ -114,7 +115,8 @@ class Sensor_MainWP extends Abstract_Sensor {
 	public function event_logout() {
 		if ( 0 !== $this->current_user->ID ) {
 			$this->activity_log->alerts->Trigger(
-				1001, array(
+				1001,
+				array(
 					'mainwp_dash'      => true,
 					'CurrentUserID'    => $this->current_user->ID,
 					'CurrentUserRoles' => $this->activity_log->settings->get_current_user_roles( $this->current_user->roles ),
@@ -143,7 +145,8 @@ class Sensor_MainWP extends Abstract_Sensor {
 
 		if ( false !== $key && isset( $mwp_sites[ $key ] ) ) {
 			$this->activity_log->alerts->trigger(
-				7700, array(
+				7700,
+				array(
 					'friendly_name' => $mwp_sites[ $key ]['name'],
 					'site_url'      => $mwp_sites[ $key ]['url'],
 					'site_id'       => $mwp_sites[ $key ]['id'],
@@ -168,7 +171,8 @@ class Sensor_MainWP extends Abstract_Sensor {
 
 		if ( isset( $website->name ) ) {
 			$this->activity_log->alerts->trigger(
-				7701, array(
+				7701,
+				array(
 					'friendly_name' => $website->name,
 					'site_url'      => $website->url,
 					'site_id'       => $website->id,
@@ -198,7 +202,8 @@ class Sensor_MainWP extends Abstract_Sensor {
 
 		if ( false !== $key && isset( $mwp_sites[ $key ] ) ) {
 			$this->activity_log->alerts->trigger(
-				7702, array(
+				7702,
+				array(
 					'friendly_name' => $mwp_sites[ $key ]['name'],
 					'site_url'      => $mwp_sites[ $key ]['url'],
 					'site_id'       => $mwp_sites[ $key ]['id'],
@@ -231,7 +236,8 @@ class Sensor_MainWP extends Abstract_Sensor {
 
 		if ( isset( $website->name ) ) {
 			$this->activity_log->alerts->trigger(
-				7703, array(
+				7703,
+				array(
 					'friendly_name' => $website->name,
 					'site_url'      => $website->url,
 					'site_id'       => $website->id,
@@ -297,7 +303,8 @@ class Sensor_MainWP extends Abstract_Sensor {
 		// Check if the slug is not empty and it is active.
 		if ( ! empty( $slug ) && \is_plugin_active( $slug ) ) {
 			$this->activity_log->alerts->trigger(
-				7709, array(
+				7709,
+				array(
 					'mainwp_dash' => true,
 					'extension'   => $slug,
 					'action'      => $action,
@@ -332,6 +339,10 @@ class Sensor_MainWP extends Abstract_Sensor {
 	 * @param string $extension – Name of extension.
 	 */
 	private function extension_log_event( $event = 0, $extension ) {
+		if ( ! \WSAL\MainWPExtension\mwpal_extension()->is_mainwp_active() ) {
+			return;
+		}
+
 		$extension_dir = explode( '/', $extension );
 		$extension_dir = isset( $extension_dir[0] ) ? $extension_dir[0] : false;
 
@@ -497,7 +508,8 @@ class Sensor_MainWP extends Abstract_Sensor {
 			// If site is found then report it as MainWP child site.
 			if ( false !== $site ) {
 				$this->activity_log->alerts->trigger(
-					$event_id, array(
+					$event_id,
+					array(
 						'friendly_name' => $site['name'],
 						'site_url'      => $site['url'],
 						'site_id'       => $site['id'],
@@ -507,7 +519,8 @@ class Sensor_MainWP extends Abstract_Sensor {
 			} else {
 				// Else report as other site.
 				$this->activity_log->alerts->trigger(
-					$event_id, array(
+					$event_id,
+					array(
 						'friendly_name' => $site_url,
 						'site_url'      => $site_url,
 						'mainwp_dash'   => true,

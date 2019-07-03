@@ -4,7 +4,7 @@
  * Plugin URI: https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/
  * Description: This extension for MainWP enables you to view the activity logs of all child sites in one central location, the MainWP dashboard.
  * Author: WP White Security
- * Version: 1.0.4
+ * Version: 1.0.5
  * Text Domain: mwp-al-ext
  * Author URI: http://www.wpwhitesecurity.com/
  * License: GPL2
@@ -15,7 +15,7 @@
 
 /*
 	Activity Log for MainWP
-	Copyright(c) 2018  Robert Abela  (email : robert@wpwhitesecurity.com)
+	Copyright(c) 2019  WP White Security  (email : info@wpwhitesecurity.com)
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License, version 2, as
@@ -50,7 +50,7 @@ class Activity_Log {
 	 *
 	 * @var string
 	 */
-	public $version = '1.0.4';
+	public $version = '1.0.5';
 
 	/**
 	 * Single Static Instance of the plugin.
@@ -180,9 +180,9 @@ class Activity_Log {
 		add_action( 'mwp_events_cleanup', array( $this, 'events_cleanup' ) ); // Schedule hook for refreshing events.
 		add_filter( 'mainwp-getextensions', array( &$this, 'get_this_extension' ) );
 		add_action( 'admin_init', array( &$this, 'redirect_on_activate' ) );
-		add_action( 'admin_notices', array( &$this, 'mainwp_error_notice' ) );
 		add_filter( 'plugin_action_links_' . MWPAL_BASE_NAME, array( $this, 'add_plugin_page_links' ), 20, 1 );
 		add_action( 'plugins_loaded', array( $this, 'load_mwpal_extension' ) );
+		add_action( 'admin_notices', array( &$this, 'mainwp_error_notice' ) );
 
 		// This filter will return true if the main plugin is activated.
 		$this->mainwp_main_activated = apply_filters( 'mainwp-activated-check', false );
@@ -401,7 +401,8 @@ class Activity_Log {
 	public function mainwp_error_notice() {
 		global $current_screen;
 		if ( 'plugins' === $current_screen->parent_base && false === $this->mainwp_main_activated ) {
-			echo '<div class="error"><p>Activity Log for MainWP Extension ' . esc_html__( 'requires ', 'mwp-al-ext' ) . '<a href="http://mainwp.com/" target="_blank">MainWP</a>' . esc_html__( ' Plugin to be activated in order to work. Please install and activate', 'mwp-al-ext' ) . '<a href="http://mainwp.com/" target="_blank">MainWP</a> ' . esc_html__( 'first.', 'mwp-al-ext' ) . '</p></div>';
+			/* Translators: MainWP website hyperlink */
+			echo '<div class="error"><p>' . sprintf( esc_html__( 'Activity Log for MainWP Extension requires %1$s plugin to be activated in order to work. Please install and activate %2$s first.', 'mwp-al-ext' ), '<a href="https://mainwp.com/" target="_blank">MainWP</a>', '<a href="https://mainwp.com/" target="_blank">MainWP</a>' ) . '</p></div>';
 		}
 	}
 
@@ -620,6 +621,15 @@ class Activity_Log {
 	 */
 	public function add_cleanup_hook( $hook ) {
 		$this->cleanup_hooks[] = $hook;
+	}
+
+	/**
+	 * Checks if MainWP dashboard plugin is active or not.
+	 *
+	 * @return boolean|string
+	 */
+	public function is_mainwp_active() {
+		return $this->mainwp_main_activated;
 	}
 }
 
