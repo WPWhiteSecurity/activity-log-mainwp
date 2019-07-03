@@ -4,7 +4,7 @@
  * Plugin URI: https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/
  * Description: This extension for MainWP enables you to view the activity logs of all child sites in one central location, the MainWP dashboard.
  * Author: WP White Security
- * Version: 1.0.4
+ * Version: 1.0.5
  * Text Domain: mwp-al-ext
  * Author URI: http://www.wpwhitesecurity.com/
  * License: GPL2
@@ -15,7 +15,7 @@
 
 /*
 	Activity Log for MainWP
-	Copyright(c) 2018  Robert Abela  (email : robert@wpwhitesecurity.com)
+	Copyright(c) 2019  WP White Security  (email : info@wpwhitesecurity.com)
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License, version 2, as
@@ -50,7 +50,7 @@ class Activity_Log {
 	 *
 	 * @var string
 	 */
-	public $version = '1.0.4';
+	public $version = '1.0.5';
 
 	/**
 	 * Single Static Instance of the plugin.
@@ -402,7 +402,7 @@ class Activity_Log {
 		global $current_screen;
 		if ( 'plugins' === $current_screen->parent_base && false === $this->mainwp_main_activated ) {
 			/* Translators: MainWP website hyperlink */
-			echo '<div class="error"><p>' . sprintf( esc_html__( 'Activity Log for MainWP Extension requires %1$s plugin to be activated in order to work. Please install and activate %2$s first.', 'mwp-al-ext' ), '<a href="http://mainwp.com/" target="_blank">MainWP</a>', '<a href="http://mainwp.com/" target="_blank">MainWP</a>' ) . '</p></div>';
+			echo '<div class="error"><p>' . sprintf( esc_html__( 'Activity Log for MainWP Extension requires %1$s plugin to be activated in order to work. Please install and activate %2$s first.', 'mwp-al-ext' ), '<a href="https://mainwp.com/" target="_blank">MainWP</a>', '<a href="https://mainwp.com/" target="_blank">MainWP</a>' ) . '</p></div>';
 		}
 	}
 
