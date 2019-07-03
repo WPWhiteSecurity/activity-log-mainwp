@@ -622,6 +622,15 @@ class Activity_Log {
 	public function add_cleanup_hook( $hook ) {
 		$this->cleanup_hooks[] = $hook;
 	}
+
+	/**
+	 * Checks if MainWP dashboard plugin is active or not.
+	 *
+	 * @return boolean|string
+	 */
+	public function is_mainwp_active() {
+		return $this->mainwp_main_activated;
+	}
 }
 
 /**
