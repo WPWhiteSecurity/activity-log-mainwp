@@ -88,11 +88,13 @@ class View extends Abstract_View {
 			add_action( 'wp_ajax_mwpal_infinite_scroll_events', array( $this, 'infinite_scroll_events' ) );
 		}
 
-		if ( \version_compare( \MainWP_System::$version, '4.0-beta', '<' ) ) {
-			add_action( 'mainwp_extensions_top_header_after_tab', array( $this, 'activitylog_settings_tab' ), 10, 1 );
-			add_action( 'admin_print_styles', array( $this, 'admin_print_styles' ) );
-		} else {
-			add_filter( 'mainwp_page_navigation', array( $this, 'mwpal_extension_tabs' ), 10, 1 );
+		if ( MWPAL_Extension\mwpal_extension()->is_mainwp_active() ) {
+			if ( \version_compare( \MainWP_System::$version, '4.0-beta', '<' ) ) {
+				add_action( 'mainwp_extensions_top_header_after_tab', array( $this, 'activitylog_settings_tab' ), 10, 1 );
+				add_action( 'admin_print_styles', array( $this, 'admin_print_styles' ) );
+			} else {
+				add_filter( 'mainwp_page_navigation', array( $this, 'mwpal_extension_tabs' ), 10, 1 );
+			}
 		}
 	}
 
