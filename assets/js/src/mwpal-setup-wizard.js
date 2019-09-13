@@ -5,4 +5,4 @@
  */
 
 // Import styles.
-import '../../css/src/mwpal-setup-wizard.scss';
+// import '../../css/src/mwpal-setup-wizard.scss';

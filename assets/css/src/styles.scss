@@ -270,3 +270,67 @@ td.column-user {
 		transform: translate(19px, 0);
 	}
 }
+.mwpal-notice .content {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+	align-items: center;
+	-ms-flex-pack: justify;
+	justify-content: space-between;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+}
+
+.mwpal-notice .content .notice-message {
+	display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+	align-items: center;
+}
+.notice-message-img img {
+	width: 70px;
+}
+.notice-message-desc{
+	
+}
+.notice-message-desc p {
+	margin-bottom: 0;
+	margin-top: 0;
+}
+.mwpal-notice-right {
+	padding-left: 15px;
+}
+.mwpal-notice-right .close-btn {
+	text-align: right;
+	padding-top: 5px;
+}
+
+.notice.notice-success.mwpal-notice {
+	margin-bottom: 20px;
+}
+.tablenav.bottom + .mwpal-notice {
+	display: none;
+}
+@media ( max-width: 1142px ) {
+	.notice.notice-success.mwpal-notice .upgrade-btn {
+		text-align: right;
+	}
+	.notice.notice-success.mwpal-notice .upgrade-btn a.ui.button.green {
+		margin-bottom: 5px !important;
+	}
+}
+
+@media ( max-width: 768px ) {
+	.mwpal-notice-left {
+		width: 100%;
+	}
+	.mwpal-notice-right {
+		width: 100%;
+	}
+	.mwpal-notice-right .close-btn {
+		text-align: center;
+	}
+	.notice-message-img {
+		display: none;
+	}
+}
