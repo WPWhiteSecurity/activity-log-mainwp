@@ -32,13 +32,17 @@
     "eslint": "^5.16.0",
     "eslint-config-wordpress": "^2.0.0",
     "eslint-plugin-wordpress": "^0.1.0",
+    "eslint-utils": "^1.4.2",
     "extract-text-webpack-plugin": "^4.0.0-alpha.0",
     "lodash": "^4.17.11",
+    "mixin-deep": "^2.0.1",
     "node-sass": "^4.11.0",
     "node.extend": "^2.0.2",
     "postcss-loader": "^3.0.0",
     "raw-loader": "^2.0.0",
     "sass-loader": "^7.1.0",
+    "set-value": "^3.0.1",
+    "tar": "^4.4.8",
     "webpack": "^4.31.0",
     "webpack-cli": "^3.3.2"
   }
