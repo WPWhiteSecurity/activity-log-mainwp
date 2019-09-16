@@ -1345,7 +1345,7 @@ class View extends Abstract_View {
 		} );
 
 		// Get current site ID.
-		$this->page_args->site_id = isset( $_REQUEST['id'] ) ? sanitize_text_field( $_REQUEST['id'] ) : 0;
+		$_REQUEST['mwpal-site-id'] = isset( $_REQUEST['id'] ) ? sanitize_text_field( $_REQUEST['id'] ) : 0;
 
 		// Prepare items
 		$this->get_list_view()->prepare_items();
