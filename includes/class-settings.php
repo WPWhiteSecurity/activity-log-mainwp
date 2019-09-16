@@ -626,6 +626,24 @@ class Settings {
 	}
 
 	/**
+	 * Checks if current admin page is extension's page or not.
+	 *
+	 * @since 1.1
+	 *
+	 * @return boolean
+	 */
+	public function is_current_extension_page() {
+		global $pagenow;
+		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // phpcs:ignore
+
+		if ( 'admin.php' === $pagenow && MWPAL_EXTENSION_NAME === $page ) {
+			return true;
+		}
+
+		return false;
+	}
+	
+	/**
 	 * Set disabled events.
 	 *
 	 * @param array $types - IDs events to disable.

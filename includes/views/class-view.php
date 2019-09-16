@@ -462,6 +462,10 @@ class View extends Abstract_View {
 	 * Handle Audit Log Form Submission.
 	 */
 	public function handle_auditlog_form_submission() {
+		if ( ! MWPAL_Extension\mwpal_extension()->settings->is_current_extension_page() ) {
+			return;
+		}
+		
 		if ( $this->current_tab && ! empty( $this->mwpal_extension_tabs[ $this->current_tab ]['save'] ) ) {
 			call_user_func( $this->mwpal_extension_tabs[ $this->current_tab ]['save'] );
 		}
