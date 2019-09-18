@@ -71,19 +71,23 @@ class View extends Abstract_View {
 	 */
 	public function __construct() {
 		add_action( 'admin_init', array( $this, 'setup_extension_tabs' ), 10 );
+		add_filter( 'mainwp-getsubpages-sites', array( $this, 'managesites_subpage' ), 10, 1 );
 		add_filter( 'mainwp_left_menu_sub', array( $this, 'mwp_left_menu_sub' ), 10, 1 );
 		add_filter( 'mainwp_subleft_menu_sub', array( $this, 'mwp_sub_menu_dropdown' ), 10, 1 );
 		add_filter( 'mainwp_main_menu', array( $this, 'mwpal_main_menu' ), 10, 1 );
 		add_filter( 'mainwp_main_menu_submenu', array( $this, 'mwpal_main_menu_submenu' ), 10, 1 );
 		add_action( 'mainwp-pageheader-extensions', array( $this, 'enqueue_styles' ), 10 );
 		add_action( 'mainwp-pagefooter-extensions', array( $this, 'enqueue_scripts' ), 10 );
+		add_action( 'mainwp-pageheader-sites', array( $this, 'enqueue_styles' ), 10 );
+		add_action( 'mainwp-pagefooter-sites', array( $this, 'enqueue_scripts' ), 10 );
 		add_action( 'admin_init', array( $this, 'handle_auditlog_form_submission' ), 20 );
 		add_action( 'wp_ajax_set_per_page_events', array( $this, 'set_per_page_events' ) );
 		add_action( 'wp_ajax_metadata_inspector', array( $this, 'metadata_inspector' ) );
 		add_action( 'wp_ajax_refresh_child_sites', array( $this, 'refresh_child_sites' ) );
 		add_action( 'wp_ajax_update_active_wsal_sites', array( $this, 'update_active_wsal_sites' ) );
 		add_action( 'wp_ajax_retrieve_events_manually', array( $this, 'retrieve_events_manually' ) );
-
+		add_action( 'wp_ajax_mwpal_advert_dismissed', array( $this, 'mwpal_advert_dismissed' ) );
+		add_action( 'admin_footer', array( $this, 'mwpal_extensions_print_scripts' ) );
 		if ( MWPAL_Extension\mwpal_extension()->settings->is_infinite_scroll() ) {
 			add_action( 'wp_ajax_mwpal_infinite_scroll_events', array( $this, 'infinite_scroll_events' ) );
 		}
@@ -125,7 +129,7 @@ class View extends Abstract_View {
 		);
 
 		/**
-		 * Filter: `mwpal_extension_tabs`
+		 * `mwpal_extension_tabs`
 		 *
 		 * This filter is used to filter the tabs of WSAL settings page.
 		 *
@@ -137,13 +141,23 @@ class View extends Abstract_View {
 		 *         'name'   => This function is used to save the related setting of the tab,
 		 *     );
 		 *
-		 * @param array $mwpal_extension_tabs – Array of extension tabs.
+		 * @param array  $mwpal_extension_tabs - Array of extension tabs.
+		 * @param string $extension_url        - URL of the extension.
 		 */
-		$this->mwpal_extension_tabs = apply_filters( 'mwpal_extension_tabs', $mwpal_extension_tabs );
+		$this->mwpal_extension_tabs = apply_filters( 'mwpal_extension_tabs', $mwpal_extension_tabs, $extension_url );
 
 		// Get the current tab.
 		$current_tab       = filter_input( INPUT_GET, 'tab', FILTER_SANITIZE_STRING );
 		$this->current_tab = empty( $current_tab ) ? 'activity-log' : $current_tab;
+	}
+
+	/**
+	 * Returns current tab of the extension.
+	 *
+	 * @return string
+	 */
+	public function get_current_tab() {
+		return $this->current_tab;
 	}
 
 	/**
@@ -191,13 +205,17 @@ class View extends Abstract_View {
 	 * @return array
 	 */
 	public function mwp_sub_menu_dropdown( $mwp_dropdown_menu ) {
-		$mwp_dropdown_menu[ MWPAL_EXTENSION_NAME ] = array(
+		$mwp_dropdown_menu[ MWPAL_EXTENSION_NAME ] = apply_filters(
+			'mwpal_left_submenu_dropdown',
 			array(
-				__( 'Extension Settings', 'mwp-al-ext' ),
-				$this->mwpal_extension_tabs['settings']['link'],
-				'',
-			),
+				array(
+					__( 'Extension Settings', 'mwp-al-ext' ),
+					$this->mwpal_extension_tabs['settings']['link'],
+					'',
+				),
+			)
 		);
+
 		return $mwp_dropdown_menu;
 	}
 
@@ -229,13 +247,17 @@ class View extends Abstract_View {
 	 * @return array
 	 */
 	public function mwpal_main_menu_submenu( $mwpal_sub_left_menu ) {
-		$mwpal_sub_left_menu[ MWPAL_EXTENSION_NAME ] = array(
+		$mwpal_sub_left_menu[ MWPAL_EXTENSION_NAME ] = apply_filters(
+			'mwpal_main_menu_submenu',
 			array(
-				__( 'Extension Settings', 'mwp-al-ext' ),
-				$this->mwpal_extension_tabs['settings']['link'],
-				'manage_options',
-			),
+				array(
+					__( 'Extension Settings', 'mwp-al-ext' ),
+					$this->mwpal_extension_tabs['settings']['link'],
+					'manage_options',
+				),
+			)
 		);
+
 		return $mwpal_sub_left_menu;
 	}
 
@@ -251,16 +273,14 @@ class View extends Abstract_View {
 			return;
 		}
 
-		$settings_url_args = array(
-			'page' => MWPAL_EXTENSION_NAME,
-			'tab'  => 'settings',
-		);
-		$settings_tab_url  = add_query_arg( $settings_url_args, admin_url( 'admin.php' ) );
-		?>
-		<a class="nav-tab pos-nav-tab echo <?php echo ( 'settings' === $this->current_tab ) ? 'nav-tab-active' : false; ?>" href="<?php echo esc_url( $settings_tab_url ); ?>">
-			<?php esc_html_e( 'Extension Settings', 'mwp-al-ext' ); ?>
-		</a>
-		<?php
+		$extension_tabs = $this->mwpal_extension_tabs;
+		unset( $extension_tabs['activity-log'] ); // Due to the fact the activity log tab will already be added to the extension.
+
+		foreach ( $extension_tabs as $tab_id => $tab ) :
+			?>
+			<a class="nav-tab pos-nav-tab echo<?php echo ( $tab_id === $this->current_tab ) ? ' nav-tab-active' : false; ?>" href="<?php echo esc_url( $tab['link'] ); ?>"><?php echo esc_html( $tab['name'] ); ?></a>
+			<?php
+		endforeach;
 	}
 
 	/**
@@ -297,18 +317,27 @@ class View extends Abstract_View {
 		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // phpcs:ignore
 
 		if ( 'admin.php' !== $pagenow ) {
-			return;
+			return $page_tabs;
 		} elseif ( MWPAL_EXTENSION_NAME !== $page ) {
-			return;
+			return $page_tabs;
 		}
 
 		$page_tabs[1]['active'] = 'activity-log' === $this->current_tab;
 
-		$page_tabs[] = array(
-			'title'  => __( 'Extension Settings', 'mwp-al-ext' ),
-			'href'   => $this->mwpal_extension_tabs['settings']['link'],
-			'active' => 'settings' === $this->current_tab,
+		$extension_tabs = apply_filters(
+			'mwpal_page_navigation',
+			array(
+				array(
+					'title'  => __( 'Extension Settings', 'mwp-al-ext' ),
+					'href'   => $this->mwpal_extension_tabs['settings']['link'],
+					'active' => 'settings' === $this->current_tab,
+				),
+			)
 		);
+
+		foreach ( $extension_tabs as $tab ) {
+			$page_tabs[] = $tab;
+		}
 
 		return $page_tabs;
 	}
@@ -326,7 +355,7 @@ class View extends Abstract_View {
 
 		if ( 'admin.php' !== $pagenow ) {
 			return;
-		} elseif ( MWPAL_EXTENSION_NAME !== $page ) {
+		} elseif ( MWPAL_EXTENSION_NAME !== $page && 'ManageSitesActivityLog' !== $page ) {
 			return;
 		}
 
@@ -368,7 +397,7 @@ class View extends Abstract_View {
 
 		if ( 'admin.php' !== $pagenow ) {
 			return;
-		} elseif ( MWPAL_EXTENSION_NAME !== $page ) {
+		} elseif ( MWPAL_EXTENSION_NAME !== $page && 'ManageSitesActivityLog' !== $page ) {
 			return;
 		}
 
@@ -386,13 +415,15 @@ class View extends Abstract_View {
 			);
 		}
 
-		wp_register_script(
-			'mwpal-view-script',
-			trailingslashit( MWPAL_BASE_URL ) . 'assets/js/dist/index.js',
-			array( 'jquery' ),
-			filemtime( trailingslashit( MWPAL_BASE_DIR ) . 'assets/js/dist/index.js' ),
-			false
-		);
+		if ( in_array( $this->current_tab, array( 'activity-log', 'settings' ), true ) ) {
+			wp_register_script(
+				'mwpal-view-script',
+				trailingslashit( MWPAL_BASE_URL ) . 'assets/js/dist/index.js',
+				array( 'jquery' ),
+				filemtime( trailingslashit( MWPAL_BASE_DIR ) . 'assets/js/dist/index.js' ),
+				false
+			);
+		}
 
 		// JS data.
 		$script_data = array(
@@ -406,31 +437,45 @@ class View extends Abstract_View {
 			'siteId'         => isset( $this->page_args->site_id ) ? $this->page_args->site_id : false,
 			'orderBy'        => isset( $this->page_args->order_by ) ? $this->page_args->order_by : false,
 			'order'          => isset( $this->page_args->order ) ? $this->page_args->order : false,
+			'getEvents'      => isset( $this->page_args->get_events ) ? $this->page_args->get_events : false,
+			'searchTerm'     => isset( $this->page_args->search_term ) ? $this->page_args->search_term : false,
+			'searchFilters'  => isset( $this->page_args->search_filters ) ? $this->page_args->search_filters : false,
 			'infiniteScroll' => MWPAL_Extension\mwpal_extension()->settings->is_infinite_scroll(),
 		);
 		wp_localize_script( 'mwpal-view-script', 'scriptData', $script_data );
 		wp_enqueue_script( 'mwpal-view-script' );
+
+		if ( 'activity-log' !== $this->current_tab ) {
+			?>
+			<script type="text/javascript">
+				var currentTab = '<?php echo esc_html( $this->current_tab ); ?>';
+
+				if ( 'activity-log' !== currentTab ) {
+					document.getElementById( 'mainwp-tabs' ).children[1].classList.remove( 'nav-tab-active' );
+				}
+			</script>
+			<?php
+		}
 	}
 
 	/**
 	 * Handle Audit Log Form Submission.
 	 */
 	public function handle_auditlog_form_submission() {
-		// Global WP page now variable.
-		global $pagenow;
-
-		// Only run the function on audit log custom page.
-		// @codingStandardsIgnoreStart
-		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // Current page.
-		// @codingStandardsIgnoreEnd
-
-		if ( 'admin.php' !== $pagenow ) {
+		if ( ! MWPAL_Extension\mwpal_extension()->settings->is_current_extension_page() ) {
 			return;
-		} elseif ( MWPAL_EXTENSION_NAME !== $page ) { // Page is admin.php, now check auditlog page.
-			return; // Return if the current page is not auditlog's.
 		}
+		
+		if ( $this->current_tab && ! empty( $this->mwpal_extension_tabs[ $this->current_tab ]['save'] ) ) {
+			call_user_func( $this->mwpal_extension_tabs[ $this->current_tab ]['save'] );
+		}
+	}
 
-		if ( isset( $_GET['_wpnonce'] ) && 'activity-log' === $this->current_tab ) {
+	/**
+	 * Activity log form submit handler.
+	 */
+	public function tab_activity_log_save() {
+		if ( isset( $_GET['_wpnonce'] ) ) {
 			// Verify nonce for security.
 			check_admin_referer( 'bulk-activity-logs' );
 
@@ -438,22 +483,36 @@ class View extends Abstract_View {
 			$site_id = isset( $_GET['mwpal-site-id'] ) ? sanitize_text_field( wp_unslash( $_GET['mwpal-site-id'] ) ) : false;
 
 			// Check for dashboard.
-			if ( 'dashboard' !== $site_id ) {
+			if ( '0' === $site_id ) {
+				$site_id = false;
+			} elseif ( 'dashboard' !== $site_id ) {
 				$site_id = (int) $site_id;
 			}
 
-			// Remove args array.
-			$remove_args = array(
-				'_wp_http_referer',
-				'_wpnonce',
-			);
+			$this->get_list_view();
 
-			if ( empty( $site_id ) ) {
-				$remove_args[] = 'mwpal-site-id';
+			// Remove args array.
+			$remove_args   = array( '_wp_http_referer', '_wpnonce' );
+			$remove_args[] = ! $site_id ? 'mwpal-site-id' : false;
+			$remove_args[] = ! $this->page_args->search_term ? 's' : false;
+			$remove_args[] = ( ! is_int( $site_id ) && $this->page_args->get_events ) ? 'get-events' : false;
+
+			$redirect_url = remove_query_arg( $remove_args );
+
+			if ( is_int( $site_id ) && ( $this->page_args->search_term || $this->page_args->search_filters ) ) {
+				$redirect_url = add_query_arg( 'get-events', 'live', $redirect_url );
 			}
-			wp_safe_redirect( remove_query_arg( $remove_args ) );
+
+			wp_safe_redirect( $redirect_url );
 			exit();
-		} elseif ( isset( $_POST['_wpnonce'] ) && isset( $_POST['submit'] ) && 'settings' === $this->current_tab ) {
+		}
+	}
+
+	/**
+	 * Settings form submit handler.
+	 */
+	public function tab_settings_save() {
+		if ( isset( $_POST['_wpnonce'] ) && isset( $_POST['submit'] ) ) {
 			// Verify nonce for security.
 			check_admin_referer( 'mwpal-settings-nonce' );
 
@@ -514,7 +573,7 @@ class View extends Abstract_View {
 		$this->mwp_child_sites  = MWPAL_Extension\mwpal_extension()->settings->get_mwp_child_sites(); // Get MainWP child sites.
 		$this->wsal_child_sites = MWPAL_Extension\mwpal_extension()->settings->get_wsal_child_sites(); // Get child sites with WSAL installed.
 
-		if ( MWPAL_Extension\mwpal_extension()->is_child_enabled() ) {
+		if ( MWPAL_Extension\mwpal_extension()->is_child_enabled() ) :
 			?>
 			<div class="mwpal-content-wrapper">
 				<?php
@@ -526,14 +585,12 @@ class View extends Abstract_View {
 				?>
 			</div>
 			<!-- Content Wrapper -->
-			<?php
-		} else {
-			?>
+		<?php else : ?>
 			<div class="mainwp_info-box-yellow">
 				<?php esc_html_e( 'The Extension has to be enabled to change the settings.', 'mwp-al-ext' ); ?>
 			</div>
 			<?php
-		}
+			endif;
 	}
 
 	/**
@@ -541,17 +598,19 @@ class View extends Abstract_View {
 	 */
 	public function tab_activity_log() {
 		$this->get_list_view()->prepare_items();
-		$site_id = MWPAL_Extension\mwpal_extension()->settings->get_view_site_id();
-
-		// @codingStandardsIgnoreStart
-		$mwp_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // Admin WSAL Page.
-		// @codingStandardsIgnoreEnd
+		$site_id    = MWPAL_Extension\mwpal_extension()->settings->get_view_site_id();
+		$mwp_page   = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // phpcs:ignore
+		$get_events = isset( $_GET['get-events'] ) ? sanitize_text_field( wp_unslash( $_GET['get-events'] ) ) : false; // phpcs:ignore
 		?>
 		<form id="audit-log-viewer" method="get">
 			<div id="audit-log-viewer-content">
 				<input type="hidden" name="page" value="<?php echo esc_attr( $mwp_page ); ?>" />
 				<input type="hidden" id="mwpal-site-id" name="mwpal-site-id" value="<?php echo esc_attr( $site_id ); ?>" />
-				<?php
+				<?php if ( $get_events ) : ?>
+					<input type="hidden" name="get-events" value="<?php echo esc_attr( $get_events ); ?>" />
+					<?php
+				endif;
+
 				/**
 				 * Action: `mwpal_auditlog_after_view`
 				 *
@@ -963,9 +1022,9 @@ class View extends Abstract_View {
 				// Get MainWP child sites.
 				$mwp_sites = MWPAL_Extension\mwpal_extension()->settings->get_mwp_child_sites();
 
-				foreach ( $sites_data as $site_id => $site_events ) {
-					// If $site_events is array, then MainWP failed to fetch logs from the child site.
-					if ( ! empty( $site_events ) && is_array( $site_events ) ) {
+				foreach ( $sites_data as $site_id => $site_data ) {
+					// If $site_data is array, then MainWP failed to fetch logs from the child site.
+					if ( ! empty( $site_data ) && is_array( $site_data ) ) {
 						// Search for the site data.
 						$key = array_search( $site_id, array_column( $mwp_sites, 'id' ), false );
 
@@ -983,10 +1042,12 @@ class View extends Abstract_View {
 								)
 							);
 						}
-					} elseif ( empty( $site_events ) || ! isset( $site_events->events ) ) {
+					} elseif ( empty( $site_data ) || ! isset( $site_data->events ) ) {
 						continue;
 					}
-					MWPAL_Extension\mwpal_extension()->alerts->log_events( $site_events->events, $site_id );
+
+					MWPAL_Extension\mwpal_extension()->alerts->log_events( $site_data->events, $site_id );
+					\WSAL\MainWPExtension\save_child_site_users( $site_id, $site_data->users );
 				}
 			}
 		}
@@ -997,7 +1058,7 @@ class View extends Abstract_View {
 	 *
 	 * @return AuditLogListView
 	 */
-	private function get_list_view() {
+	public function get_list_view() {
 		// Set page arguments.
 		if ( ! $this->page_args ) {
 			$this->page_args = new \stdClass();
@@ -1009,12 +1070,30 @@ class View extends Abstract_View {
 			// Order arguments.
 			$this->page_args->order_by = isset( $_REQUEST['orderby'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['orderby'] ) ) : false;
 			$this->page_args->order    = isset( $_REQUEST['order'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['order'] ) ) : false;
+
+			// Search arguments.
+			$this->page_args->get_events     = ! empty( $_REQUEST['get-events'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['get-events'] ) ) : false;
+			$this->page_args->search_term    = ( isset( $_REQUEST['s'] ) && ! empty( $_REQUEST['s'] ) ) ? trim( sanitize_text_field( wp_unslash( $_REQUEST['s'] ) ) ) : false;
+			$this->page_args->search_filters = ( isset( $_REQUEST['filters'] ) && is_array( $_REQUEST['filters'] ) ) ? array_map( 'sanitize_text_field', wp_unslash( $_REQUEST['filters'] ) ) : false;
 			// @codingStandardsIgnoreEnd
 		}
 
 		if ( is_null( $this->list_view ) ) {
-			$this->list_view = new AuditLogListView( MWPAL_Extension\mwpal_extension(), $this->page_args );
+			$list_view_class = '\WSAL\MainWPExtension\Views\AuditLogListView';
+
+			/**
+			 * List view class name filter.
+			 *
+			 * @since 1.1
+			 *
+			 * @param string $list_view_class - List view class name.
+			 */
+			$list_view_class = apply_filters( 'mwpal_auditlog_list_view_class', $list_view_class );
+
+			// Initialize the list view.
+			$this->list_view = new $list_view_class( $this->page_args );
 		}
+
 		return $this->list_view;
 	}
 
@@ -1214,8 +1293,6 @@ class View extends Abstract_View {
 
 	/**
 	 * Infinite Scroll Events AJAX Hanlder.
-	 *
-	 * @since 3.3.1.1
 	 */
 	public function infinite_scroll_events() {
 		// Check user permissions.
@@ -1230,6 +1307,7 @@ class View extends Abstract_View {
 
 			// Query events.
 			$events_query = $this->get_list_view()->query_events( $paged );
+
 			if ( ! empty( $events_query['items'] ) ) {
 				foreach ( $events_query['items'] as $event ) {
 					$this->get_list_view()->single_row( $event );
@@ -1239,5 +1317,97 @@ class View extends Abstract_View {
 		} else {
 			die( esc_html__( 'Nonce verification failed.', 'mwp-al-ext' ) );
 		}
+	}
+
+	/**
+	 * Add submenu on manage sites
+	 * @param  array $subPage
+	 * @return array
+	 */
+	public function managesites_subpage( $subPage ) {
+		$subPage[] = array(
+			'title' => __( 'Activity Logs', 'mwp-al-ext' ),
+			'slug' => 'ActivityLog',
+			'sitetab' => true,
+			'menu_hidden' => true,
+			'callback' => array( $this, 'managesites_activity_logs' )
+		);
+		return $subPage;
+	}
+
+	/**
+	 * Managesites show activity logs
+	 * @return empty
+	 */
+	public function managesites_activity_logs() {
+
+		/**
+		 * Remove child sites filter.
+		 */
+		add_filter( 'pre_option_' . MWPAL_OPT_PREFIX . 'wsal-child-sites', function() {
+			return array();
+		} );
+
+		// Get current site ID.
+		$_REQUEST['mwpal-site-id'] = isset( $_REQUEST['id'] ) ? sanitize_text_field( $_REQUEST['id'] ) : 0;
+
+		// Prepare items
+		$this->get_list_view()->prepare_items();
+
+		/**
+		 * Do action before the view renders.
+		 */
+		do_action( 'mainwp-pageheader-sites', 'ActivityLog' );
+
+		// Display events table.
+		$this->get_list_view()->display();
+		
+		/**
+		 * Do action before the view renders.
+		 */
+		do_action( 'mainwp-pagefooter-sites', 'ActivityLog' );
+
+		return;
+	}
+
+	/**
+	 * Enqueue script for extensions page.
+	 */
+	public function mwpal_extensions_print_scripts() {
+		// Only run the function on mainWP Extensions page.
+		// @codingStandardsIgnoreStart
+		$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : false; // Current page.
+		// @codingStandardsIgnoreEnd
+
+		if ( 'Extensions' !== $page ) {
+			return;
+		}
+		?>
+		<script>
+			jQuery( document ).ready( function( $ ) {
+				var mwpalExtension = $( 'div[extension-slug$="/activity-log-mainwp.php"]' );
+				mwpalExtension.append( '<div class="ui middle aligned extra content"><a href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/pricing/' ); ?>" target="_blank" class="ui mini right floated button"><?php echo __( 'Upgrade to Premium', 'mwp-al-ext' ); ?></a></div>' );
+			} );
+		</script>
+		<?php
+	}
+
+	/**
+	 * Dismissed Upgrade advert
+	 * @return json
+	 */
+	public function mwpal_advert_dismissed() {
+		// Verify mwp nonce
+		check_ajax_referer( 'mwp-activitylog-nonce', 'mwp_nonce' );
+		
+		// Set advert transient
+		$dismissed_advert = set_transient( 'mwpal-is-advert-dismissed', true, MONTH_IN_SECONDS );
+		// Send ajax response
+		wp_send_json(
+			array(
+				'status' => $dismissed_advert
+			)
+		);
+		die();
 	}
 }

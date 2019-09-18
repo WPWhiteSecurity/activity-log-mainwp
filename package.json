@@ -1,6 +1,6 @@
 {
   "name": "activity-log-for-mainwp",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "An add-on for MainWP to be able to view the activity logs of all child sites from the central MainWP dashboard.",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/WPWhiteSecurity/activity-log-mainwp.git"
+    "url": "git+https://github.com/WPWhiteSecurity/Activity-Log-for-MainWP-Premium.git"
   },
   "keywords": [
     "wsal",
@@ -19,11 +19,12 @@
   "author": "WP White Security",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/WPWhiteSecurity/activity-log-mainwp/issues"
+    "url": "https://github.com/WPWhiteSecurity/Activity-Log-for-MainWP-Premium/issues"
   },
-  "homepage": "https://github.com/WPWhiteSecurity/activity-log-mainwp#readme",
+  "homepage": "https://github.com/WPWhiteSecurity/Activity-Log-for-MainWP-Premium#readme",
   "devDependencies": {
     "@babel/core": "^7.4.4",
+    "@babel/plugin-transform-runtime": "^7.4.3",
     "@babel/preset-env": "^7.4.4",
     "autoprefixer": "^9.5.1",
     "babel-core": "^6.26.3",
@@ -32,18 +33,19 @@
     "eslint": "^5.16.0",
     "eslint-config-wordpress": "^2.0.0",
     "eslint-plugin-wordpress": "^0.1.0",
-    "eslint-utils": "^1.4.2",
     "extract-text-webpack-plugin": "^4.0.0-alpha.0",
     "lodash": "^4.17.11",
-    "mixin-deep": "^2.0.1",
     "node-sass": "^4.11.0",
     "node.extend": "^2.0.2",
     "postcss-loader": "^3.0.0",
     "raw-loader": "^2.0.0",
     "sass-loader": "^7.1.0",
-    "set-value": "^3.0.1",
-    "tar": "^4.4.8",
+    "style-loader": "^0.23.1",
+    "svg-url-loader": "^2.3.2",
     "webpack": "^4.31.0",
-    "webpack-cli": "^3.3.2"
+    "webpack-cli": "^3.3.2",
+    "mini-css-extract-plugin": "^0.5.0",
+    "css-loader": "^2.1.1",
+    "webpack-fix-style-only-entries": "^0.2.1"
   }
 }

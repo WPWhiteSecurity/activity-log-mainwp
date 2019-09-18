@@ -10,7 +10,7 @@
 
 namespace WSAL\MainWPExtension\Views;
 
-use \WSAL\MainWPExtension\Activity_Log as Activity_Log;
+use \WSAL\MainWPExtension as MWPAL_Extension;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -25,14 +25,7 @@ require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
  *
  * Log view class which extends WP List Table class.
  */
-final class AuditLogListView extends \WP_List_Table {
-
-	/**
-	 * Instance of Activity Log.
-	 *
-	 * @var Activity_Log
-	 */
-	protected $activity_log;
+class AuditLogListView extends \WP_List_Table {
 
 	/**
 	 * GMT Offset
@@ -62,7 +55,7 @@ final class AuditLogListView extends \WP_List_Table {
 	 *
 	 * @var stdClass
 	 */
-	private $query_args;
+	protected $query_args;
 
 	/**
 	 * Events Meta.
@@ -71,20 +64,17 @@ final class AuditLogListView extends \WP_List_Table {
 	 *
 	 * @var array
 	 */
-	private $item_meta = array();
+	protected $item_meta = array();
 
 	/**
-	 * Method: Constructor.
+	 * Constructor.
 	 *
-	 * @param object   $activity_log - Instance of Activity_Log.
-	 * @param stdClass $query_args   - Events query arguments.
+	 * @param stdClass $query_args - Events query arguments.
 	 */
-	public function __construct( $activity_log, $query_args ) {
-		$this->activity_log = $activity_log;
-		$this->query_args   = $query_args;
+	public function __construct( $query_args ) {
+		$this->query_args = $query_args;
+		$timezone         = MWPAL_Extension\mwpal_extension()->settings->get_timezone(); // Set GMT offset.
 
-		// Set GMT offset.
-		$timezone = $this->activity_log->settings->get_timezone();
 		if ( 'utc' === $timezone ) {
 			$this->gmt_offset_sec = date( 'Z' );
 		} else {
@@ -92,7 +82,7 @@ final class AuditLogListView extends \WP_List_Table {
 		}
 
 		// Get MainWP child sites.
-		$this->mwp_child_sites = $this->activity_log->settings->get_mwp_child_sites();
+		$this->mwp_child_sites = MWPAL_Extension\mwpal_extension()->settings->get_mwp_child_sites();
 
 		parent::__construct(
 			array(
@@ -102,6 +92,15 @@ final class AuditLogListView extends \WP_List_Table {
 				'screen'   => 'interval-list',
 			)
 		);
+	}
+
+	/**
+	 * Provides access to private query args property.
+	 *
+	 * @return stdClass
+	 */
+	public function get_query_args() {
+		return $this->query_args;
 	}
 
 	/**
@@ -124,11 +123,47 @@ final class AuditLogListView extends \WP_List_Table {
 		<div class="tablenav <?php echo esc_attr( $which ); ?>">
 			<?php
 			$this->extra_tablenav( $which );
+
+			/**
+			 * Display search filters.
+			 *
+			 * @since 1.1
+			 *
+			 * @param string $which - Display position of tablenav i.e. top or bottom.
+			 */
+			do_action( 'mwpal_search_filters', $which );
+
 			$this->pagination( $which );
 			?>
 			<br class="clear" />
 		</div>
-		<?php
+		<?php if ( ! get_transient( 'mwpal-is-advert-dismissed' ) ) : ?>
+		<div class="notice notice-success mwpal-notice"> 
+			<div class="content">
+				<div class=mwpal-notice-left>
+				<div class="notice-message">
+					<div class="notice-message-img">
+						<img src="<?php echo MWPAL_BASE_URL ?>assets/img/mwp-al-ext-150x150.jpg">
+					</div>
+					<div class="notice-message-desc">
+						<p><strong><?php esc_html_e( 'Upgrade to premium to add search & filters and reports.', 'mwp-al-ext' ); ?></strong></p>
+						<p><?php esc_html_e( 'Use the search to also search in the child sites\'activity log and the filters to fine-tune the results.', 'mwp-al-ext' ); ?></p>
+						<p><?php esc_html_e( 'Generate and schedule automated weekly and monthly reports from the child site\'s activity logs.', 'mwp-al-ext' ); ?></p>
+					</div>
+				</div>
+				</div>
+				<div class="mwpal-notice-right">
+					<div class="upgrade-btn">
+						<a target="_blank" href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/pricing/' ); ?>" class="ui button green"><?php esc_html_e( 'Upgrade Now', 'mwp-al-ext' ); ?></a>
+						<a target="_blank" href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/premium-features/' ); ?>" class="ui button"><?php esc_html_e( 'Tell Me More', 'mwp-al-ext' ); ?></a>
+					</div>
+					<div class="close-btn">
+						<a href="javascript:;"><?php esc_html_e( 'Close', 'mwp-al-ext' ); ?></a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<?php endif;
 	}
 
 	/**
@@ -138,9 +173,9 @@ final class AuditLogListView extends \WP_List_Table {
 	 */
 	public function extra_tablenav( $which ) {
 		// If the position is not top then render.
-		if ( 'top' !== $which && ! $this->activity_log->settings->is_infinite_scroll() ) :
+		if ( 'top' !== $which && ! MWPAL_Extension\mwpal_extension()->settings->is_infinite_scroll() ) :
 			// Items-per-page widget.
-			$per_page = $this->activity_log->settings->get_view_per_page();
+			$per_page = MWPAL_Extension\mwpal_extension()->settings->get_view_per_page();
 			$items    = array( 5, 10, 15, 30, 50 );
 			if ( ! in_array( $per_page, $items, true ) ) {
 				$items[] = $per_page;
@@ -163,7 +198,7 @@ final class AuditLogListView extends \WP_List_Table {
 			<?php
 		endif;
 
-		if ( 'top' !== $which && $this->activity_log->settings->is_infinite_scroll() ) :
+		if ( 'top' !== $which && MWPAL_Extension\mwpal_extension()->settings->is_infinite_scroll() ) :
 			?>
 			<div id="mwpal-auditlog-end"><p><?php esc_html_e( '— End of Activity Log —', 'mwp-al-ext' ); ?></p></div>
 			<div id="mwpal-event-loader"><div class="mwpal-lds-ellipsis"><div></div><div></div><div></div><div></div></div></div>
@@ -172,9 +207,9 @@ final class AuditLogListView extends \WP_List_Table {
 
 		if ( 'top' === $which ) :
 			// Get child sites with WSAL installed.
-			$wsal_child_sites = $this->activity_log->settings->get_wsal_child_sites();
+			$wsal_child_sites = MWPAL_Extension\mwpal_extension()->settings->get_wsal_child_sites();
 			if ( count( $wsal_child_sites ) > 0 ) :
-				$current_site = $this->activity_log->settings->get_view_site_id();
+				$current_site = MWPAL_Extension\mwpal_extension()->settings->get_view_site_id();
 				?>
 				<div class="mwp-ssa mwp-ssa-<?php echo esc_attr( $which ); ?>">
 					<select class="mwp-ssas">
@@ -189,7 +224,7 @@ final class AuditLogListView extends \WP_List_Table {
 									<?php selected( (int) $this->mwp_child_sites[ $key ]['id'], $current_site ); ?>>
 									<?php echo esc_html( $this->mwp_child_sites[ $key ]['name'] ) . ' (' . esc_html( $this->mwp_child_sites[ $key ]['url'] ) . ')'; ?>
 								</option>
-							<?php
+								<?php
 							endif;
 						endforeach;
 						?>
@@ -218,8 +253,8 @@ final class AuditLogListView extends \WP_List_Table {
 	 * @param string $column_name - Name of the column.
 	 */
 	public function column_default( $item, $column_name ) {
-		$datetime_format = $this->activity_log->settings->get_date_time_format(); // Get date time format.
-		$type_username   = $this->activity_log->settings->get_type_username(); // Get username type to display.
+		$datetime_format = MWPAL_Extension\mwpal_extension()->settings->get_date_time_format(); // Get date time format.
+		$type_username   = MWPAL_Extension\mwpal_extension()->settings->get_type_username(); // Get username type to display.
 		$mwp_child_sites = $this->mwp_child_sites; // Get MainWP child sites.
 
 		if ( ! isset( $this->item_meta[ $item->getId() ] ) ) {
@@ -242,18 +277,18 @@ final class AuditLogListView extends \WP_List_Table {
 				return $html;
 
 			case 'type':
-				$code = $this->activity_log->alerts->GetAlert( $item->alert_id );
+				$code = MWPAL_Extension\mwpal_extension()->alerts->GetAlert( $item->alert_id );
 				return '<span class="log-disable">' . str_pad( $item->alert_id, 4, '0', STR_PAD_LEFT ) . ' </span>';
 
 			case 'code':
-				$code  = $this->activity_log->alerts->GetAlert( $item->alert_id );
+				$code  = MWPAL_Extension\mwpal_extension()->alerts->GetAlert( $item->alert_id );
 				$code  = $code ? $code->code : 0;
 				$const = (object) array(
 					'name'        => 'E_UNKNOWN',
 					'value'       => 0,
 					'description' => __( 'Unknown error code.', 'mwp-al-ext' ),
 				);
-				$const = $this->activity_log->constants->GetConstantBy( 'value', $code, $const );
+				$const = MWPAL_Extension\mwpal_extension()->constants->GetConstantBy( 'value', $code, $const );
 				if ( 'E_CRITICAL' === $const->name ) {
 					$const->name = __( 'Critical', 'mwp-al-ext' );
 				} elseif ( 'E_WARNING' === $const->name ) {
@@ -275,6 +310,7 @@ final class AuditLogListView extends \WP_List_Table {
 			case 'user':
 				$username  = $item->GetUsername( $this->item_meta[ $item->getId() ] ); // Get username.
 				$user_data = $item->get_user_data( $this->item_meta[ $item->getId() ] ); // Get user data.
+
 				if ( empty( $user_data ) ) {
 					$user_data = get_user_by( 'login', $username );
 				}
@@ -296,7 +332,7 @@ final class AuditLogListView extends \WP_List_Table {
 					$image = '<span class="dashicons dashicons-wordpress wsal-system-icon"></span>';
 					$uhtml = '<i>' . __( 'System', 'mwp-al-ext' ) . '</i>';
 					$roles = '';
-				} elseif ( $username && $user_data ) {
+				} elseif ( $user_data && 'System' !== $user_data->username ) {
 					$image = get_avatar( $user_data->user_email, 32 ); // Avatar.
 
 					// Checks for display name.
@@ -311,7 +347,12 @@ final class AuditLogListView extends \WP_List_Table {
 						$display_name = $user_data->username;
 					}
 
-					$site_id    = (string) $item->site_id;
+					if ( $this->query_args->site_id && 'live' === $this->query_args->get_events ) {
+						$site_id = (string) $this->query_args->site_id;
+					} else {
+						$site_id = (string) $item->site_id;
+					}
+
 					$site_index = array_search( $site_id, array_column( $mwp_child_sites, 'id' ), true );
 					$site_url   = '#';
 
@@ -424,7 +465,7 @@ final class AuditLogListView extends \WP_List_Table {
 		$cols = array(
 			'site' => __( 'Site', 'mwp-al-ext' ),
 			'type' => __( 'Event ID', 'mwp-al-ext' ),
-			'code' => __( 'Severity', 'mwp-al-ext' ),
+			'code' => __( 'Sev.', 'mwp-al-ext' ),
 			'crtd' => __( 'Date', 'mwp-al-ext' ),
 			'user' => __( 'User', 'mwp-al-ext' ),
 			'scip' => __( 'Source IP', 'mwp-al-ext' ),
@@ -433,7 +474,7 @@ final class AuditLogListView extends \WP_List_Table {
 		);
 
 		// Get selected columns.
-		$selected = $this->activity_log->settings->get_columns_selected();
+		$selected = MWPAL_Extension\mwpal_extension()->settings->get_columns_selected();
 
 		// If selected columns are not empty, then unset default columns.
 		if ( ! empty( $selected ) ) {
@@ -448,7 +489,7 @@ final class AuditLogListView extends \WP_List_Table {
 						$cols['type'] = __( 'Event ID', 'mwp-al-ext' );
 						break;
 					case 'type':
-						$cols['code'] = __( 'Severity', 'mwp-al-ext' );
+						$cols['code'] = __( 'Sev.', 'mwp-al-ext' );
 						break;
 					case 'date':
 						$cols['crtd'] = __( 'Date', 'mwp-al-ext' );
@@ -464,8 +505,14 @@ final class AuditLogListView extends \WP_List_Table {
 						break;
 				}
 			}
+
 			$cols['data'] = '';
 		}
+
+		if ( isset( $cols['site'] ) && $this->query_args->site_id ) {
+			unset( $cols['site'] );
+		}
+
 		return $cols;
 	}
 
@@ -498,7 +545,7 @@ final class AuditLogListView extends \WP_List_Table {
 		$total_items  = isset( $query_events['total_items'] ) ? $query_events['total_items'] : false;
 		$per_page     = isset( $query_events['per_page'] ) ? $query_events['per_page'] : false;
 
-		if ( ! $this->activity_log->settings->is_infinite_scroll() ) {
+		if ( ! MWPAL_Extension\mwpal_extension()->settings->is_infinite_scroll() ) {
 			$this->set_pagination_args(
 				array(
 					'total_items' => $total_items,
@@ -536,13 +583,13 @@ final class AuditLogListView extends \WP_List_Table {
 		 * It is helpful while performing search operations on the
 		 * audit log events.
 		 *
-		 * @param \WSAL\MainWPExtension\Models\OccurrenceQuery $events_query – Occurrrence query instance.
+		 * @param \WSAL\MainWPExtension\Models\OccurrenceQuery $events_query - Occurrence query instance.
 		 */
 		$events_query = apply_filters( 'mwpal_auditlog_query', $events_query );
 
-		if ( ! $this->activity_log->settings->is_infinite_scroll() ) {
+		if ( ! MWPAL_Extension\mwpal_extension()->settings->is_infinite_scroll() ) {
 			$total_items = $events_query->getAdapter()->Count( $events_query );
-			$per_page    = $this->activity_log->settings->get_view_per_page();
+			$per_page    = MWPAL_Extension\mwpal_extension()->settings->get_view_per_page();
 			$offset      = ( $this->get_pagenum() - 1 ) * $per_page;
 		} else {
 			$total_items = false;
@@ -660,7 +707,7 @@ final class AuditLogListView extends \WP_List_Table {
 
 			case '%LinkFile%' === $name:
 				if ( 'NULL' != $value ) {
-					$site_id = $this->activity_log->settings->get_view_site_id(); // Site id for multisite.
+					$site_id = MWPAL_Extension\mwpal_extension()->settings->get_view_site_id(); // Site id for multisite.
 					return '<a href="javascript:;" onclick="download_404_log( this )" data-log-file="' . esc_attr( $value ) . '" data-site-id="' . esc_attr( $site_id ) . '" data-nonce-404="' . esc_attr( wp_create_nonce( 'wsal-download-404-log-' . $value ) ) . '" title="' . esc_html__( 'Download the log file', 'mwp-al-ext' ) . '">' . esc_html__( 'Download the log file', 'mwp-al-ext' ) . '</a>';
 				} else {
 					return 'Click <a href="' . esc_url( add_query_arg( 'page', 'wsal-togglealerts', admin_url( 'admin.php' ) ) ) . '">here</a> to log such requests to file';
@@ -737,5 +784,34 @@ final class AuditLogListView extends \WP_List_Table {
 			default:
 				return '<strong>' . esc_html( $value ) . '</strong>';
 		}
+	}
+
+	/**
+	 * Displays the search box.
+	 *
+	 * @param string $text     - The 'submit' button label.
+	 * @param string $input_id - ID attribute value for the search input field.
+	 */
+	public function search_box( $text, $input_id ) {
+		$input_id = $input_id . '-search-input';
+
+		if ( ! empty( $_REQUEST['orderby'] ) ) { // phpcs:ignore
+			echo '<input type="hidden" name="orderby" value="' . esc_attr( sanitize_text_field( wp_unslash( $_REQUEST['orderby'] ) ) ) . '" />'; // phpcs:ignore
+		}
+
+		if ( ! empty( $_REQUEST['order'] ) ) { // phpcs:ignore
+			echo '<input type="hidden" name="order" value="' . esc_attr( sanitize_text_field( wp_unslash( $_REQUEST['order'] ) ) ) . '" />'; // phpcs:ignore
+		}
+		?>
+		<div class="mwpal-search-box">
+			<span class="mwpal-filters"><div id="mwpal-search-list" class="mwpal-search-filters-list no-filters"></div></span>
+			<p class="search-box">
+				<label class="screen-reader-text" for="<?php echo esc_attr( $input_id ); ?>"><?php echo esc_html( $text ); ?>:</label>
+				<input type="search" id="<?php echo esc_attr( $input_id ); ?>" name="s" value="<?php _admin_search_query(); ?>" />
+				<?php submit_button( $text, '', '', false, array( 'id' => 'search-submit' ) ); ?>
+				<input type="button" id="mwpal-clear-search" class="button" value="<?php esc_attr_e( 'Clear Search Results', 'mwp-al-ext' ); ?>" disabled>
+			</p>
+		</div>
+		<?php
 	}
 }
