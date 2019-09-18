@@ -118,7 +118,7 @@ Release Notes: [Announcing Activity Log for MainWP Premium)(https://www.wpsecuri
 
 * **New Feature**
 	* Added activity log tab in individual site child overview dashboard.
-	* Added support for [Activity Log for MainWP Premium](https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/premium-features/).
+	* Added support for [Activity Log for MainWP Premium](https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/premium-benefits/).
 	
 * **Improvement**
 	* Improved support for MainWP4.
