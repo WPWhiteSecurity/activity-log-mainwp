@@ -17,7 +17,9 @@ See the activity logs of all child sites & MainWP in one central location - the 
 
 MainWP is an invaluable tool administrators and agencies use to manage multiple WordPress sites from one central dashboard. Add the [Activity Logs for MainWP extension](https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/) to keep a log of what happened on the MainWP dashboard and also on child sites without having to login to the child sites.
 
-The Activity Log for MainWP extension is developed by [WP White Security](https://www.wpwhitesecurity.com/), the developers of WP Security Audit Log, [the most comprehensive activity log plugin for WordPress](https://www.wpsecurityauditlog.com/).
+#### Maintained & Supported by WP White Security
+
+WP White Security builds high-quality niche WordPress security & admin plugins like [WP Security Audit Log](https://www.wpsecurityauditlog.com/), the #1 WordPress activity log plugin. Browse our list of [WordPress plugins](https://www.wpwhitesecurity.com/wordpress-plugins/ that help you better manage and improve the security of your WordPress website.
 
 ####Keep a Log of everything that happens on your MainWP network and child sites
 

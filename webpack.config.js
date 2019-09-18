@@ -92,7 +92,7 @@ let config = {
 						 *
 						 * @see https://babeljs.io/docs/plugins/preset-env/
 						 */
-						presets: [ 'env' ]
+						presets: [ '@babel/preset-env' ]
 					}
 				}
 			},
