@@ -5,7 +5,7 @@
  */
 
 // Import styles.
-import '../../css/src/styles.scss';
+// import '../../css/src/styles.scss';
 
 jQuery( document ).ready( function() {
 
@@ -41,11 +41,6 @@ jQuery( document ).ready( function() {
 			location.reload();
 		});
 	});
-
-	// Remove active tab class.
-	if ( 'settings' === scriptData.currentTab ) {
-		jQuery( '#mainwp-tabs a:nth-child(2)' ).removeClass( 'nav-tab-active' );
-	}
 
 	/**
 	 * Refresh WSAL Child Sites.
@@ -186,7 +181,10 @@ jQuery( document ).ready( function() {
 				page: scriptData.page,
 				'mwpal-site-id': scriptData.siteId,
 				orderby: scriptData.orderBy,
-				order: scriptData.order
+				order: scriptData.order,
+				'get-events': scriptData.getEvents,
+				s: scriptData.searchTerm,
+				filters: scriptData.searchFilters
 			},
 			success: function( html ) {
 				jQuery( '#mwpal-event-loader' ).hide( '1000' );
@@ -216,7 +214,7 @@ jQuery( document ).ready( function() {
 	 * @since 1.0.3
 	 */
 	if ( scriptData.infiniteScroll ) {
-		var count = 2;
+		let count = 2;
 		jQuery( window ).scroll( function() {
 			if ( jQuery( window ).scrollTop() === jQuery( document ).height() - jQuery( window ).height() ) {
 				if ( 0 !== count ) {
@@ -244,4 +242,26 @@ jQuery( document ).ready( function() {
 		const allchecked = 0 === jQuery( this ).parents( 'tbody:first' ).find( 'th>:checkbox:not(:checked)' ).length;
 		jQuery( this ).parents( 'table:first' ).find( 'thead>tr>th:first>:checkbox:first' ).attr( 'checked', allchecked );
 	});
+
+	/**
+	 * Close upgrade to premium notice
+	 */
+	jQuery( '.mwpal-notice' ).on( 'click', '.close-btn a', function() {
+		// Store this element
+		let _this = jQuery( this );
+		// dismissed notice
+		jQuery.post( ajaxurl, {
+			action : 'mwpal_advert_dismissed',
+			mwp_nonce: scriptData.scriptNonce
+		},
+		function( response ) {
+			// If check update field response
+			if ( response.status ) {
+				_this.parents( '.mwpal-notice' ).remove();
+			}
+		}, 'json' )
+		.fail( function( error ) {
+			console.log( error );
+		} );
+	} );
 });
