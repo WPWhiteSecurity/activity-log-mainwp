@@ -155,7 +155,7 @@ class AuditLogListView extends \WP_List_Table {
 				<div class="mwpal-notice-right">
 					<div class="upgrade-btn">
 						<a target="_blank" href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/pricing/' ); ?>" class="ui button green"><?php esc_html_e( 'Upgrade Now', 'mwp-al-ext' ); ?></a>
-						<a target="_blank" href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/premium-features/' ); ?>" class="ui button"><?php esc_html_e( 'Tell Me More', 'mwp-al-ext' ); ?></a>
+						<a target="_blank" href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/premium-benefits/' ); ?>" class="ui button"><?php esc_html_e( 'Tell Me More', 'mwp-al-ext' ); ?></a>
 					</div>
 					<div class="close-btn">
 						<a href="javascript:;"><?php esc_html_e( 'Close', 'mwp-al-ext' ); ?></a>
