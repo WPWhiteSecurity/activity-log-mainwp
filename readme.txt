@@ -114,6 +114,8 @@ Please refer to our [Support & Documentation pages](https://www.wpsecurityauditl
 
 = 1.1 (2019-09-18) =
 
+Release Notes: [Announcing Activity Log for MainWP Premium)(https://www.wpsecurityauditlog.com/releases/activity-log-mainwp-premium-release/)
+
 * **New Feature**
 	* Added activity log tab in individual site child overview dashboard.
 	* Added support for [Activity Log for MainWP Premium](https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/premium-features/).
@@ -166,7 +168,5 @@ Please refer to our [Support & Documentation pages](https://www.wpsecurityauditl
 	* Handling an error for when Activity Log for MainWP is installed on a WordPress site without MainWP.
 
 = 1.0 (2018-11-15) =
-
-Release Notes: [click here](https://www.wpsecurityauditlog.com/releases/XXX/)
 
 	* First release - everything is new!
