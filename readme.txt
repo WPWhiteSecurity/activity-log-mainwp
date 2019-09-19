@@ -5,7 +5,7 @@ License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 Tags: activity log, mainwp, mainwp extension, wordpress security, wordpress security audit log, audit log, mainwp user tracking, wordpress activity log, security activity log, wordpress admin, mainwp admin, user tracking
 Requires at least: 3.6
-Tested up to: 5.2.1
+Tested up to: 5.2.3
 Stable tag: 1.1
 Requires PHP: 5.5
 
@@ -19,7 +19,7 @@ MainWP is an invaluable tool administrators and agencies use to manage multiple 
 
 #### Maintained & Supported by WP White Security
 
-WP White Security builds high-quality niche WordPress security & admin plugins like [WP Security Audit Log](https://www.wpsecurityauditlog.com/), the #1 WordPress activity log plugin. Browse our list of [WordPress plugins](https://www.wpwhitesecurity.com/wordpress-plugins/ that help you better manage and improve the security of your WordPress website.
+WP White Security builds high-quality niche WordPress security & admin plugins like [WP Security Audit Log](https://www.wpsecurityauditlog.com/), the #1 WordPress activity log plugin. Browse our list of [WordPress plugins](https://www.wpwhitesecurity.com/wordpress-plugins/) that help you better manage and improve the security of your WordPress website.
 
 ####Keep a Log of everything that happens on your MainWP network and child sites
 
@@ -114,7 +114,7 @@ Please refer to our [Support & Documentation pages](https://www.wpsecurityauditl
 
 = 1.1 (2019-09-18) =
 
-Release Notes: [Announcing Activity Log for MainWP Premium)(https://www.wpsecurityauditlog.com/releases/activity-log-mainwp-premium-release/)
+Release Notes: [Announcing Activity Log for MainWP Premium](https://www.wpsecurityauditlog.com/releases/activity-log-mainwp-premium-release/)
 
 * **New Feature**
 	* Added activity log tab in individual site child overview dashboard.
