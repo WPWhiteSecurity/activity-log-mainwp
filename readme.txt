@@ -5,7 +5,7 @@ License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 Tags: activity log, mainwp, mainwp extension, wordpress security, wordpress security audit log, audit log, mainwp user tracking, wordpress activity log, security activity log, wordpress admin, mainwp admin, user tracking
 Requires at least: 3.6
-Tested up to: 5.2.1
+Tested up to: 5.2.3
 Stable tag: 1.1
 Requires PHP: 5.5
 
@@ -13,65 +13,82 @@ See the activity logs of all child sites & MainWP in one central location - the 
 
 == Description ==
 
-<strong>THE ONLY ACTIVITY LOG PLUGIN FOR MAINWP & CHILD SITES</strong><br />
+<strong>THE ACTIVITY LOG PLUGIN FOR MAINWP & CHILD SITES</strong><br />
 
-MainWP is an invaluable tool administrators and agencies use to manage multiple WordPress sites from one central dashboard. Add the [Activity Logs for MainWP extension](https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/) to keep a log of what happened on the MainWP dashboard and also on child sites without having to login to the child sites.
+MainWP is an invaluable tool for those who manage multiple WordPress websites. However, it only shows you the technical aspects of the child websites.
+ 
+Gain a detailed overview of what is happening on the MainWP dashboard and what customers are doing on the child sites - install the [Activity Logs for MainWP extension](https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/) to keep a log of all user and under the hood activity that happen on the MainWP dashboard child sites.
 
 #### Maintained & Supported by WP White Security
 
-WP White Security builds high-quality niche WordPress security & admin plugins like [WP Security Audit Log](https://www.wpsecurityauditlog.com/), the #1 WordPress activity log plugin. Browse our list of [WordPress plugins](https://www.wpwhitesecurity.com/wordpress-plugins/ that help you better manage and improve the security of your WordPress website.
+WP White Security builds high-quality niche WordPress security & admin plugins like [WP Security Audit Log](https://www.wpsecurityauditlog.com/), the #1 WordPress activity log plugin. Browse our list of [WordPress plugins](https://www.wpwhitesecurity.com/wordpress-plugins/) that help you better manage and improve the security of your WordPress website.
 
-####Keep a Log of everything that happens on your MainWP network and child sites
+###Keep a comprehensive log of what happens on your MainWP network & child sites
 
-Your back is covered with the Activity Log for MainWP extension! Now you can:
+Your back is covered with the Activity Log for MainWP extension!
 
-* See the activity logs of all child sites in the MainWP dashboard
-* Know what your clients changed on their business site
-* Keep a log of all changes done to child sites via the MainWP dashboard
-* Keep a log of changes done in the MainWP dashboard and other extensions
+* Keep a log of all child site changes done via the MainWP dashboard,
+* Keep a log of changes in the MainWP dashboard and extensions,
+* See all activity logs from one central location, the MainWP dashboard,
+* Know what your clients change on their business site without logging in.
 
-####No more customer blame games & Guess work!
+####No more customer blame games & guesswork!
 
-By keeping an activity log of everything that happens on your clients' sites and the MainWP dashboard you can:
+By keeping an activity log of everything that happens on your clients’ sites and the MainWP dashboard you:
 
-* Ease troubleshooting - no more guess work!
-* Better manage and secure your client sites
-* Identify suspicious behaviour before it becomes a security issue
-* Stop all the customer blame games - have a proof of what happened
-* Keep a record of all your work, thus justifying your fees
+* Ease troubleshooting – no more guesswork!
+* Better manage and secure your client sites,
+* Identify suspicious behaviour before it becomes a security issue,
+* Stop all the customer blame games & have proof of what happened,
+* Keep a record of all your work to justify your fees.
 
-####The Activity Log for MainWP Can Keep a Log Of:
+Learn about all the [benefits of having WordPress activity logs](https://www.wpsecurityauditlog.com/benefits-wordpress-activity-log/).
 
-###Activity Logs on Child Sites
+###Extend the functionality of Activity Log for MainWP
+[Upgrade to premium](https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/pricing/) to:
 
-The extension uses the WP Security Audit Log plugin to for the child sites activity log. So refer to the [list of WordPress activity log events & event IDs](https://www.wpsecurityauditlog.com/support-documentation/list-wordpress-audit-trail-alerts/) for a complete list.
+* Add search and filters to the activity log,
+* Search in the child sites’ activity log from the MainWP dashboard,
+* Generate any type of user, site and MainWP activity report,
+* Generate any type of report from the child sites’ activity log,
+* Configure daily, weekly, monthly and quarterly reports that are sent automatically to you via email.
 
-###Activity Logs on MainWP Dashboard
+###Free and premium support
+
+Support for the free edition of the plugin is available via the WordPress forums for free.
+
+Premium world-class support is available via email to all [Activity Log for MainWP Premium](https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/pricing/) customers.
+
+> <strong>Note</strong>: paid customers support is always given priority  over free support. Paid customers support is provided via one-to-one email and over the phone.
+>
+
+###The Activity Log for MainWP Can Keep a Log Of:
+
+####Activity Logs on Child Sites
+
+The extension uses WP Security Audit Log to keep a log of changes on child sites. Refer to the [list of WordPress activity log events IDs](https://www.wpsecurityauditlog.com/support-documentation/list-wordpress-audit-trail-alerts/) for a complete list.
+
+####Activity Logs on MainWP Dashboard
 
 The extension also keeps a log of changes users do on the MainWP dashboard, such as:
 
-* Adding, editing or removing child sites
-* Logging in or out of the MainWP dashboard
-* Installing, activating, deactivating, uninstalling extensions
-* Adding or removing extensions to the MainWP menu
-* Changes in the MainWP extension Advanced Uptime Monitor
+* Adding, editing or removing child sites,
+* Logging in or out of the MainWP dashboard,
+* Installing, activating, deactivating, uninstalling extensions,
+* Adding or removing extensions to the MainWP menu,
+* Changes in the MainWP extension Advanced Uptime Monitor.
 
 Refer to the [list of MainWP extension event log events](https://www.wpsecurityauditlog.com/support-documentation/list-wordpress-audit-trail-alerts/#mainwp) for a complete list of changes it can keep a log of.
 
-####Get Started Within Minutes!
+###Get Started Within Minutes!
 
 Follow the [Activity Logs for MainWP getting started guide](https://www.wpsecurityauditlog.com/support-documentation/gettting-started-activity-log-mainwp-extension/) for an easy to follow step by step procedure of how you can start keeping an activity log of all child site changes and view them from the MainWP dashboard.
-
-#### Free Extension Support
-
-Support for the Activity Log for MainWP extension is provided via the WordPress forums or [email](https://www.wpsecurityauditlog.com/contact/) for free.
 
 #### Related Links and Documentation
 
 * [What is a WordPress Activity Log?](https://www.wpsecurityauditlog.com/wordpress-user-monitoring-plugin-documentation/what-is-a-wordpress-audit-trail/)
 * [List of WordPress Activity Log events](http://www.wpsecurityauditlog.com/documentation/list-monitoring-wordpress-security-alerts-audit-log/)
 * [Activity Log for MainWP Extension Page](https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/)
-
 * [Official WP Security Audit Log Plugin Website](http://www.wpsecurityauditlog.com/)
 
 == Installation ==
@@ -114,7 +131,7 @@ Please refer to our [Support & Documentation pages](https://www.wpsecurityauditl
 
 = 1.1 (2019-09-18) =
 
-Release Notes: [Announcing Activity Log for MainWP Premium)(https://www.wpsecurityauditlog.com/releases/activity-log-mainwp-premium-release/)
+Release Notes: [Announcing Activity Log for MainWP Premium](https://www.wpsecurityauditlog.com/releases/activity-log-mainwp-premium-release/)
 
 * **New Feature**
 	* Added activity log tab in individual site child overview dashboard.
