@@ -453,7 +453,10 @@ class View extends Abstract_View {
 				var currentTab = '<?php echo esc_html( $this->current_tab ); ?>';
 
 				if ( 'activity-log' !== currentTab ) {
-					document.getElementById( 'mainwp-tabs' ).children[1].classList.remove( 'nav-tab-active' );
+					var tabItems = document.getElementById( 'mainwp-tabs' );
+					if( null !== tabItems && tabItems.length ) {
+						tabItems.children[1].classList.remove( 'nav-tab-active' );
+					}
 				}
 			</script>
 			<?php
@@ -467,7 +470,7 @@ class View extends Abstract_View {
 		if ( ! MWPAL_Extension\mwpal_extension()->settings->is_current_extension_page() ) {
 			return;
 		}
-		
+
 		if ( $this->current_tab && ! empty( $this->mwpal_extension_tabs[ $this->current_tab ]['save'] ) ) {
 			call_user_func( $this->mwpal_extension_tabs[ $this->current_tab ]['save'] );
 		}
@@ -1428,7 +1431,7 @@ class View extends Abstract_View {
 
 		// Display events table.
 		$this->get_list_view()->display();
-		
+
 		/**
 		 * Do action before the view renders.
 		 */
@@ -1466,7 +1469,7 @@ class View extends Abstract_View {
 	public function mwpal_advert_dismissed() {
 		// Verify mwp nonce
 		check_ajax_referer( 'mwp-activitylog-nonce', 'mwp_nonce' );
-		
+
 		// Set advert transient
 		$dismissed_advert = set_transient( 'mwpal-is-advert-dismissed', true, MONTH_IN_SECONDS );
 		// Send ajax response
