@@ -1300,7 +1300,14 @@ class View extends Abstract_View {
 				foreach ( $request_sites as $site ) {
 					$key = array_search( $site, $active_sites, true );
 					if ( false !== $key ) {
-						unset( $active_sites[ $key ] );
+						// get wsal status from the remote site.
+						$site_status = $this->check_remote_wsal_status( (int) $site );
+						if ( is_a( $site_status, 'stdClass' ) ) {
+
+							unset( $active_sites[ $key ] );
+							// remove from the active sites list.
+							MWPAL_Extension\mwpal_extension()->settings->set_wsal_child_sites( $active_sites );
+						}
 					}
 				}
 
@@ -1314,7 +1321,12 @@ class View extends Abstract_View {
 				foreach ( $request_sites as $site ) {
 					$key = array_search( $site, $active_sites, true );
 					if ( false === $key ) {
-						$active_sites[] = $site;
+						$site_status = $this->check_remote_wsal_status( (int) $site );
+						if ( is_a( $site_status, 'stdClass' ) ) {
+
+							$active_sites[] = $site;
+							MWPAL_Extension\mwpal_extension()->settings->set_wsal_child_sites( $active_sites );
+						}
 					}
 				}
 
@@ -1479,5 +1491,35 @@ class View extends Abstract_View {
 			)
 		);
 		die();
+	}
+
+	/**
+	 * Makes an exteral call to check if WSAL is installed.
+	 *
+	 * @method check_wsal_status
+	 * @since  1.2
+	 * @param  integer $site_id a site ID to try fetch status from.
+	 * @return bool|stdClass
+	 */
+	private function check_remote_wsal_status( $site_id = 0 ) {
+
+		// Fail early if there is no id to work with.
+		if ( 0 === $site_id || ! is_int( $site_id ) ) {
+			return false;
+		}
+
+		// action we are checking.
+		$post_data = array( 'action' => 'check_wsal' );
+
+		// Call to child site to check if WSAL is installed or not.
+		$response = apply_filters(
+			'mainwp_fetchurlauthed',
+			MWPAL_Extension\mwpal_extension()->get_child_file(),
+			MWPAL_Extension\mwpal_extension()->get_child_key(),
+			$site_id,
+			'extra_excution',
+			$post_data
+		);
+		return $response;
 	}
 }
