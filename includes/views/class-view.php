@@ -66,6 +66,8 @@ class View extends Abstract_View {
 	 */
 	private $page_args;
 
+	const MWPAL_REFRESH_KEY = 'mwpal_site_refresh_in_progress';
+
 	/**
 	 * Constructor.
 	 */
@@ -451,7 +453,10 @@ class View extends Abstract_View {
 				var currentTab = '<?php echo esc_html( $this->current_tab ); ?>';
 
 				if ( 'activity-log' !== currentTab ) {
-					document.getElementById( 'mainwp-tabs' ).children[1].classList.remove( 'nav-tab-active' );
+					var tabItems = document.getElementById( 'mainwp-tabs' );
+					if( null !== tabItems && tabItems.length ) {
+						tabItems.children[1].classList.remove( 'nav-tab-active' );
+					}
 				}
 			</script>
 			<?php
@@ -465,7 +470,7 @@ class View extends Abstract_View {
 		if ( ! MWPAL_Extension\mwpal_extension()->settings->is_current_extension_page() ) {
 			return;
 		}
-		
+
 		if ( $this->current_tab && ! empty( $this->mwpal_extension_tabs[ $this->current_tab ]['save'] ) ) {
 			call_user_func( $this->mwpal_extension_tabs[ $this->current_tab ]['save'] );
 		}
@@ -926,6 +931,17 @@ class View extends Abstract_View {
 												</div>
 											</div>
 											<input type="button" class="button-primary" id="mwpal-wsal-sites-refresh" value="<?php esc_html_e( 'Refresh list of child sites', 'mwp-al-ext' ); ?>" />
+											<div id="mwpal-wcs-refresh-message"  style="display:none;"  class="notice notice-info">
+												<p><?php esc_html_e( 'Updating sites in the background. This can take a while, please do not navigate away from this page.', 'mwp-al-ext' ); ?> <span class="spinner is-active"></span></p>
+												<?php
+												printf(
+													'<p>%1$s<span class="last-message-time">%2$s</span>%3$s</p>',
+													esc_html( 'Last message recieved from backend at: ', 'mw-al-ext' ),
+													esc_html( 'Just starting...', 'mw-al-ext' ),
+													'<span class="spinner is-visible" style="float: none; margin:0 10px 0;"></span>'
+												);
+												?>
+											</div>
 										</td>
 									</tr>
 								</tbody>
@@ -1168,15 +1184,57 @@ class View extends Abstract_View {
 		}
 
 		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'mwp-activitylog-nonce' ) ) {
-			$mwp_child_sites  = MWPAL_Extension\mwpal_extension()->settings->get_mwp_child_sites(); // Get MainWP child sites.
-			$wsal_child_sites = MWPAL_Extension\mwpal_extension()->settings->get_option( 'wsal-child-sites', array() ); // Get activity log sites.
-			$disabled_sites   = MWPAL_Extension\mwpal_extension()->settings->get_option( 'disabled-wsal-sites', array() ); // Get disabled WSAL sites.
-			$wsal_site_ids    = array_merge( array_keys( $wsal_child_sites ), array_keys( $disabled_sites ) ); // Merge arrays active & disabled WSAL child sites.
-			$mwp_site_ids     = array_column( $mwp_child_sites, 'id' ); // Get MainWP child site ids.
-			$diff             = array_diff( $mwp_site_ids, $wsal_site_ids ); // Compute the difference.
 
-			if ( ! empty( $diff ) ) {
-				foreach ( $diff as $index => $site_id ) {
+			// get a passed run ID or get a new one.
+			$run_id = ( isset( $_POST['mwpal_run_id'] ) ) ? filter_var( wp_unslash( $_POST['mwpal_run_id'] ), FILTER_SANITIZE_STRING ) : uniqid();
+			$forced = ( isset( $_POST['mwpal_forced'] ) ) ? filter_var( wp_unslash( $_POST['mwpal_forced'] ), FILTER_VALIDATE_BOOLEAN ) : false;
+
+			/*
+			 * Check transient to see if we are in the middle of a run.
+			 */
+			$running_flag = get_transient( self::MWPAL_REFRESH_KEY );
+			if ( false !== $running_flag && is_array( $running_flag ) ) {
+				// verify this id matches the one we got passed.
+				if ( isset( $running_flag['run_id'] ) && $running_flag['run_id'] !== $run_id ) {
+					// didn't match id. Error if this is not 'forced'.
+					if ( ! $forced ) {
+						$error = new \WP_Error(
+							'run_in_progress',
+							esc_html__( 'There is a run in progress and the ID does not match the previously stored run ID: ', 'mwp-al-ext' ) . $running_flag['run_id'],
+							$running_flag
+						);
+						wp_send_json_error( $error );
+					}
+				}
+			} else {
+				// since we don't have a workable array start a fresh one.
+				$running_flag = array(
+					'run_id'         => $run_id,
+					'site_ids'       => array(),
+					'disabled_sites' => array(),
+				);
+			}
+
+			/*
+			 * Get a list of site IDs that we will start working with.
+			 */
+			if ( ! empty( $running_flag['site_ids'] ) ) {
+				$next_batch = array_slice( $running_flag['site_ids'], 0, 5 );
+			} else {
+				$mwp_child_sites  = MWPAL_Extension\mwpal_extension()->settings->get_mwp_child_sites(); // Get MainWP child sites.
+				$wsal_child_sites = MWPAL_Extension\mwpal_extension()->settings->get_option( 'wsal-child-sites', array() ); // Get activity log sites.
+				$disabled_sites   = (array) MWPAL_Extension\mwpal_extension()->settings->get_option( 'disabled-wsal-sites', array() ); // Get disabled WSAL sites.
+				$wsal_site_ids    = array_merge( array_keys( $wsal_child_sites ), array_keys( $disabled_sites ) ); // Merge arrays active & disabled WSAL child sites.
+				$mwp_site_ids     = array_column( $mwp_child_sites, 'id' ); // Get MainWP child site ids.
+				$diff             = array_diff( $mwp_site_ids, $wsal_site_ids ); // Compute the difference.
+
+				$running_flag['site_ids']       = $diff;
+				$running_flag['disabled_sites'] = $disabled_sites;
+				$next_batch                     = array_slice( $diff, 0, 5 );
+			}
+
+			if ( ! empty( $next_batch ) ) {
+				foreach ( $next_batch as $index => $site_id ) {
 					// Post data for child site.
 					$post_data = array( 'action' => 'check_wsal' );
 
@@ -1192,14 +1250,26 @@ class View extends Abstract_View {
 
 					// Check if WSAL is installed on the child site.
 					if ( true === $response->wsal_installed ) {
-						$disabled_sites[ $site_id ] = $response;
+						$disabled_sites[ $site_id ]                 = $response;
+						$running_flag['disabled_sites'][ $site_id ] = $response;
 					}
 				}
-
-				// Update disabled sites.
-				MWPAL_Extension\mwpal_extension()->settings->update_option( 'disabled-wsal-sites', $disabled_sites );
 			}
-			die();
+			// Update disabled sites.
+			MWPAL_Extension\mwpal_extension()->settings->update_option( 'disabled-wsal-sites', ( isset( $running_flag['disabled_sites'] ) ) ? $running_flag['disabled_sites'] : array() );
+			$running_flag['site_ids'] = array_diff( $running_flag['site_ids'], $next_batch );
+
+			// Send a response message. The JS frontend should know how to deal
+			// with the reply.
+			if ( ! empty( $running_flag['site_ids'] ) ) {
+				// cache the current progress in a transient.
+				set_transient( self::MWPAL_REFRESH_KEY, $running_flag, HOUR_IN_SECONDS );
+			} else {
+				// set the flag as complete to pass back and delete the cache.
+				$running_flag['complete'] = true;
+				delete_transient( self::MWPAL_REFRESH_KEY );
+			}
+			wp_send_json_success( $running_flag );
 		}
 		die( esc_html__( 'Nonce verification failed.', 'mwp-al-ext' ) );
 	}
@@ -1230,7 +1300,14 @@ class View extends Abstract_View {
 				foreach ( $request_sites as $site ) {
 					$key = array_search( $site, $active_sites, true );
 					if ( false !== $key ) {
-						unset( $active_sites[ $key ] );
+						// get wsal status from the remote site.
+						$site_status = $this->check_remote_wsal_status( (int) $site );
+						if ( is_a( $site_status, 'stdClass' ) ) {
+
+							unset( $active_sites[ $key ] );
+							// remove from the active sites list.
+							MWPAL_Extension\mwpal_extension()->settings->set_wsal_child_sites( $active_sites );
+						}
 					}
 				}
 
@@ -1244,7 +1321,12 @@ class View extends Abstract_View {
 				foreach ( $request_sites as $site ) {
 					$key = array_search( $site, $active_sites, true );
 					if ( false === $key ) {
-						$active_sites[] = $site;
+						$site_status = $this->check_remote_wsal_status( (int) $site );
+						if ( is_a( $site_status, 'stdClass' ) ) {
+
+							$active_sites[] = $site;
+							MWPAL_Extension\mwpal_extension()->settings->set_wsal_child_sites( $active_sites );
+						}
 					}
 				}
 
@@ -1361,7 +1443,7 @@ class View extends Abstract_View {
 
 		// Display events table.
 		$this->get_list_view()->display();
-		
+
 		/**
 		 * Do action before the view renders.
 		 */
@@ -1399,7 +1481,7 @@ class View extends Abstract_View {
 	public function mwpal_advert_dismissed() {
 		// Verify mwp nonce
 		check_ajax_referer( 'mwp-activitylog-nonce', 'mwp_nonce' );
-		
+
 		// Set advert transient
 		$dismissed_advert = set_transient( 'mwpal-is-advert-dismissed', true, MONTH_IN_SECONDS );
 		// Send ajax response
@@ -1409,5 +1491,35 @@ class View extends Abstract_View {
 			)
 		);
 		die();
+	}
+
+	/**
+	 * Makes an exteral call to check if WSAL is installed.
+	 *
+	 * @method check_wsal_status
+	 * @since  1.2
+	 * @param  integer $site_id a site ID to try fetch status from.
+	 * @return bool|stdClass
+	 */
+	private function check_remote_wsal_status( $site_id = 0 ) {
+
+		// Fail early if there is no id to work with.
+		if ( 0 === $site_id || ! is_int( $site_id ) ) {
+			return false;
+		}
+
+		// action we are checking.
+		$post_data = array( 'action' => 'check_wsal' );
+
+		// Call to child site to check if WSAL is installed or not.
+		$response = apply_filters(
+			'mainwp_fetchurlauthed',
+			MWPAL_Extension\mwpal_extension()->get_child_file(),
+			MWPAL_Extension\mwpal_extension()->get_child_key(),
+			$site_id,
+			'extra_excution',
+			$post_data
+		);
+		return $response;
 	}
 }

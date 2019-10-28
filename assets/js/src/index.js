@@ -47,14 +47,30 @@ jQuery( document ).ready( function() {
 	 */
 	jQuery( '#mwpal-wsal-sites-refresh' ).click( function() {
 		const refreshBtn = jQuery( this );
+		const refreshMsg = jQuery( '#mwpal-wcs-refresh-message' );
 		refreshBtn.attr( 'disabled', true );
 		refreshBtn.val( scriptData.refreshing );
+		jQuery( refreshMsg ).show();
 
 		jQuery.post( scriptData.ajaxURL, {
 			action: 'refresh_child_sites',
-			nonce: scriptData.scriptNonce
-		}, function() {
-			location.reload();
+			nonce: scriptData.scriptNonce,
+			mwpal_forced: true,
+			mwpal_run_id: scriptData.runId
+		}, function( response ) {
+			console.log( response );
+			scriptData.runId = response.data.run_id;
+			// if we are complete then reload the page.
+			if ( response.data.complete === true ) {
+				location.reload();
+			} else {
+				// indicate progress by showing a date of last message.
+				let d = new Date();
+				jQuery( refreshMsg ).find( '.last-message-time' ).html( d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() );
+				refreshBtn.attr( 'disabled', false );
+				refreshBtn.removeAttr( 'disabled' );
+				jQuery( refreshBtn ).trigger( 'click' );
+			}
 		});
 	});
 
