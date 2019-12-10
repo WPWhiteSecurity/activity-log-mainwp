@@ -89,6 +89,7 @@ class View extends Abstract_View {
 		add_action( 'wp_ajax_update_active_wsal_sites', array( $this, 'update_active_wsal_sites' ) );
 		add_action( 'wp_ajax_retrieve_events_manually', array( $this, 'retrieve_events_manually' ) );
 		add_action( 'wp_ajax_mwpal_advert_dismissed', array( $this, 'mwpal_advert_dismissed' ) );
+				add_action( 'wp_ajax_mwpal_purge_logs', array( $this, 'purge_logs' ) );
 		add_action( 'admin_footer', array( $this, 'mwpal_extensions_print_scripts' ) );
 		if ( MWPAL_Extension\mwpal_extension()->settings->is_infinite_scroll() ) {
 			add_action( 'wp_ajax_mwpal_infinite_scroll_events', array( $this, 'infinite_scroll_events' ) );
@@ -102,6 +103,31 @@ class View extends Abstract_View {
 				add_filter( 'mainwp_page_navigation', array( $this, 'mwpal_extension_tabs' ), 10, 1 );
 			}
 		}
+	}
+
+	/**
+	 * AJAX function for purging activity logs in the MainWP instance.
+	 *
+	 * @method purge_logs
+	 * @since  1.3.0
+	 */
+	public function purge_logs() {
+		// Check nonce and user permissions, bail early with no updates.
+		check_ajax_referer( 'mwp-activitylog-nonce', 'mwp_nonce' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error(
+				array(
+					'message' => 'failed',
+				)
+			);
+		}
+		$db = new \WSAL\MainWPExtension\Connector\MySQLDB();
+		$db->purge_activity();
+		wp_send_json_success(
+			array(
+				'message' => 'success',
+			)
+		);
 	}
 
 	/**
