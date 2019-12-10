@@ -89,7 +89,7 @@ class View extends Abstract_View {
 		add_action( 'wp_ajax_update_active_wsal_sites', array( $this, 'update_active_wsal_sites' ) );
 		add_action( 'wp_ajax_retrieve_events_manually', array( $this, 'retrieve_events_manually' ) );
 		add_action( 'wp_ajax_mwpal_advert_dismissed', array( $this, 'mwpal_advert_dismissed' ) );
-				add_action( 'wp_ajax_mwpal_purge_logs', array( $this, 'purge_logs' ) );
+		add_action( 'wp_ajax_mwpal_purge_logs', array( $this, 'purge_logs' ) );
 		add_action( 'admin_footer', array( $this, 'mwpal_extensions_print_scripts' ) );
 		if ( MWPAL_Extension\mwpal_extension()->settings->is_infinite_scroll() ) {
 			add_action( 'wp_ajax_mwpal_infinite_scroll_events', array( $this, 'infinite_scroll_events' ) );
@@ -825,36 +825,6 @@ class View extends Abstract_View {
 									<?php endforeach; ?>
 								</tbody>
 							</table>
-
-							<table class="form-table">
-								<tr>
-									<th><label for="events-pruning"><?php esc_html_e( 'MainWP Network Activity Log Events Pruning', 'mwp-al-ext' ); ?></label></th>
-									<td>
-										<fieldset>
-											<?php
-											$events_pruning = MWPAL_Extension\mwpal_extension()->settings->is_events_pruning();
-											$pruning_date   = MWPAL_Extension\mwpal_extension()->settings->get_pruning_date();
-											?>
-											<label for="pruning-enabled">
-												<input type="radio" name="events-pruning" id="pruning-enabled" value="enabled" style="margin-top:-2px" <?php checked( $events_pruning ); ?>>
-												<span>
-													<?php esc_html_e( 'Prune events older than:', 'mwp-al-ext' ); ?>
-													<input type="number" name="events-pruning-date" value="<?php echo esc_html( $pruning_date->date ); ?>">
-													<select name="events-pruning-unit" style="margin-top: -2px;">
-														<option value="months" <?php selected( $pruning_date->unit, 'months' ); ?>><?php esc_html_e( 'Months', 'mwp-al-ext' ); ?></option>
-														<option value="years" <?php selected( $pruning_date->unit, 'years' ); ?>><?php esc_html_e( 'Years', 'mwp-al-ext' ); ?></option>
-													</select>
-												</span>
-											</label>
-											<br>
-											<label for="pruning-disabled">
-												<input type="radio" name="events-pruning" id="pruning-disabled" value="disabled" style="margin-top:-2px" <?php checked( $events_pruning, false ); ?>>
-												<span><?php esc_html_e( 'Do not prune any events', 'mwp-al-ext' ); ?></span>
-											</label>
-										</fieldset>
-									</td>
-								</tr>
-							</table>
 						</div>
 					</div>
 					<!-- MainWP Network Activity Logs -->
@@ -901,6 +871,52 @@ class View extends Abstract_View {
 						</div>
 					</div>
 					<!-- Activity Log Retrieval Settings -->
+
+					<div class="postbox">
+						<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'MainWP database activity logs management', 'mwp-al-ext' ); ?></span></h2>
+						<div class="mainwp-postbox-actions-top"><p class="description"><?php esc_html_e( 'Use the settings below to manage the activity log data stored in the MainWP dashboard site database. Note that these settings do not apply to the activity logs of the child sites.', 'mwp-al-ext' ); ?></p></div>
+						<div class="inside">
+							<table class="form-table">
+								<tr>
+									<th><label for="events-pruning"><?php esc_html_e( 'MainWP Network Activity Log Events Pruning', 'mwp-al-ext' ); ?></label></th>
+									<td>
+										<fieldset>
+											<?php
+											$events_pruning = MWPAL_Extension\mwpal_extension()->settings->is_events_pruning();
+											$pruning_date   = MWPAL_Extension\mwpal_extension()->settings->get_pruning_date();
+											?>
+											<label for="pruning-enabled">
+												<input type="radio" name="events-pruning" id="pruning-enabled" value="enabled" style="margin-top:-2px" <?php checked( $events_pruning ); ?>>
+												<span>
+													<?php esc_html_e( 'Prune events older than:', 'mwp-al-ext' ); ?>
+													<input type="number" name="events-pruning-date" value="<?php echo esc_html( $pruning_date->date ); ?>">
+													<select name="events-pruning-unit" style="margin-top: -2px;">
+														<option value="months" <?php selected( $pruning_date->unit, 'months' ); ?>><?php esc_html_e( 'Months', 'mwp-al-ext' ); ?></option>
+														<option value="years" <?php selected( $pruning_date->unit, 'years' ); ?>><?php esc_html_e( 'Years', 'mwp-al-ext' ); ?></option>
+													</select>
+												</span>
+											</label>
+											<br>
+											<label for="pruning-disabled">
+												<input type="radio" name="events-pruning" id="pruning-disabled" value="disabled" style="margin-top:-2px" <?php checked( $events_pruning, false ); ?>>
+												<span><?php esc_html_e( 'Do not prune any events', 'mwp-al-ext' ); ?></span>
+											</label>
+										</fieldset>
+									</td>
+								</tr>
+								<tr>
+									<th><label for="purge-trigger"><?php esc_html_e( 'Purge the activity log data stored in the MainWP dashboard', 'mwp-al-ext' ); ?></label></th>
+									<td>
+										<fieldset>
+											<label for="pruning-enabled">
+												<input type="button" class="button-primary" name="events-pruning-now" id="purge-trigger" value="<?php esc_html_e( 'Purge activity log data', 'mwp-al-ext' ); ?>">
+											</label>
+										</fieldset>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
 
 					<div id="mwpal-setting-contentbox-3" class="postbox">
 						<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'List of Child Sites in the Activity Log for MainWP', 'mwp-al-ext' ); ?></span></h2>
@@ -1273,7 +1289,10 @@ class View extends Abstract_View {
 						'extra_excution',
 						$post_data
 					);
-
+					// skip early incase of connection error.
+					if ( isset( $response['error'] ) ) {
+						continue;
+					}
 					// Check if WSAL is installed on the child site.
 					if ( true === $response->wsal_installed ) {
 						$disabled_sites[ $site_id ]                 = $response;
