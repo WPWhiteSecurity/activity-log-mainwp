@@ -137,33 +137,66 @@ class AuditLogListView extends \WP_List_Table {
 			?>
 			<br class="clear" />
 		</div>
-		<?php if ( ! get_transient( 'mwpal-is-advert-dismissed' ) ) : ?>
-		<div class="notice notice-success mwpal-notice">
-			<div class="content">
-				<div class=mwpal-notice-left>
-				<div class="notice-message">
-					<div class="notice-message-img">
-						<img src="<?php echo MWPAL_BASE_URL ?>assets/img/mwp-al-ext-150x150.jpg">
+		<?php
+		// only display notices if this is the top side of the table.
+		if ( 'top' === $which ) {
+			if ( ! get_transient( 'mwpal-is-advert-dismissed' ) && ! ( function_exists( 'almainwp_fs' ) && almainwp_fs()->is__premium_only() ) ) : ?>
+			<div class="notice notice-success mwpal-notice">
+				<div class="content">
+					<div class=mwpal-notice-left>
+					<div class="notice-message">
+						<div class="notice-message-img">
+							<img src="<?php echo MWPAL_BASE_URL ?>assets/img/mwp-al-ext-150x150.jpg">
+						</div>
+						<div class="notice-message-desc">
+							<p><strong><?php esc_html_e( 'Upgrade to premium to add search & filters and reports.', 'mwp-al-ext' ); ?></strong></p>
+							<p><?php esc_html_e( 'Use the search to also search in the child sites\'activity log and the filters to fine-tune the results.', 'mwp-al-ext' ); ?></p>
+							<p><?php esc_html_e( 'Generate and schedule automated weekly and monthly reports from the child site\'s activity logs.', 'mwp-al-ext' ); ?></p>
+						</div>
 					</div>
-					<div class="notice-message-desc">
-						<p><strong><?php esc_html_e( 'Upgrade to premium to add search & filters and reports.', 'mwp-al-ext' ); ?></strong></p>
-						<p><?php esc_html_e( 'Use the search to also search in the child sites\'activity log and the filters to fine-tune the results.', 'mwp-al-ext' ); ?></p>
-						<p><?php esc_html_e( 'Generate and schedule automated weekly and monthly reports from the child site\'s activity logs.', 'mwp-al-ext' ); ?></p>
 					</div>
-				</div>
-				</div>
-				<div class="mwpal-notice-right">
-					<div class="upgrade-btn">
-						<a target="_blank" href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/pricing/?utm_source=plugin&utm_medium=referral&utm_campaign=AL4MWP&utm_content=banner+upgrade+now' ); ?>" class="ui button green"><?php esc_html_e( 'Upgrade Now', 'mwp-al-ext' ); ?></a>
-						<a target="_blank" href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/premium-benefits/?utm_source=plugin&utm_medium=referral&utm_campaign=AL4MWP&utm_content=tell+me+more' ); ?>" class="ui button"><?php esc_html_e( 'Tell Me More', 'mwp-al-ext' ); ?></a>
-					</div>
-					<div class="close-btn">
-						<a href="javascript:;"><?php esc_html_e( 'Close', 'mwp-al-ext' ); ?></a>
+					<div class="mwpal-notice-right">
+						<div class="upgrade-btn">
+							<a target="_blank" href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/pricing/?utm_source=plugin&utm_medium=referral&utm_campaign=AL4MWP&utm_content=banner+upgrade+now' ); ?>" class="ui button green"><?php esc_html_e( 'Upgrade Now', 'mwp-al-ext' ); ?></a>
+							<a target="_blank" href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/premium-benefits/?utm_source=plugin&utm_medium=referral&utm_campaign=AL4MWP&utm_content=banner+tell+me+more' ); ?>" class="ui button"><?php esc_html_e( 'Tell Me More', 'mwp-al-ext' ); ?></a>
+						</div>
+						<div class="close-btn">
+							<a href="javascript:;"><?php esc_html_e( 'Close', 'mwp-al-ext' ); ?></a>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		<?php endif;
+			<?php endif;
+			$incompatible_sites = get_option( 'mwpal-incompatible-wsal-version', array() );
+			if ( ! empty( $incompatible_sites ) && ! get_transient( 'mwpal-hide-incompatible-wsal-version-notice' ) ) {
+				?>
+				<div class="notice notice-error mwpal-notice">
+					<div class="content">
+						<div class=mwpal-notice-left>
+							<div class="notice-message">
+								<div class="notice-message-img">
+									<img src="<?php echo MWPAL_BASE_URL; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static string ?>assets/img/mwp-al-ext-150x150.jpg">
+								</div>
+								<div class="notice-message-desc">
+									<p><strong><?php esc_html_e( 'The WP Security Audit Log plugin installed on the below child websites is version 4. Please update this extension to version 4 to download the logs from these websites.', 'mwp-al-ext' ); ?></strong></p>
+									<p><i>
+										<?php
+										echo esc_html( implode( ', ', $incompatible_sites ) );
+										?>
+									</i></p>
+								</div>
+							</div>
+						</div>
+						<div class="mwpal-notice-right">
+							<div class="close-btn">
+								<a data-notice="mwpal-hide-incompatible-wsal-version-notice" href="javascript:;"><?php esc_html_e( 'Close', 'mwp-al-ext' ); ?></a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<?php
+			};
+		}
 	}
 
 	/**

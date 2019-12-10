@@ -1508,12 +1508,18 @@ class View extends Abstract_View {
 		// Verify mwp nonce
 		check_ajax_referer( 'mwp-activitylog-nonce', 'mwp_nonce' );
 
-		// Set advert transient
-		$dismissed_advert = set_transient( 'mwpal-is-advert-dismissed', true, MONTH_IN_SECONDS );
+		$notice_type = filter_input( INPUT_POST, 'mwpal_notice_type', FILTER_SANITIZE_STRING );
+		if ( null !== $notice_type && false !== $notice_type ) {
+			$dissmissed_notice = set_transient( $notice_type, true, MONTH_IN_SECONDS );
+		} else {
+			// Set advert transient
+			$dissmissed_notice = set_transient( 'mwpal-is-advert-dismissed', true, MONTH_IN_SECONDS );
+		}
+
 		// Send ajax response
 		wp_send_json(
 			array(
-				'status' => $dismissed_advert
+				'status' => $dissmissed_notice
 			)
 		);
 		die();
