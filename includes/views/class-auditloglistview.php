@@ -249,17 +249,19 @@ class AuditLogListView extends \WP_List_Table {
 						<option value="0"><?php esc_html_e( 'All Sites', 'mwp-al-ext' ); ?></option>
 						<option value="dashboard" <?php selected( $current_site, 'dashboard' ); ?>><?php esc_html_e( 'MainWP Dashboard', 'mwp-al-ext' ); ?></option>
 						<?php
-						foreach ( $wsal_child_sites as $site_id => $site_data ) :
-							$key = array_search( $site_id, array_column( $this->mwp_child_sites, 'id' ), false );
-							if ( false !== $key ) :
-								?>
-								<option value="<?php echo esc_attr( $this->mwp_child_sites[ $key ]['id'] ); ?>"
-									<?php selected( (int) $this->mwp_child_sites[ $key ]['id'], $current_site ); ?>>
-									<?php echo esc_html( $this->mwp_child_sites[ $key ]['name'] ) . ' (' . esc_html( $this->mwp_child_sites[ $key ]['url'] ) . ')'; ?>
-								</option>
-								<?php
-							endif;
-						endforeach;
+						if ( is_array( $wsal_child_sites ) ) {
+							foreach ( $wsal_child_sites as $site_id => $site_data ) {
+								$key = array_search( $site_id, array_column( $this->mwp_child_sites, 'id' ), false );
+								if ( false !== $key ) {
+									?>
+									<option value="<?php echo esc_attr( $this->mwp_child_sites[ $key ]['id'] ); ?>"
+										<?php selected( (int) $this->mwp_child_sites[ $key ]['id'], $current_site ); ?>>
+										<?php echo esc_html( $this->mwp_child_sites[ $key ]['name'] ) . ' (' . esc_html( $this->mwp_child_sites[ $key ]['url'] ) . ')'; ?>
+									</option>
+									<?php
+								}
+							}
+						}
 						?>
 					</select>
 					<input type="button" class="button-primary" id="mwpal-wsal-manual-retrieve" value="<?php esc_html_e( 'Retrieve Activity Logs Now', 'mwp-al-ext' ); ?>" />
