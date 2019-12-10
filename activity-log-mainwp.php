@@ -189,6 +189,18 @@ class Activity_Log {
 	}
 
 	/**
+	 * When the freemius connection confirmed set the activation flag for
+	 * the plugin again since freemius intercepts the activation redirect.
+	 *
+	 * @method account_connection_set
+	 * @since  1.3
+	 */
+	public function account_connection_set() {
+		$this->settings->set_extension_activated( 'yes' );
+	}
+
+
+	/**
 	 * Initialize Plugin Hooks.
 	 *
 	 * @since 1.1
@@ -216,6 +228,15 @@ class Activity_Log {
 
 		// Initialize freemius.
 		$this->init_freemius();
+
+		/*
+		Hook to freemus account connection hook that fires after a user
+		activates we can rerun the plugin activation redirects again
+		without freemius intercepting.
+		 */
+		if ( function_exists( 'almainwp_fs' ) ) {
+			\almainwp_fs()->add_action( 'after_account_connection', array( $this, 'account_connection_set' ) );
+		}
 	}
 
 	/**
@@ -389,12 +410,13 @@ class Activity_Log {
 	public function redirect_on_activate() {
 		$redirect_url = false;
 		if ( 'yes' === $this->settings->is_extension_activated() ) {
+			// clear the activation flag so this runs only once.
 			$this->settings->delete_option( 'activity-extension-activated' );
 
 			if ( ! $this->settings->get_option( 'setup-complete' ) ) {
-				$redirect_url = add_query_arg( 'page', 'activity-log-mainwp-setup', admin_url( 'index.php' ) );
+				$redirect_url = add_query_arg( 'page', 'activity-log-mainwp-setup', admin_url( 'admin.php' ) );
 			} else {
-				$redirect_url = add_query_arg( 'page', MWPAL_EXTENSION_NAME, admin_url( 'admin.php' ) );
+				$redirect_url = add_query_arg( 'page', MWPAL_EXTENSION_NAME, admin_url( 'index.php' ) );
 			}
 		}
 
