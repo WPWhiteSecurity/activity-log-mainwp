@@ -138,7 +138,7 @@ class AuditLogListView extends \WP_List_Table {
 			<br class="clear" />
 		</div>
 		<?php if ( ! get_transient( 'mwpal-is-advert-dismissed' ) ) : ?>
-		<div class="notice notice-success mwpal-notice"> 
+		<div class="notice notice-success mwpal-notice">
 			<div class="content">
 				<div class=mwpal-notice-left>
 				<div class="notice-message">
@@ -154,8 +154,8 @@ class AuditLogListView extends \WP_List_Table {
 				</div>
 				<div class="mwpal-notice-right">
 					<div class="upgrade-btn">
-						<a target="_blank" href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/pricing/' ); ?>" class="ui button green"><?php esc_html_e( 'Upgrade Now', 'mwp-al-ext' ); ?></a>
-						<a target="_blank" href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/premium-benefits/' ); ?>" class="ui button"><?php esc_html_e( 'Tell Me More', 'mwp-al-ext' ); ?></a>
+						<a target="_blank" href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/pricing/?utm_source=plugin&utm_medium=referral&utm_campaign=AL4MWP&utm_content=banner+upgrade+now' ); ?>" class="ui button green"><?php esc_html_e( 'Upgrade Now', 'mwp-al-ext' ); ?></a>
+						<a target="_blank" href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/premium-benefits/?utm_source=plugin&utm_medium=referral&utm_campaign=AL4MWP&utm_content=tell+me+more' ); ?>" class="ui button"><?php esc_html_e( 'Tell Me More', 'mwp-al-ext' ); ?></a>
 					</div>
 					<div class="close-btn">
 						<a href="javascript:;"><?php esc_html_e( 'Close', 'mwp-al-ext' ); ?></a>

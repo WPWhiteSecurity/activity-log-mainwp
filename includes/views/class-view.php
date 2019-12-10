@@ -1494,7 +1494,7 @@ class View extends Abstract_View {
 		<script>
 			jQuery( document ).ready( function( $ ) {
 				var mwpalExtension = $( 'div[extension-slug$="/activity-log-mainwp.php"]' );
-				mwpalExtension.append( '<div class="ui middle aligned extra content"><a href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/pricing/' ); ?>" target="_blank" class="ui mini right floated button"><?php echo __( 'Upgrade to Premium', 'mwp-al-ext' ); ?></a></div>' );
+				mwpalExtension.append( '<div class="ui middle aligned extra content"><a href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/pricing/?utm_source=plugin&utm_medium=referral&utm_campaign=AL4MWP&utm_content=extensions+upgrade' ); ?>" target="_blank" class="ui mini right floated button"><?php echo __( 'Upgrade to Premium', 'mwp-al-ext' ); ?></a></div>' );
 			} );
 		</script>
 		<?php
