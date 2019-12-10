@@ -281,6 +281,16 @@ final class AlertManager {
 					$meta_data['Username'] = $user_data->username;
 				}
 
+				// First name.
+				if ( isset( $user_data->first_name ) ) {
+					$meta_data['FirstName'] = $user_data->first_name;
+				}
+
+				// Last name.
+				if ( isset( $user_data->last_name ) ) {
+					$meta_data['LastName'] = $user_data->last_name;
+				}
+
 				// Log the events in DB.
 				foreach ( $loggers as $logger ) {
 					$logger->log( $event->alert_id, $meta_data, $event->created_on, $site_id );
@@ -441,7 +451,7 @@ final class AlertManager {
 				// Set $trigger_retrieving to false to avoid logging 7711 multiple times.
 				$trigger_retrieving = false;
 
-				if ( $trigger_ready && isset( $sites_data[ $site_id ]->events ) ) {
+				if ( $trigger_ready && ( isset( $sites_data[ $site_id ]->events ) || isset( $sites_data[ $site_id ]['incompatible__skipped'] ) ) ) {
 					// Extension is ready after retrieving.
 					$this->trigger(
 						7712,
@@ -487,11 +497,20 @@ final class AlertManager {
 				);
 			}
 
+			// Check if this site is valid version.
+			$sites_data = self::check_wsal_version_compatible( $sites_data, $site_id );
+
+			if ( isset( $sites_data['incompatible__skipped'] ) ) {
+				return $sites_data;
+			}
+
 			// Post data for child sites.
-			$post_data = array(
-				'action'       => 'get_events',
-				'events_count' => MWPAL_Extension\mwpal_extension()->settings->get_child_site_events(),
-			);
+			if ( empty( $post_data ) ) {
+				$post_data = array(
+					'action'       => 'get_events',
+					'events_count' => MWPAL_Extension\mwpal_extension()->settings->get_child_site_events(),
+				);
+			}
 
 			// Call to child sites to fetch WSAL events.
 			return apply_filters(
