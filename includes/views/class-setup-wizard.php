@@ -267,6 +267,12 @@ final class Setup_Wizard {
 						?>
 					</div>
 				</fieldset>
+				<fieldset>
+					<div class="fetch-logs-container checkbox-toggle">
+						<input type="checkbox" name="fetch-logs-now" value="1" id="fetch-logs-toggle" checked>
+						<label for="fetch-logs-toggle"><?php esc_html_e( 'Fetch logs from the child sites immediately?', 'mwp-al-ext' ); ?></label>
+					</div>
+				</fieldset>
 				<p class="description"><?php /* translators: %s: Note */ echo sprintf( esc_html__( '%s You can add or remove child websites at a later stage from the extensions settings.', 'mwp-al-ext' ), '<strong>' . esc_html__( 'Note:', 'mwp-al-ext' ) . '</strong>' ); ?></p>
 				<div class="mwpal-setup-actions">
 					<button class="button button-primary" type="submit" name="save_step" value="<?php esc_attr_e( 'Next', 'wp-security-audit-log' ); ?>">
@@ -301,7 +307,38 @@ final class Setup_Wizard {
 		// Save the sites.
 		$this->activity_log->settings->set_wsal_child_sites( ! empty( $selected_sites ) ? $selected_sites : false );
 		$this->activity_log->settings->update_option( 'setup-complete', true );
+		// Fetch the initial logs from the sites.
+		if ( filter_input( INPUT_POST, 'fetch-logs-now', FILTER_VALIDATE_BOOLEAN ) && ! empty( $selected_sites ) ) {
+			$this->fetch_initial_logs( $selected_sites );
+		}
 		wp_safe_redirect( esc_url_raw( $this->get_next_step() ) );
 		exit();
+	}
+
+	/**
+	 * Get initial set of logs from sites right after adding them during wizard.
+	 *
+	 * @method fetch_initial_logs
+	 * @since  1.2.0
+	 * @param  array $sites array of site ids that were just added.
+	 */
+	public function fetch_initial_logs( $sites ) {
+		// get events from site.
+		foreach ( $sites as $site ) {
+			$sites_data[ $site ] = $this->activity_log->alerts->fetch_site_events( $site );
+		}
+		// Extension is ready after retrieving.
+		$this->activity_log->alerts->Trigger(
+			7712,
+			array(
+				'mainwp_dash' => true,
+				'Username'    => 'System',
+				'ClientIP'    => $this->activity_log->settings->get_server_ip(),
+			)
+		);
+		// Set child site events.
+		if ( ! empty( $sites_data ) && is_array( $sites_data ) ) {
+			$this->activity_log->alerts->set_site_events( $sites_data );
+		}
 	}
 }
