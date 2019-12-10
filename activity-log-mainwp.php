@@ -214,6 +214,7 @@ class Activity_Log {
 		add_filter( 'plugin_action_links_' . MWPAL_BASE_NAME, array( $this, 'add_plugin_page_links' ), 20, 1 );
 		add_action( 'plugins_loaded', array( $this, 'load_mwpal_extension' ) );
 		add_action( 'admin_notices', array( &$this, 'mainwp_error_notice' ) );
+		add_action( 'mainwp_delete_site', array( $this, 'remove_almwp_child_when_removed_from_mwp' ) );
 
 		// This filter will return true if the main plugin is activated.
 		$this->mainwp_main_activated = apply_filters( 'mainwp-activated-check', false );
@@ -699,6 +700,24 @@ class Activity_Log {
 	 */
 	public function is_mainwp_active() {
 		return $this->mainwp_main_activated;
+	}
+
+	/**
+	 * When MainWP site is deleted this removes it from the list of ALMWP's
+	 * list of sites so we don't try fetch it when it doesn't exists.
+	 *
+	 * @method remove_almwp_child_when_removed_from_mwp
+	 * @since  1.3.0
+	 * @param  stdObject $site object containing site data that has been removed.
+	 */
+	public function remove_almwp_child_when_removed_from_mwp( $site ) {
+		$wsal_child_sites = $this->settings->get_wsal_child_sites(); // Get activity log sites.
+		if ( isset( $wsal_child_sites[ $site->id ] ) ) {
+			// remove the site from the array.
+			unset( $wsal_child_sites[ $site->id ] );
+			// update the child sites with keys from the sites.
+			$this->settings->set_wsal_child_sites( array_keys( $wsal_child_sites ) );
+		}
 	}
 }
 
