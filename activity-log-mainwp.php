@@ -417,7 +417,7 @@ class Activity_Log {
 			if ( ! $this->settings->get_option( 'setup-complete' ) ) {
 				$redirect_url = add_query_arg( 'page', 'activity-log-mainwp-setup', admin_url( 'admin.php' ) );
 			} else {
-				$redirect_url = add_query_arg( 'page', MWPAL_EXTENSION_NAME, admin_url( 'index.php' ) );
+				$redirect_url = add_query_arg( 'page', MWPAL_EXTENSION_NAME, admin_url( 'admin.php' ) );
 			}
 		}
 
