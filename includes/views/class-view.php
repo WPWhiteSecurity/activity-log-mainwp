@@ -89,6 +89,7 @@ class View extends Abstract_View {
 		add_action( 'wp_ajax_update_active_wsal_sites', array( $this, 'update_active_wsal_sites' ) );
 		add_action( 'wp_ajax_retrieve_events_manually', array( $this, 'retrieve_events_manually' ) );
 		add_action( 'wp_ajax_mwpal_advert_dismissed', array( $this, 'mwpal_advert_dismissed' ) );
+		add_action( 'wp_ajax_mwpal_purge_logs', array( $this, 'purge_logs' ) );
 		add_action( 'admin_footer', array( $this, 'mwpal_extensions_print_scripts' ) );
 		if ( MWPAL_Extension\mwpal_extension()->settings->is_infinite_scroll() ) {
 			add_action( 'wp_ajax_mwpal_infinite_scroll_events', array( $this, 'infinite_scroll_events' ) );
@@ -102,6 +103,31 @@ class View extends Abstract_View {
 				add_filter( 'mainwp_page_navigation', array( $this, 'mwpal_extension_tabs' ), 10, 1 );
 			}
 		}
+	}
+
+	/**
+	 * AJAX function for purging activity logs in the MainWP instance.
+	 *
+	 * @method purge_logs
+	 * @since  1.3.0
+	 */
+	public function purge_logs() {
+		// Check nonce and user permissions, bail early with no updates.
+		check_ajax_referer( 'mwp-activitylog-nonce', 'mwp_nonce' );
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error(
+				array(
+					'message' => 'failed',
+				)
+			);
+		}
+		$db = new \WSAL\MainWPExtension\Connector\MySQLDB();
+		$db->purge_activity();
+		wp_send_json_success(
+			array(
+				'message' => 'success',
+			)
+		);
 	}
 
 	/**
@@ -799,36 +825,6 @@ class View extends Abstract_View {
 									<?php endforeach; ?>
 								</tbody>
 							</table>
-
-							<table class="form-table">
-								<tr>
-									<th><label for="events-pruning"><?php esc_html_e( 'MainWP Network Activity Log Events Pruning', 'mwp-al-ext' ); ?></label></th>
-									<td>
-										<fieldset>
-											<?php
-											$events_pruning = MWPAL_Extension\mwpal_extension()->settings->is_events_pruning();
-											$pruning_date   = MWPAL_Extension\mwpal_extension()->settings->get_pruning_date();
-											?>
-											<label for="pruning-enabled">
-												<input type="radio" name="events-pruning" id="pruning-enabled" value="enabled" style="margin-top:-2px" <?php checked( $events_pruning ); ?>>
-												<span>
-													<?php esc_html_e( 'Prune events older than:', 'mwp-al-ext' ); ?>
-													<input type="number" name="events-pruning-date" value="<?php echo esc_html( $pruning_date->date ); ?>">
-													<select name="events-pruning-unit" style="margin-top: -2px;">
-														<option value="months" <?php selected( $pruning_date->unit, 'months' ); ?>><?php esc_html_e( 'Months', 'mwp-al-ext' ); ?></option>
-														<option value="years" <?php selected( $pruning_date->unit, 'years' ); ?>><?php esc_html_e( 'Years', 'mwp-al-ext' ); ?></option>
-													</select>
-												</span>
-											</label>
-											<br>
-											<label for="pruning-disabled">
-												<input type="radio" name="events-pruning" id="pruning-disabled" value="disabled" style="margin-top:-2px" <?php checked( $events_pruning, false ); ?>>
-												<span><?php esc_html_e( 'Do not prune any events', 'mwp-al-ext' ); ?></span>
-											</label>
-										</fieldset>
-									</td>
-								</tr>
-							</table>
 						</div>
 					</div>
 					<!-- MainWP Network Activity Logs -->
@@ -875,6 +871,52 @@ class View extends Abstract_View {
 						</div>
 					</div>
 					<!-- Activity Log Retrieval Settings -->
+
+					<div class="postbox">
+						<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'MainWP database activity logs management', 'mwp-al-ext' ); ?></span></h2>
+						<div class="mainwp-postbox-actions-top"><p class="description"><?php esc_html_e( 'Use the settings below to manage the activity log data stored in the MainWP dashboard site database. Note that these settings do not apply to the activity logs of the child sites.', 'mwp-al-ext' ); ?></p></div>
+						<div class="inside">
+							<table class="form-table">
+								<tr>
+									<th><label for="events-pruning"><?php esc_html_e( 'MainWP Network Activity Log Events Pruning', 'mwp-al-ext' ); ?></label></th>
+									<td>
+										<fieldset>
+											<?php
+											$events_pruning = MWPAL_Extension\mwpal_extension()->settings->is_events_pruning();
+											$pruning_date   = MWPAL_Extension\mwpal_extension()->settings->get_pruning_date();
+											?>
+											<label for="pruning-enabled">
+												<input type="radio" name="events-pruning" id="pruning-enabled" value="enabled" style="margin-top:-2px" <?php checked( $events_pruning ); ?>>
+												<span>
+													<?php esc_html_e( 'Prune events older than:', 'mwp-al-ext' ); ?>
+													<input type="number" name="events-pruning-date" value="<?php echo esc_html( $pruning_date->date ); ?>">
+													<select name="events-pruning-unit" style="margin-top: -2px;">
+														<option value="months" <?php selected( $pruning_date->unit, 'months' ); ?>><?php esc_html_e( 'Months', 'mwp-al-ext' ); ?></option>
+														<option value="years" <?php selected( $pruning_date->unit, 'years' ); ?>><?php esc_html_e( 'Years', 'mwp-al-ext' ); ?></option>
+													</select>
+												</span>
+											</label>
+											<br>
+											<label for="pruning-disabled">
+												<input type="radio" name="events-pruning" id="pruning-disabled" value="disabled" style="margin-top:-2px" <?php checked( $events_pruning, false ); ?>>
+												<span><?php esc_html_e( 'Do not prune any events', 'mwp-al-ext' ); ?></span>
+											</label>
+										</fieldset>
+									</td>
+								</tr>
+								<tr>
+									<th><label for="purge-trigger"><?php esc_html_e( 'Purge the activity log data stored in the MainWP dashboard', 'mwp-al-ext' ); ?></label></th>
+									<td>
+										<fieldset>
+											<label for="pruning-enabled">
+												<input type="button" class="button-primary" name="events-pruning-now" id="purge-trigger" value="<?php esc_html_e( 'Purge activity log data', 'mwp-al-ext' ); ?>">
+											</label>
+										</fieldset>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
 
 					<div id="mwpal-setting-contentbox-3" class="postbox">
 						<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'List of Child Sites in the Activity Log for MainWP', 'mwp-al-ext' ); ?></span></h2>
@@ -1247,7 +1289,16 @@ class View extends Abstract_View {
 						'extra_excution',
 						$post_data
 					);
-
+					// skip early incase of connection error.
+					if ( ! is_object( $response ) ) {
+						// Some error occurred. This might be connectivity
+						// problem or it could be sites added/removed from
+						// MainWP. Skip this itteration early.
+						if ( is_array( $response ) && isset( $response['error'] ) ) {
+							MWPAL_Extension\mwpal_extension()->log( esc_html__( 'Error when refreshing child sites: ', 'mwp-al-ext' ) . $response['error'] );
+						}
+						continue;
+					}
 					// Check if WSAL is installed on the child site.
 					if ( true === $response->wsal_installed ) {
 						$disabled_sites[ $site_id ]                 = $response;
@@ -1468,7 +1519,7 @@ class View extends Abstract_View {
 		<script>
 			jQuery( document ).ready( function( $ ) {
 				var mwpalExtension = $( 'div[extension-slug$="/activity-log-mainwp.php"]' );
-				mwpalExtension.append( '<div class="ui middle aligned extra content"><a href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/pricing/' ); ?>" target="_blank" class="ui mini right floated button"><?php echo __( 'Upgrade to Premium', 'mwp-al-ext' ); ?></a></div>' );
+				mwpalExtension.append( '<div class="ui middle aligned extra content"><a href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/pricing/?utm_source=plugin&utm_medium=referral&utm_campaign=AL4MWP&utm_content=extensions+upgrade' ); ?>" target="_blank" class="ui mini right floated button"><?php echo __( 'Upgrade to Premium', 'mwp-al-ext' ); ?></a></div>' );
 			} );
 		</script>
 		<?php
@@ -1482,12 +1533,18 @@ class View extends Abstract_View {
 		// Verify mwp nonce
 		check_ajax_referer( 'mwp-activitylog-nonce', 'mwp_nonce' );
 
-		// Set advert transient
-		$dismissed_advert = set_transient( 'mwpal-is-advert-dismissed', true, MONTH_IN_SECONDS );
+		$notice_type = filter_input( INPUT_POST, 'mwpal_notice_type', FILTER_SANITIZE_STRING );
+		if ( null !== $notice_type && false !== $notice_type ) {
+			$dissmissed_notice = set_transient( $notice_type, true, MONTH_IN_SECONDS );
+		} else {
+			// Set advert transient
+			$dissmissed_notice = set_transient( 'mwpal-is-advert-dismissed', true, MONTH_IN_SECONDS );
+		}
+
 		// Send ajax response
 		wp_send_json(
 			array(
-				'status' => $dismissed_advert
+				'status' => $dissmissed_notice
 			)
 		);
 		die();

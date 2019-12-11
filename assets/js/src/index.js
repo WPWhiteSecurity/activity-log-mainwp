@@ -266,18 +266,43 @@ jQuery( document ).ready( function() {
 		// Store this element
 		let _this = jQuery( this );
 		// dismissed notice
-		jQuery.post( ajaxurl, {
+		let noticeData = {
 			action : 'mwpal_advert_dismissed',
 			mwp_nonce: scriptData.scriptNonce
-		},
-		function( response ) {
-			// If check update field response
-			if ( response.status ) {
-				_this.parents( '.mwpal-notice' ).remove();
-			}
+		};
+		let noticeType = _this.attr( 'data-notice' );
+		if ( typeof noticeType !== 'undefined' && noticeType.length > 1 ) {
+			noticeData.mwpal_notice_type = noticeType;
+		}
+		jQuery.post(
+			ajaxurl,
+			noticeData,
+			function( response ) {
+				// If check update field response.
+				if ( response.status ) {
+					_this.parents( '.mwpal-notice' ).remove();
+				}
+			},
+			'json'
+		)
+		.fail( function( error ) {
+			console.log( error );
+		} );
+	} );
+
+	jQuery( '#purge-trigger' ).on( 'click', {}, function() {
+		let pruneButton = jQuery( this );
+		jQuery( pruneButton ).attr("disabled", true);
+		jQuery.post( ajaxurl, {
+			action: 'mwpal_purge_logs',
+			mwp_nonce: scriptData.scriptNonce
 		}, 'json' )
 		.fail( function( error ) {
 			console.log( error );
+		} )
+		.success( function( msg ) {
+			console.log( msg );
+			jQuery( pruneButton ).attr("disabled", false);
 		} );
 	} );
 });

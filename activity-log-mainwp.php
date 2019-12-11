@@ -4,7 +4,7 @@
  * Plugin URI: https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/
  * Description: This extension for MainWP enables you to view the activity logs of all child sites in one central location, the MainWP dashboard.
  * Author: WP White Security
- * Version: 1.2
+ * Version: 1.3
  * Text Domain: mwp-al-ext
  * Author URI: http://www.wpwhitesecurity.com/
  * License: GPL2
@@ -50,7 +50,26 @@ class Activity_Log {
 	 *
 	 * @var string
 	 */
-	public $version = '1.2';
+	public $version = '1.3';
+
+	/**
+	 * The minimum wsal version this plugin is compatible with.
+	 *
+	 * @since 1.3.0
+	 * @var string
+	 */
+	public $min_compatible_wsal_version = '3.0.0';
+
+	/**
+	 * The maximum wsal version this plugin is compatible with.
+	 *
+	 * NOTE: before wsal releases a breaking change this number should be
+	 * adjusted to state the latest version before the change was made.
+	 *
+	 * @since 1.3.0
+	 * @var string
+	 */
+	public $max_compatible_wsal_version = '3.7';
 
 	/**
 	 * Single Static Instance of the plugin.
@@ -170,6 +189,18 @@ class Activity_Log {
 	}
 
 	/**
+	 * When the freemius connection confirmed set the activation flag for
+	 * the plugin again since freemius intercepts the activation redirect.
+	 *
+	 * @method account_connection_set
+	 * @since  1.3
+	 */
+	public function account_connection_set() {
+		$this->settings->set_extension_activated( 'yes' );
+	}
+
+
+	/**
 	 * Initialize Plugin Hooks.
 	 *
 	 * @since 1.1
@@ -183,6 +214,7 @@ class Activity_Log {
 		add_filter( 'plugin_action_links_' . MWPAL_BASE_NAME, array( $this, 'add_plugin_page_links' ), 20, 1 );
 		add_action( 'plugins_loaded', array( $this, 'load_mwpal_extension' ) );
 		add_action( 'admin_notices', array( &$this, 'mainwp_error_notice' ) );
+		add_action( 'mainwp_delete_site', array( $this, 'remove_almwp_child_when_removed_from_mwp' ) );
 
 		// This filter will return true if the main plugin is activated.
 		$this->mainwp_main_activated = apply_filters( 'mainwp-activated-check', false );
@@ -197,6 +229,15 @@ class Activity_Log {
 
 		// Initialize freemius.
 		$this->init_freemius();
+
+		/*
+		Hook to freemus account connection hook that fires after a user
+		activates we can rerun the plugin activation redirects again
+		without freemius intercepting.
+		 */
+		if ( function_exists( 'almainwp_fs' ) ) {
+			\almainwp_fs()->add_action( 'after_account_connection', array( $this, 'account_connection_set' ) );
+		}
 	}
 
 	/**
@@ -316,7 +357,7 @@ class Activity_Log {
 	public function mwp_old_plugin_version() {
 		return mwpal_extension()->settings->get_option( 'version', '0.0.0' );
 	}
-	
+
 	/**
 	 * Define constants.
 	 */
@@ -370,10 +411,11 @@ class Activity_Log {
 	public function redirect_on_activate() {
 		$redirect_url = false;
 		if ( 'yes' === $this->settings->is_extension_activated() ) {
+			// clear the activation flag so this runs only once.
 			$this->settings->delete_option( 'activity-extension-activated' );
 
 			if ( ! $this->settings->get_option( 'setup-complete' ) ) {
-				$redirect_url = add_query_arg( 'page', 'activity-log-mainwp-setup', admin_url( 'index.php' ) );
+				$redirect_url = add_query_arg( 'page', 'activity-log-mainwp-setup', admin_url( 'admin.php' ) );
 			} else {
 				$redirect_url = add_query_arg( 'page', MWPAL_EXTENSION_NAME, admin_url( 'admin.php' ) );
 			}
@@ -658,6 +700,24 @@ class Activity_Log {
 	 */
 	public function is_mainwp_active() {
 		return $this->mainwp_main_activated;
+	}
+
+	/**
+	 * When MainWP site is deleted this removes it from the list of ALMWP's
+	 * list of sites so we don't try fetch it when it doesn't exists.
+	 *
+	 * @method remove_almwp_child_when_removed_from_mwp
+	 * @since  1.3.0
+	 * @param  stdObject $site object containing site data that has been removed.
+	 */
+	public function remove_almwp_child_when_removed_from_mwp( $site ) {
+		$wsal_child_sites = $this->settings->get_wsal_child_sites(); // Get activity log sites.
+		if ( isset( $wsal_child_sites[ $site->id ] ) ) {
+			// remove the site from the array.
+			unset( $wsal_child_sites[ $site->id ] );
+			// update the child sites with keys from the sites.
+			$this->settings->set_wsal_child_sites( array_keys( $wsal_child_sites ) );
+		}
 	}
 }
 
