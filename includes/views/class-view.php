@@ -1290,7 +1290,13 @@ class View extends Abstract_View {
 						$post_data
 					);
 					// skip early incase of connection error.
-					if ( isset( $response['error'] ) ) {
+					if ( ! is_object( $response ) ) {
+						// Some error occurred. This might be connectivity
+						// problem or it could be sites added/removed from
+						// MainWP. Skip this itteration early.
+						if ( is_array( $response ) && isset( $response['error'] ) ) {
+							MWPAL_Extension\mwpal_extension()->log( esc_html__( 'Error when refreshing child sites: ', 'mwp-al-ext' ) . $response['error'] );
+						}
 						continue;
 					}
 					// Check if WSAL is installed on the child site.
