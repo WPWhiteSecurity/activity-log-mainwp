@@ -289,4 +289,20 @@ jQuery( document ).ready( function() {
 			console.log( error );
 		} );
 	} );
+
+	jQuery( '#purge-trigger' ).on( 'click', {}, function() {
+		let pruneButton = jQuery( this );
+		jQuery( pruneButton ).attr("disabled", true);
+		jQuery.post( ajaxurl, {
+			action: 'mwpal_purge_logs',
+			mwp_nonce: scriptData.scriptNonce
+		}, 'json' )
+		.fail( function( error ) {
+			console.log( error );
+		} )
+		.success( function( msg ) {
+			console.log( msg );
+			jQuery( pruneButton ).attr("disabled", false);
+		} );
+	} );
 });
