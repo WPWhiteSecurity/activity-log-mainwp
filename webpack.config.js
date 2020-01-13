@@ -28,6 +28,10 @@ const PluginStylesheetsConfig = ( mode ) => {
 			}
 		},
 		{
+			loader: 'resolve-url-loader',
+			options: {}
+		},
+		{
 			loader: 'sass-loader',
 			options: {
 				outputStyle: 'production' === mode ? 'compressed' : 'nested'
