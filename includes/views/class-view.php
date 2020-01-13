@@ -66,6 +66,15 @@ class View extends Abstract_View {
 	 */
 	private $page_args;
 
+	/**
+	 * Stores the value of the last view the user requested.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @var string
+	 */
+	public $user_last_view = '';
+
 	const MWPAL_REFRESH_KEY = 'mwpal_site_refresh_in_progress';
 
 	/**
@@ -103,6 +112,10 @@ class View extends Abstract_View {
 				add_filter( 'mainwp_page_navigation', array( $this, 'mwpal_extension_tabs' ), 10, 1 );
 			}
 		}
+
+		// Setup the users last view by getting the value from user meta.
+		$last_view            = get_user_meta( get_current_user_id(), 'almwp-selected-main-view', true );
+		$this->user_last_view = ( in_array( $last_view, $this->supported_view_types(), true ) ) ? $last_view : 'list';
 	}
 
 	/**
@@ -469,6 +482,7 @@ class View extends Abstract_View {
 			'searchTerm'     => isset( $this->page_args->search_term ) ? $this->page_args->search_term : false,
 			'searchFilters'  => isset( $this->page_args->search_filters ) ? $this->page_args->search_filters : false,
 			'infiniteScroll' => MWPAL_Extension\mwpal_extension()->settings->is_infinite_scroll(),
+			'userView'       => ( in_array( $this->user_last_view, $this->supported_view_types(), true ) ) ? $this->user_last_view : 'list',
 		);
 		wp_localize_script( 'mwpal-view-script', 'scriptData', $script_data );
 		wp_enqueue_script( 'mwpal-view-script' );
@@ -770,6 +784,8 @@ class View extends Abstract_View {
 															<span><?php esc_html_e( 'User', 'mwp-al-ext' ); ?></span>
 														<?php elseif ( 'source_ip' === $key ) : ?>
 															<span><?php esc_html_e( 'Source IP Address', 'mwp-al-ext' ); ?></span>
+														<?php elseif ( 'info' === $key ) : ?>
+															<span><?php esc_html_e( 'Info (used in Grid view mode only)', 'mwp-al-ext' ); ?></span>
 														<?php else : ?>
 															<span><?php echo esc_html( ucwords( str_replace( '_', ' ', $key ) ) ); ?></span>
 														<?php endif; ?>
@@ -1137,22 +1153,57 @@ class View extends Abstract_View {
 		}
 
 		if ( is_null( $this->list_view ) ) {
-			$list_view_class = '\WSAL\MainWPExtension\Views\AuditLogListView';
+			// Setup the view class name. This has been validated before this
+			// point and can only be 'list' or 'grid'.
+			$view_type = $this->detect_view_type();
 
+			// if the requested view didn't match the view users last viewed
+			// then update their preference.
+			if ( $view_type !== $this->user_last_view ) {
+				$view_type = ( in_array( $view_type, $this->supported_view_types(), true ) ) ? $view_type : 'list';
+				update_user_meta( get_current_user_id(), 'almwp-selected-main-view', ( in_array( $view_type, $this->supported_view_types(), true ) ) ? $view_type : 'list' );
+				$this->user_last_view = $view_type;
+			}
+
+			$view_class = "\WSAL\MainWPExtension\Views\AuditLog{$view_type}View";
 			/**
 			 * List view class name filter.
 			 *
 			 * @since 1.1
 			 *
-			 * @param string $list_view_class - List view class name.
+			 * @param string $view_class - List view class name.
 			 */
-			$list_view_class = apply_filters( 'mwpal_auditlog_list_view_class', $list_view_class );
+			$view_class = apply_filters( 'mwpal_auditlog_list_view_class', $view_class );
 
 			// Initialize the list view.
-			$this->list_view = new $list_view_class( $this->page_args );
+			$this->list_view = new $view_class( $this->page_args );
 		}
 
 		return $this->list_view;
+	}
+
+	/**
+	 * Helper to get the current user selected view.
+	 *
+	 * @method detect_view_type
+	 * @since  1.4.0
+	 * @return string
+	 */
+	public function detect_view_type() {
+		// First check if there is a GET/POST request for a specific view.
+		if ( defined( 'DOING_AJAX' ) ) {
+			$requested_view = ( isset( $_POST['view'] ) ) ? wp_unslash( filter_input( INPUT_POST, 'view', FILTER_SANITIZE_STRING ) ) : '';
+		} else {
+			$requested_view = ( isset( $_GET['view'] ) ) ? wp_unslash( filter_input( INPUT_GET, 'view', FILTER_SANITIZE_STRING ) ) : '';
+		}
+
+		// When there is no GET/POST view requested use the user value.
+		if ( empty( $requested_view ) ) {
+			$requested_view = $this->user_last_view;
+		}
+
+		// return the requested view. This is 'list' by default.
+		return ( in_array( $requested_view, $this->supported_view_types(), true ) ) ? $requested_view : 'list';
 	}
 
 	/**
