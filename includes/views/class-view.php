@@ -1183,6 +1183,20 @@ class View extends Abstract_View {
 	}
 
 	/**
+	 * Helper to store the views that are supported for the plugins lists.
+	 *
+	 * @method supported_view_types
+	 * @since  1.4.0
+	 * @return array
+	 */
+	public function supported_view_types() {
+		return array(
+			'list',
+			'grid',
+		);
+	}
+
+	/**
 	 * Helper to get the current user selected view.
 	 *
 	 * @method detect_view_type
