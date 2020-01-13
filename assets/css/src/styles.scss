@@ -8,9 +8,12 @@ td.code.column-code a {
 }
 
 .column-read,
-.column-more,
-.column-data {
+.column-more {
 	width: 40px;
+}
+
+.column-data {
+	width: 60px;
 }
 
 .column-type {
@@ -18,7 +21,7 @@ td.code.column-code a {
 }
 
 .column-code {
-	width: 53px;
+	width: 75px;
 }
 
 .column-crtd {
@@ -31,6 +34,15 @@ td.code.column-code a {
 
 .column-site {
 	width: 100px;
+}
+
+.column-object,
+.column-event_type {
+    width: 120px;
+}
+
+.column-info {
+	width: 220px;
 }
 
 td.column-user {
@@ -60,22 +72,86 @@ td.column-user {
 	width: 120px;
 }
 
+#the-list > tr > td {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.almwp-table {
+	&.widefat {
+		td {
+    		font-size: 14px;
+			color: #000;
+		}
+	}
+}
+
+.almwp-table-grid {
+
+	.column-site {
+		width: 150px;
+	}
+
+	.column-data {
+		width: 100px;
+	}
+
+	.column-type {
+		width: 100px;
+	}
+
+	.column-code {
+		width: 140px;
+	}
+
+	.column-crtd {
+		width: 125px;
+	}
+
+	.column-info {
+		width: 280px;
+	}
+
+	.wsal-system-icon {
+		width: 32px;
+		font-size: 32px;
+		height: 32px;
+		margin-right: 4px;
+	}
+
+	.column-scip {
+		width: 120px;
+	}
+
+	.log-type:after {
+		width: 50px;
+		height: 50px;
+	}
+
+	.more-info {
+	    width: 50px;
+	    height: 50px;
+	    font-size: 24px;
+	    line-height: 36px;
+	}
+
+}
+
 .log-type {
 	cursor: help;
 }
 
 .log-type:after {
 	display: block;
-	width: 16px;
-	height: 16px;
-	color: #FFF;
+	width: 35px;
+	height: 35px;
+	background-size: contain;
+	background-color: inherit;
+	background-repeat: no-repeat;
+	border-radius: 0;
 	font-weight: bold;
-	font-size: 11px;
-	line-height: 17px;
-	background: #CCC;
 	text-align: center;
-	border-radius: 32px;
-	margin-left: 8px;
+	margin: 0 auto;
 }
 
 /* errors */
@@ -87,25 +163,42 @@ td.column-user {
 .log-type-256:after,
 .log-type-4096:after,
 .log-type-E_CRITICAL:after {
-	background: #c9302c; content: "!";
+	content: " ";
+	background-image: url( '../../img/icons/critical.svg' );
+}
+
+/* high */
+.log-type-6:after {
+	content: " ";
+	background-image: url( '../../img/icons/high.svg' );
 }
 
 /* warnings */
 .log-type-2:after,
+.log-type-10:after,
 .log-type-32:after,
 .log-type-128:after,
 .log-type-512:after {
-	background: #ec971f; content: "!";
+	content: " ";
+	background-image: url( '../../img/icons/medium.svg' );
+}
+
+/* low */
+.log-type-15:after {
+	content: " ";
+	background-image: url( '../../img/icons/low.svg' );
 }
 
 /* notices/strict/deprecation */
 .log-type-8:after,
+.log-type-20:after,
 .log-type-1024:after,
 .log-type-2048:after,
 .log-type-8192:after,
 .log-type-16384:after,
 .log-type-E_DEBUG:after {
-	background: #ec0; content: "i";
+	content: " ";
+	background-image: url( '../../img/icons/info.svg' );
 }
 
 .log-disable .disable {
@@ -114,12 +207,12 @@ td.column-user {
 
 .more-info {
 	display: block;
-	width: 16px;
-	height: 16px;
+	width: 35px;
+	height: 35px;
 	color: #FFF;
 	font-weight: bold;
-	font-size: 13px;
-	line-height: 9px;
+	font-size: 20px;
+	line-height: 20px;
 	text-align: center;
 	border-radius: 32px;
 	background: #AAA;
@@ -132,6 +225,7 @@ td.column-user {
 
 .mwp-ssas {
 	vertical-align: top;
+	margin-right: 5px;
 }
 
 .mwp-ipp,
@@ -140,6 +234,47 @@ td.column-user {
 	color: #555;
 	line-height: 30px;
 	font-size: 12px;
+}
+
+.display-type-buttons{
+	float: right;
+}
+
+.display-type-buttons {
+	.button.dashicons-before:before {
+    	margin: 4px 4px 0 0;
+	}
+}
+
+.tablenav{
+	&.top {
+    	height: 36px;
+	}
+	a.select2-choice {
+	    height:30px;
+	    padding-top: 1px;
+	    box-sizing: border-box;
+	}
+	input#s2id_autogen2_search {
+	    padding: 0 5px;
+	    // background: #fff url('js/dist/select2/select2.png') no-repeat 100% -22px;
+	    // background: url('js/dist/select2/select2.png') no-repeat 100% -22px, -webkit-gradient(linear, left bottom, left top, color-stop(0.85, #fff), color-stop(0.99, #eee));
+	    // background: url('js/dist/select2/select2.png') no-repeat 100% -22px, -webkit-linear-gradient(center bottom, #fff 85%, #eee 99%);
+	    // background: url('js/dist/select2/select2.png') no-repeat 100% -22px, -moz-linear-gradient(center bottom, #fff 85%, #eee 99%);
+	    // background: url('js/dist/select2/select2.png') no-repeat 100% -22px, linear-gradient(to bottom, #fff 85%, #eee 99%) 0 0;
+	}
+}
+
+.column-info {
+	td {
+		&.wsal-grid-text-header,
+		&.wsal-grid-text-data {
+			padding: 0;
+		}
+		&.wsal-grid-text-header {
+			min-width: 100px;
+		}
+	}
 }
 
 .mwp-ipp select {
@@ -290,9 +425,7 @@ td.column-user {
 .notice-message-img img {
 	width: 70px;
 }
-.notice-message-desc{
-	
-}
+
 .notice-message-desc p {
 	margin-bottom: 0;
 	margin-top: 0;
@@ -332,5 +465,83 @@ td.column-user {
 	}
 	.notice-message-img {
 		display: none;
+	}
+}
+
+#audit-log-viewer-content {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+#mwpal-search-box-search-input {
+    border-radius: 0;
+    margin-right: 0;
+    border-color: #ddd;
+    box-shadow: none;
+}
+
+#mwpal-search-box-search-input:focus {
+    border-color: #016087;
+}
+
+.almwp-button,
+#almwp-search-submit {
+	color: #000;
+	border-color: #ddd;
+	border-radius: 0;
+	background: #f3f5f6;
+	vertical-align: top;
+	display: inline-block;
+	text-decoration: none;
+	font-size: 13px;
+	line-height: 2.15384615;
+	min-height: 30px;
+	margin: 0;
+	padding: 0 10px;
+	cursor: pointer;
+	border-width: 1px;
+	border-style: solid;
+	-webkit-appearance: none;
+	white-space: nowrap;
+	box-sizing: border-box;
+
+	&:hover,
+	&.active {
+		background: #f1f1f1;
+		border-color: #016087;
+		color: #016087;
+	}
+
+	&:focus {
+		background: #f3f5f6;
+		border-color: #007cba;
+		color: #016087;
+		box-shadow: 0 0 0 1px #007cba;
+		outline: 2px solid transparent;
+		outline-offset: 0;
+	}
+
+	&.dashicons-before:before {
+		margin: 4px 4px 0 0;
+	}
+
+	&.disabled,
+	&:disabled {
+		background: rgba(255,255,255,.5);
+	    border-color: rgba(222,222,222,.75);
+	    box-shadow: inset 0 1px 2px rgba(0,0,0,.04);
+	    color: rgba(51,51,51,.5);
+		cursor: default;
+	}
+}
+
+#almwp-search-submit {
+    margin-left: -1px !important;
+	margin-right: 5px !important;
+}
+
+.display-type-buttons {
+	a {
+		margin-left: 5px;
 	}
 }

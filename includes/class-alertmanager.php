@@ -114,8 +114,14 @@ final class AlertManager {
 		foreach ( $groups as $name => $group ) {
 			foreach ( $group as $subname => $subgroup ) {
 				foreach ( $subgroup as $item ) {
-					list($type, $code, $desc, $mesg) = $item;
-					$this->Register( array( $type, $code, $name, $subname, $desc, $mesg ) );
+					/*
+					 * For legacy events keys 4 & 5 are not set. Make them empty
+					 * strings so that `list` doesn't throw warnings/fail.
+					 */
+					$item[4] = ( isset( $item[4] ) ) ? $item[4] : '';
+					$item[5] = ( isset( $item[5] ) ) ? $item[5] : '';
+					list( $type, $code, $desc, $mesg, $object, $event_type ) = $item;
+					$this->Register( array( $type, $code, $name, $subname, $desc, $mesg, $object, $event_type ) );
 				}
 			}
 		}
@@ -130,13 +136,13 @@ final class AlertManager {
 	public function Register( $info ) {
 		if ( 1 === func_num_args() ) {
 			// Handle single item.
-			list($type, $code, $catg, $subcatg, $desc, $mesg) = $info;
+			list($type, $code, $catg, $subcatg, $desc, $mesg, $object, $event_type ) = $info;
 			if ( isset( $this->alerts[ $type ] ) ) {
 				add_action( 'admin_notices', array( $this, 'duplicate_event_notice' ) );
 				/* Translators: Event ID */
 				throw new \Exception( sprintf( esc_html__( 'Event %s already registered with Activity Log MainWP Extension.', 'mwp-al-ext' ), $type ) );
 			}
-			$this->alerts[ $type ] = new Alert( $type, $code, $catg, $subcatg, $desc, $mesg );
+			$this->alerts[ $type ] = new Alert( $type, $code, $catg, $subcatg, $desc, $mesg, $object, $event_type );
 		} else {
 			// Handle multiple items.
 			foreach ( func_get_args() as $arg ) {
@@ -405,6 +411,16 @@ final class AlertManager {
 			}
 		}
 
+		// Alert `object type`.
+		if ( ! isset( $data['Object'] ) && isset( $this->alerts[ $type ]->object ) ) {
+			$data['Object'] = $this->alerts[ $type ]->object;
+		}
+
+		// Alert `event type`.
+		if ( ! isset( $data['EventType'] ) && isset( $this->alerts[ $type ]->event_type ) ) {
+			$data['EventType'] = $this->alerts[ $type ]->event_type;
+		}
+
 		// Log event.
 		foreach ( $this->loggers as $logger ) {
 			$logger->log( $type, $data, null, 0 );
@@ -476,9 +492,10 @@ final class AlertManager {
 	 *
 	 * @param integer $site_id            - Child site id.
 	 * @param bool    $trigger_retrieving - True if trigger retrieve events alert.
+	 * @param array   $post_data          - MainWP post data.
 	 * @return array
 	 */
-	public function fetch_site_events( $site_id = 0, $trigger_retrieving = true ) {
+	public function fetch_site_events( $site_id = 0, $trigger_retrieving = true, $post_data = array() ) {
 		$sites_data = array();
 
 		if ( $site_id ) {
@@ -593,9 +610,9 @@ final class AlertManager {
 			// Get server IP.
 			$server_ip = MWPAL_Extension\mwpal_extension()->settings->get_server_ip();
 
-			foreach ( $sites_data as $site_id => $site_events ) {
-				// If $site_events is array, then MainWP failed to fetch logs from the child site.
-				if ( ! empty( $site_events ) && is_array( $site_events ) ) {
+			foreach ( $sites_data as $site_id => $site_data ) {
+				// If $site_data is array, then MainWP failed to fetch logs from the child site.
+				if ( ! empty( $site_data ) && is_array( $site_data ) ) {
 					// Search for the site data.
 					$key = array_search( $site_id, array_column( $mwp_sites, 'id' ), false );
 
@@ -613,11 +630,346 @@ final class AlertManager {
 							)
 						);
 					}
-				} elseif ( empty( $site_events ) || ! isset( $site_events->events ) ) {
+				} elseif ( empty( $site_data ) || ! isset( $site_data->events ) ) {
 					continue;
 				}
-				$this->log_events( $site_events->events, $site_id );
+
+				if ( ! is_array( $site_data ) && isset( $site_data->events ) ) {
+					$this->log_events( $site_data->events, $site_id );
+				}
 			}
 		}
+	}
+
+	/**
+	 * Get event objects.
+	 *
+	 * @return array
+	 */
+	public function get_event_objects_data() {
+		$objects = array(
+			'user'                => __( 'User', 'mwp-al-ext' ),
+			'system'              => __( 'System', 'mwp-al-ext' ),
+			'plugin'              => __( 'Plugin', 'mwp-al-ext' ),
+			'database'            => __( 'Database', 'mwp-al-ext' ),
+			'post'                => __( 'Post', 'mwp-al-ext' ),
+			'file'                => __( 'File', 'mwp-al-ext' ),
+			'tag'                 => __( 'Tag', 'mwp-al-ext' ),
+			'comment'             => __( 'Comment', 'mwp-al-ext' ),
+			'setting'             => __( 'Setting', 'mwp-al-ext' ),
+			'file'                => __( 'File', 'mwp-al-ext' ),
+			'system-setting'      => __( 'System Setting', 'mwp-al-ext' ),
+			'bbpress'             => __( 'BBPress', 'mwp-al-ext' ),
+			'bbpress-forum'       => __( 'BBPress Forum', 'mwp-al-ext' ),
+			'woocommerce-product' => __( 'WooCommerce Product', 'mwp-al-ext' ),
+			'woocommerce-store'   => __( 'WooCommerce Store', 'mwp-al-ext' ),
+			'mainwp-network'      => __( 'MainWP Network', 'mwp-al-ext' ),
+			'mainwp'              => __( 'MainWP', 'mwp-al-ext' ),
+			'yoast-seo'           => __( 'Yoast SEO', 'mwp-al-ext' ),
+			'category'            => __( 'Category', 'mwp-al-ext' ),
+			'custom-field'        => __( 'Custom Field', 'mwp-al-ext' ),
+			'widget'              => __( 'Widget', 'mwp-al-ext' ),
+			'menu'                => __( 'Menu', 'mwp-al-ext' ),
+			'theme'               => __( 'Theme', 'mwp-al-ext' ),
+			'activity-logs'       => __( 'Activity Logs', 'mwp-al-ext' ),
+			'multisite-network'   => __( 'Multisite Network', 'mwp-al-ext' ),
+			'ip-address'          => __( 'IP Address', 'mwp-al-ext' ),
+		);
+		// add the MainWP items.
+		array_merge(
+			$objects,
+			array(
+				'user'           => __( 'User', 'mwp-al-ext' ),
+				'child-site'     => __( 'Child Site', 'mwp-al-ext' ),
+				'extension'      => __( 'Extension', 'mwp-al-ext' ),
+				'activity-logs'  => __( 'Activity Logs', 'mwp-al-ext' ),
+				'uptime-monitor' => __( 'Uptime Monitor', 'mwp-al-ext' ),
+				'mainwp'         => __( 'MainWP', 'mwp-al-ext' ),
+			)
+		);
+		asort( $objects );
+		return apply_filters(
+			'wsal_event_objects',
+			$objects
+		);
+	}
+
+	/**
+	 * Returns the text to display for object.
+	 *
+	 * @param string $object - Object.
+	 * @return string
+	 */
+	public function get_display_object_text( $object ) {
+		$display = '';
+
+		switch ( $object ) {
+			case 'user':
+				$display = __( 'User', 'mwp-al-ext' );
+				break;
+			case 'system':
+				$display = __( 'System', 'mwp-al-ext' );
+				break;
+			case 'plugin':
+				$display = __( 'Plugin', 'mwp-al-ext' );
+				break;
+			case 'database':
+				$display = __( 'Database', 'mwp-al-ext' );
+				break;
+			case 'post':
+				$display = __( 'Post', 'mwp-al-ext' );
+				break;
+			case 'file':
+				$display = __( 'File', 'mwp-al-ext' );
+				break;
+			case 'tag':
+				$display = __( 'Tag', 'mwp-al-ext' );
+				break;
+			case 'comment':
+				$display = __( 'Comment', 'mwp-al-ext' );
+				break;
+			case 'setting':
+				$display = __( 'Setting', 'mwp-al-ext' );
+				break;
+			case 'file':
+				$display = __( 'File', 'mwp-al-ext' );
+				break;
+			case 'system-setting':
+				$display = __( 'System Setting', 'mwp-al-ext' );
+				break;
+			case 'bbpress':
+				$display = __( 'BBPress', 'mwp-al-ext' );
+				break;
+			case 'bbpress-forum':
+				$display = __( 'BBPress Forum', 'mwp-al-ext' );
+				break;
+			case 'woocommerce-product':
+				$display = __( 'WooCommerce Product', 'mwp-al-ext' );
+				break;
+			case 'woocommerce-store':
+				$display = __( 'WooCommerce Store', 'mwp-al-ext' );
+				break;
+			case 'mainwp-network':
+				$display = __( 'MainWP Network', 'mwp-al-ext' );
+				break;
+			case 'mainwp':
+				$display = __( 'MainWP', 'mwp-al-ext' );
+				break;
+			case 'yoast-seo':
+				$display = __( 'Yoast SEO', 'mwp-al-ext' );
+				break;
+			case 'category':
+				$display = __( 'Category', 'mwp-al-ext' );
+				break;
+			case 'custom-field':
+				$display = __( 'Custom Field', 'mwp-al-ext' );
+				break;
+			case 'widget':
+				$display = __( 'Widget', 'mwp-al-ext' );
+				break;
+			case 'menu':
+				$display = __( 'Menu', 'mwp-al-ext' );
+				break;
+			case 'theme':
+				$display = __( 'Theme', 'mwp-al-ext' );
+				break;
+			case 'activity-logs':
+				$display = __( 'Activity Logs', 'mwp-al-ext' );
+				break;
+			case 'multisite-network':
+				$display = __( 'Multisite Network', 'mwp-al-ext' );
+				break;
+			case 'ip-address':
+				$display = __( 'IP Address', 'mwp-al-ext' );
+				break;
+			case 'user':
+				$display = __( 'User', 'mwp-al-ext' );
+				break;
+			case 'child-site':
+				$display = __( 'Child Site', 'mwp-al-ext' );
+				break;
+			case 'extension':
+				$display = __( 'Extension', 'mwp-al-ext' );
+				break;
+			case 'activity-logs':
+				$display = __( 'Activity Logs', 'mwp-al-ext' );
+				break;
+			case 'uptime-monitor':
+				$display = __( 'Uptime Monitor', 'mwp-al-ext' );
+				break;
+			case 'mainwp':
+				$display = __( 'MainWP', 'mwp-al-ext' );
+				break;
+			default:
+				break;
+		}
+
+		return $display;
+	}
+
+	/**
+	 * Get event type data.
+	 *
+	 * @return array
+	 */
+	public function get_event_type_data() {
+		$types = array(
+			'login'        => __( 'Login', 'mwp-al-ext' ),
+			'logout'       => __( 'Logout', 'mwp-al-ext' ),
+			'installed'    => __( 'Installed', 'mwp-al-ext' ),
+			'activated'    => __( 'Activated', 'mwp-al-ext' ),
+			'deactivated'  => __( 'Deactivated', 'mwp-al-ext' ),
+			'uninstalled'  => __( 'Uninstalled', 'mwp-al-ext' ),
+			'updated'      => __( 'Updated', 'mwp-al-ext' ),
+			'created'      => __( 'Created', 'mwp-al-ext' ),
+			'modified'     => __( 'Modified', 'mwp-al-ext' ),
+			'deleted'      => __( 'Deleted', 'mwp-al-ext' ),
+			'published'    => __( 'Published', 'mwp-al-ext' ),
+			'approved'     => __( 'Approved', 'mwp-al-ext' ),
+			'unapproved'   => __( 'Unapproved', 'mwp-al-ext' ),
+			'enabled'      => __( 'Enabled', 'mwp-al-ext' ),
+			'disabled'     => __( 'Disabled', 'mwp-al-ext' ),
+			'added'        => __( 'Added', 'mwp-al-ext' ),
+			'failed-login' => __( 'Failed Login', 'mwp-al-ext' ),
+			'blocked'      => __( 'Blocked', 'mwp-al-ext' ),
+			'uploaded'     => __( 'Uploaded', 'mwp-al-ext' ),
+			'restored'     => __( 'Restored', 'mwp-al-ext' ),
+			'opened'       => __( 'Opened', 'mwp-al-ext' ),
+			'viewed'       => __( 'Viewed', 'mwp-al-ext' ),
+			'started'      => __( 'Started', 'mwp-al-ext' ),
+			'stopped'      => __( 'Stopped', 'mwp-al-ext' ),
+			'removed'      => __( 'Removed', 'mwp-al-ext' ),
+			'unblocked'    => __( 'Unblocked', 'mwp-al-ext' ),
+		);
+		// add the MainWP items.
+		array_merge(
+			$types,
+			array(
+				'synced'   => __( 'Synced', 'mwp-al-ext' ),
+				'started'  => __( 'Started', 'mwp-al-ext' ),
+				'finished' => __( 'Finished', 'mwp-al-ext' ),
+				'failed'   => __( 'Failed', 'mwp-al-ext' ),
+				'stopped'  => __( 'Stopped', 'mwp-al-ext' ),
+			)
+		);
+		// sort the types alphabetically.
+		asort( $types );
+		return apply_filters(
+			'wsal_event_type_data',
+			$types
+		);
+	}
+
+	/**
+	 * Returns the text to display for event type.
+	 *
+	 * @param string $event_type - Event type.
+	 * @return string
+	 */
+	public function get_display_event_type_text( $event_type ) {
+		$display = '';
+
+		switch ( $event_type ) {
+			case 'login':
+				$display = __( 'Login', 'mwp-al-ext' );
+				break;
+			case 'logout':
+				$display = __( 'Logout', 'mwp-al-ext' );
+				break;
+			case 'installed':
+				$display = __( 'Installed', 'mwp-al-ext' );
+				break;
+			case 'activated':
+				$display = __( 'Activated', 'mwp-al-ext' );
+				break;
+			case 'deactivated':
+				$display = __( 'Deactivated', 'mwp-al-ext' );
+				break;
+			case 'uninstalled':
+				$display = __( 'Uninstalled', 'mwp-al-ext' );
+				break;
+			case 'updated':
+				$display = __( 'Updated', 'mwp-al-ext' );
+				break;
+			case 'created':
+				$display = __( 'Created', 'mwp-al-ext' );
+				break;
+			case 'modified':
+				$display = __( 'Modified', 'mwp-al-ext' );
+				break;
+			case 'deleted':
+				$display = __( 'Deleted', 'mwp-al-ext' );
+				break;
+			case 'published':
+				$display = __( 'Published', 'mwp-al-ext' );
+				break;
+			case 'approved':
+				$display = __( 'Approved', 'mwp-al-ext' );
+				break;
+			case 'unapproved':
+				$display = __( 'Unapproved', 'mwp-al-ext' );
+				break;
+			case 'enabled':
+				$display = __( 'Enabled', 'mwp-al-ext' );
+				break;
+			case 'disabled':
+				$display = __( 'Disabled', 'mwp-al-ext' );
+				break;
+			case 'added':
+				$display = __( 'Added', 'mwp-al-ext' );
+				break;
+			case 'failed-login':
+				$display = __( 'Failed Login', 'mwp-al-ext' );
+				break;
+			case 'blocked':
+				$display = __( 'Blocked', 'mwp-al-ext' );
+				break;
+			case 'uploaded':
+				$display = __( 'Uploaded', 'mwp-al-ext' );
+				break;
+			case 'restored':
+				$display = __( 'Restored', 'mwp-al-ext' );
+				break;
+			case 'opened':
+				$display = __( 'Opened', 'mwp-al-ext' );
+				break;
+			case 'viewed':
+				$display = __( 'Viewed', 'mwp-al-ext' );
+				break;
+			case 'started':
+				$display = __( 'Started', 'mwp-al-ext' );
+				break;
+			case 'stopped':
+				$display = __( 'Stopped', 'mwp-al-ext' );
+				break;
+			case 'removed':
+				$display = __( 'Removed', 'mwp-al-ext' );
+				break;
+			case 'unblocked':
+				$display = __( 'Unblocked', 'mwp-al-ext' );
+				break;
+			case 'synced':
+				$display = __( 'Synced', 'mwp-al-ext' );
+				break;
+			case 'started':
+				$display = __( 'Started', 'mwp-al-ext' );
+				break;
+			case 'finished':
+				$display = __( 'Finished', 'mwp-al-ext' );
+				break;
+			case 'failed':
+				$display = __( 'Failed', 'mwp-al-ext' );
+				break;
+			case 'stopped':
+				$display = __( 'Stopped', 'mwp-al-ext' );
+				break;
+			case 'unblocked':
+				$display = __( 'Unblocked', 'mwp-al-ext' );
+				break;
+			default:
+				break;
+		}
+
+		return $display;
 	}
 }

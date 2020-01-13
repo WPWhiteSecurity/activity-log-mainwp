@@ -14,7 +14,7 @@ jQuery( document ).ready( function() {
 	// select2 for site selection select input.
 	if ( 'activity-log' === scriptData.currentTab ) {
 		jQuery( '.mwp-ssas' ).select2({
-			width: 250
+			width: 313
 		});
 	}
 
@@ -187,6 +187,14 @@ jQuery( document ).ready( function() {
 	 */
 	function mwpalLoadEvents( pageNumber ) {
 		jQuery( '#mwpal-event-loader' ).show( 'fast' );
+		/*
+		 * Gets the view type. Defaults to 'list' but could be 'grid'. Only
+		 * those 2 types are supported. Validation handled server side.
+		 */
+		let view = scriptData.userView;
+		if ( null === view || view.length < 1 ) {
+			view = 'list';
+		}
 		jQuery.ajax({
 			type: 'POST',
 			url: ajaxurl,
@@ -200,7 +208,8 @@ jQuery( document ).ready( function() {
 				order: scriptData.order,
 				'get-events': scriptData.getEvents,
 				s: scriptData.searchTerm,
-				filters: scriptData.searchFilters
+				filters: scriptData.searchFilters,
+				view: view,
 			},
 			success: function( html ) {
 				jQuery( '#mwpal-event-loader' ).hide( '1000' );
@@ -305,4 +314,5 @@ jQuery( document ).ready( function() {
 			jQuery( pruneButton ).attr("disabled", false);
 		} );
 	} );
+
 });

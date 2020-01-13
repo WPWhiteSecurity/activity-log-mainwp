@@ -4,7 +4,7 @@
  * Plugin URI: https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/
  * Description: This extension for MainWP enables you to view the activity logs of all child sites in one central location, the MainWP dashboard.
  * Author: WP White Security
- * Version: 1.3
+ * Version: 1.4
  * Text Domain: mwp-al-ext
  * Author URI: http://www.wpwhitesecurity.com/
  * License: GPL2
@@ -50,7 +50,7 @@ class Activity_Log {
 	 *
 	 * @var string
 	 */
-	public $version = '1.3';
+	public $version = '1.4';
 
 	/**
 	 * The minimum wsal version this plugin is compatible with.
@@ -58,7 +58,7 @@ class Activity_Log {
 	 * @since 1.3.0
 	 * @var string
 	 */
-	public $min_compatible_wsal_version = '3.0.0';
+	public $min_compatible_wsal_version = '4.0.0-alpha';
 
 	/**
 	 * The maximum wsal version this plugin is compatible with.
@@ -69,7 +69,7 @@ class Activity_Log {
 	 * @since 1.3.0
 	 * @var string
 	 */
-	public $max_compatible_wsal_version = '3.7';
+	public $max_compatible_wsal_version = '5.0.0';
 
 	/**
 	 * Single Static Instance of the plugin.
@@ -156,7 +156,7 @@ class Activity_Log {
 	 * @return Activity_Log
 	 */
 	public static function get_instance() {
-		if ( ! self::$instance ) {
+		if ( \is_null( self::$instance ) ) {
 			self::$instance = new self();
 		}
 		return self::$instance;
@@ -170,6 +170,37 @@ class Activity_Log {
 		$this->define_constants(); // Define plugin constants.
 		$this->includes(); // Include files.
 		$this->init_hooks(); // Initialize hooks.
+		$this->load_events(); // Load events.
+	}
+
+	/**
+	 * Absolute URL to plugin directory WITHOUT final slash.
+	 *
+	 * @since  1.4.0
+	 * @return string
+	 */
+	public function get_base_url() {
+		return plugins_url( '', __FILE__ );
+	}
+
+	/**
+	 * Full path to plugin directory WITH final slash.
+	 *
+	 * @since  1.4.0
+	 * @return string
+	 */
+	public function get_base_dir() {
+		return plugin_dir_path( __FILE__ );
+	}
+
+	/**
+	 * Plugin directory name.
+	 *
+	 * @since  1.4.0
+	 * @return string
+	 */
+	public function get_base_name() {
+		return plugin_basename( __FILE__ );
 	}
 
 	/**
@@ -188,6 +219,7 @@ class Activity_Log {
 		\WSAL\MainWPExtension\Autoload\mwpal_autoload( MWPAL_BASE_DIR . 'includes' );
 	}
 
+
 	/**
 	 * When the freemius connection confirmed set the activation flag for
 	 * the plugin again since freemius intercepts the activation redirect.
@@ -198,7 +230,6 @@ class Activity_Log {
 	public function account_connection_set() {
 		$this->settings->set_extension_activated( 'yes' );
 	}
-
 
 	/**
 	 * Initialize Plugin Hooks.
@@ -229,7 +260,6 @@ class Activity_Log {
 
 		// Initialize freemius.
 		$this->init_freemius();
-
 		/*
 		Hook to freemus account connection hook that fires after a user
 		activates we can rerun the plugin activation redirects again
@@ -238,6 +268,7 @@ class Activity_Log {
 		if ( function_exists( 'almainwp_fs' ) ) {
 			\almainwp_fs()->add_action( 'after_account_connection', array( $this, 'account_connection_set' ) );
 		}
+
 	}
 
 	/**
@@ -266,14 +297,15 @@ class Activity_Log {
 
 		// Hook extension events.
 		$this->sensor_mainwp->hook_events();
+
+		// Activity log extension initialized.
+		do_action( 'mwpal_init' );
 	}
 
 	/**
 	 * Load extension on `plugins_loaded` action.
 	 */
-	public function load_mwpal_extension() {
-		do_action( 'mwpal_init', $this );
-	}
+	public function load_mwpal_extension() {}
 
 	/**
 	 * DB connection.
@@ -401,6 +433,12 @@ class Activity_Log {
 		if ( ! defined( 'MWPAL_OPT_PREFIX' ) ) {
 			define( 'MWPAL_OPT_PREFIX', 'mwpal-' );
 		}
+
+		// Plugin uploads directory path.
+		if ( ! defined( 'MWPAL_UPLOADS_DIR' ) ) {
+			$uploads_dir = wp_upload_dir();
+			define( 'MWPAL_UPLOADS_DIR', trailingslashit( $uploads_dir['basedir'] ) . 'activity-log-for-mainwp/' );
+		}
 	}
 
 	/**
@@ -417,7 +455,7 @@ class Activity_Log {
 			if ( ! $this->settings->get_option( 'setup-complete' ) ) {
 				$redirect_url = add_query_arg( 'page', 'activity-log-mainwp-setup', admin_url( 'admin.php' ) );
 			} else {
-				$redirect_url = add_query_arg( 'page', MWPAL_EXTENSION_NAME, admin_url( 'admin.php' ) );
+				$redirect_url = add_query_arg( 'page', MWPAL_EXTENSION_NAME, admin_url( 'index.php' ) );
 			}
 		}
 
@@ -560,7 +598,7 @@ class Activity_Log {
 				$live_event = $this->get_live_event_by_siteid( $site_id );
 
 				// If the latest event on the dashboard matches the timestamp of the latest event on child site, then skip.
-				if ( $live_event && $event && $event->created_on === $live_event->created_on ) {
+				if ( isset( $event->created_on ) && isset( $live_event->created_on ) && $event->created_on === $live_event->created_on ) {
 					continue;
 				}
 
@@ -679,9 +717,9 @@ class Activity_Log {
 		$new_links = array(
 			'mwpal-view'     => '<a href="' . add_query_arg( 'tab', 'activity-log', $extension_url ) . '">' . __( 'View Activity Log', 'wp-security-audit-log' ) . '</a>',
 			'mwpal-settings' => '<a href="' . add_query_arg( 'tab', 'settings', $extension_url ) . '">' . __( 'Settings', 'wp-security-audit-log' ) . '</a>',
-			'deactivate'     => $old_links['deactivate'],
 		);
-		return $new_links;
+
+		return array_merge( $new_links, $old_links );
 	}
 
 	/**

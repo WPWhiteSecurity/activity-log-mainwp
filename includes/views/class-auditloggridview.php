@@ -25,7 +25,7 @@ require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
  *
  * Log view class which extends WP List Table class.
  */
-class AuditLogListView extends \WP_List_Table {
+class AuditLogGridView extends \WP_List_Table {
 
 	/**
 	 * GMT Offset
@@ -89,7 +89,7 @@ class AuditLogListView extends \WP_List_Table {
 				'singular' => 'activity-log',
 				'plural'   => 'activity-logs',
 				'ajax'     => true,
-				'screen'   => 'interval-list',
+				'screen'   => 'interval-grid',
 			)
 		);
 	}
@@ -111,7 +111,7 @@ class AuditLogListView extends \WP_List_Table {
 	 * @return array
 	 */
 	protected function get_table_classes() {
-		$table_classes = array( 'widefat', 'fixed', 'striped', $this->_args['plural'], 'almwp-table', 'almwp-table-list' );
+		$table_classes = array( 'widefat', 'fixed', 'striped', $this->_args['plural'], 'almwp-table', 'almwp-table-grid' );
 		return $table_classes;
 	}
 
@@ -280,11 +280,10 @@ class AuditLogListView extends \WP_List_Table {
 				</div>
 				<?php
 			endif;
-			$user_selected_view = 'list';
 			?>
 			<div class="display-type-buttons">
-				<span class="almwp-button dashicons-before dashicons-list-view almwp-list-view-toggle <?php echo ( $this instanceof AuditLogListView ) ? esc_attr( 'disabled' ) : ''; ?>"><?php esc_html_e( 'List View', 'wp-security-audit-log' ); ?></span>
-				<a href="<?php echo esc_url( add_query_arg( 'view', 'grid' ) ); ?>" class="almwp-button dashicons-before dashicons-grid-view almwp-grid-view-toggle <?php echo ( $this instanceof AuditLogGridView ) ? esc_attr( 'disabled' ) : ''; ?>"><?php esc_html_e( 'Grid View', 'wp-security-audit-log' ); ?></a>
+				<a href="<?php echo esc_url( add_query_arg( 'view', 'list' ) ); ?>" class="almwp-button dashicons-before dashicons-list-view almwp-list-view-toggle <?php echo ( $this instanceof AuditLogListView ) ? esc_attr( 'disabled' ) : ''; ?>"><?php esc_html_e( 'List View', 'wp-security-audit-log' ); ?></a>
+				<span class="almwp-button dashicons-before dashicons-grid-view almwp-grid-view-toggle <?php echo ( $this instanceof AuditLogGridView ) ? esc_attr( 'disabled' ) : ''; ?>"><?php esc_html_e( 'Grid View', 'wp-security-audit-log' ); ?></span>
 			</div>
 			<?php
 		endif;
@@ -362,73 +361,63 @@ class AuditLogListView extends \WP_List_Table {
 				}
 				return '<a class="tooltip" href="#" data-tooltip="' . esc_html( $const->name ) . '"><span class="log-type log-type-' . $const->value . '"></span></a>';
 
-			case 'crtd':
-				return $item->created_on ? (
-					str_replace(
-						'$$$',
-						substr( number_format( fmod( $item->created_on + $this->gmt_offset_sec, 1 ), 3 ), 2 ),
-						date( $datetime_format, $item->created_on + $this->gmt_offset_sec )
-					)
-				) : '<i>' . __( 'Unknown', 'mwp-al-ext' ) . '</i>';
+			case 'info':
+				$code                = MWPAL_Extension\mwpal_extension()->alerts->GetAlert( $item->alert_id );
+				$extra_msg           = '';
+				$data_link           = '';
+				$modification_alerts = array( 1002, 1003, 6007, 6023 );
 
-			case 'user':
-				$username  = $item->GetUsername( $this->item_meta[ $item->getId() ] ); // Get username.
-				$user_data = $item->get_user_data( $this->item_meta[ $item->getId() ] ); // Get user data.
+				$date_format       = MWPAL_Extension\mwpal_extension()->settings->get_date_format();
+				$show_microseconds = MWPAL_Extension\mwpal_extension()->settings->get_time_format();
+				if ( 'no' === $show_microseconds ) {
+					// remove the microseconds placeholder from format string.
+					$datetime_format = str_replace( '.$$$', '', $datetime_format );
+				}
+				$eventdate = $item->created_on ? (
+						str_replace(
+							'$$$',
+							substr( number_format( fmod( $item->created_on + $this->_gmt_offset_sec, 1 ), 3 ), 2 ),
+							date( $date_format, $item->created_on + $this->_gmt_offset_sec )
+						)
+					) : '<i>' . __( 'Unknown', 'wp-security-audit-log' ) . '</i>';
+				$eventtime = $item->created_on ? (
+						str_replace(
+							'$$$',
+							substr( number_format( fmod( $item->created_on + $this->_gmt_offset_sec, 1 ), 3 ), 2 ),
+							date( get_option( 'time_format' ), $item->created_on + $this->_gmt_offset_sec )
+						)
+					) : '<i>' . __( 'Unknown', 'wp-security-audit-log' ) . '</i>';
 
-				if ( empty( $user_data ) ) {
-					$user_data = get_user_by( 'login', $username );
+				$username = $item->GetUsername( $this->item_meta[ $item->getId() ] ); // Get username.
+				$user     = get_user_by( 'login', $username ); // Get user.
+				if ( empty( $this->name_type ) ) {
+					$this->name_type = $type_username;
 				}
 
-				// Check if the usernames exists & matches pre-defined cases.
-				if ( 'Plugin' === $username ) {
-					$image = '<img src="' . trailingslashit( MWPAL_BASE_URL ) . 'assets/img/wsal-logo.png" width="32" alt="WSAL Logo"/>';
-					$uhtml = '<i>' . __( 'Plugin', 'mwp-al-ext' ) . '</i>';
-					$roles = '';
-				} elseif ( 'Plugins' === $username ) {
-					$image = '<span class="dashicons dashicons-wordpress wsal-system-icon"></span>';
-					$uhtml = '<i>' . __( 'Plugins', 'mwp-al-ext' ) . '</i>';
-					$roles = '';
-				} elseif ( 'Website Visitor' === $username ) {
-					$image = '<span class="dashicons dashicons-wordpress wsal-system-icon"></span>';
-					$uhtml = '<i>' . __( 'Website Visitor', 'mwp-al-ext' ) . '</i>';
-					$roles = '';
-				} elseif ( 'System' === $username ) {
-					$image = '<span class="dashicons dashicons-wordpress wsal-system-icon"></span>';
-					$uhtml = '<i>' . __( 'System', 'mwp-al-ext' ) . '</i>';
-					$roles = '';
-				} elseif ( $user_data && 'System' !== $user_data->username ) {
-					$image = get_avatar( $user_data->user_email, 32 ); // Avatar.
+				// Check if the username and user exists.
+				if ( $username && $user ) {
 
 					// Checks for display name.
-					if ( 'display_name' === $type_username && ! empty( $user_data->display_name ) ) {
-						$display_name = $user_data->display_name;
+					if ( 'display_name' === $this->name_type && ! empty( $user->display_name ) ) {
+						$display_name = $user->display_name;
 					} elseif (
-						'first_last_name' === $type_username
-						&& ( ! empty( $user_data->first_name ) || ! empty( $user_data->last_name ) )
+						'first_last_name' === $this->name_type
+						&& ( ! empty( $user->first_name ) || ! empty( $user->last_name ) )
 					) {
-						$display_name = $user_data->first_name . ' ' . $user_data->last_name;
+						$display_name = $user->first_name . ' ' . $user->last_name;
 					} else {
-						$display_name = $user_data->username;
+						$display_name = $user->user_login;
 					}
 
-					if ( $this->query_args->site_id && 'live' === $this->query_args->get_events ) {
-						$site_id = (string) $this->query_args->site_id;
+					if ( class_exists( 'WSAL_SearchExtension' ) ) {
+						$tooltip = esc_attr__( 'Show me all activity by this User', 'wp-security-audit-log' );
+
+						$uhtml = '<a class="search-user" data-tooltip="' . $tooltip . '" data-user="' . $user->user_login . '" href="' . admin_url( 'user-edit.php?user_id=' . $user->ID )
+							. '" target="_blank">' . esc_html( $display_name ) . '</a>';
 					} else {
-						$site_id = (string) $item->site_id;
+						$uhtml = '<a href="' . admin_url( 'user-edit.php?user_id=' . $user->ID )
+						. '" target="_blank">' . esc_html( $display_name ) . '</a>';
 					}
-
-					$site_index = array_search( $site_id, array_column( $mwp_child_sites, 'id' ), true );
-					$site_url   = '#';
-
-					if ( false !== $site_index && isset( $mwp_child_sites[ $site_index ] ) ) {
-						$site_url = $mwp_child_sites[ $site_index ]['url'];
-						$user_url = add_query_arg( 'user_id', $user_data->user_id, trailingslashit( $site_url ) . 'wp-admin/user-edit.php' );
-					} else {
-						$user_url = add_query_arg( 'user_id', $user_data->ID, admin_url( 'user-edit.php' ) );
-					}
-
-					// User html.
-					$uhtml = '<a href="' . esc_url( $user_url ) . '" target="_blank">' . esc_html( $display_name ) . '</a>';
 
 					$roles = $item->GetUserRoles( $this->item_meta[ $item->getId() ] );
 					if ( is_array( $roles ) && count( $roles ) ) {
@@ -436,16 +425,37 @@ class AuditLogListView extends \WP_List_Table {
 					} elseif ( is_string( $roles ) && '' != $roles ) {
 						$roles = esc_html( ucwords( str_replace( array( '"', '[', ']' ), ' ', $roles ) ) );
 					} else {
-						$roles = '<i>' . __( 'Unknown', 'mwp-al-ext' ) . '</i>';
+						$roles = '<i>' . __( 'Unknown', 'wp-security-audit-log' ) . '</i>';
 					}
+				} elseif ( 'Plugin' == $username ) {
+					$uhtml = '<i>' . __( 'Plugin', 'wp-security-audit-log' ) . '</i>';
+					$roles = '';
+				} elseif ( 'Plugins' == $username ) {
+					$uhtml = '<i>' . __( 'Plugins', 'wp-security-audit-log' ) . '</i>';
+					$roles = '';
+				} elseif ( 'Website Visitor' == $username ) {
+					$uhtml = '<i>' . __( 'Website Visitor', 'wp-security-audit-log' ) . '</i>';
+					$roles = '';
 				} else {
-					$image = '<span class="dashicons dashicons-wordpress wsal-system-icon"></span>';
-					$uhtml = '<i>' . __( 'System', 'mwp-al-ext' ) . '</i>';
+					$uhtml = '<i>' . __( 'System', 'wp-security-audit-log' ) . '</i>';
 					$roles = '';
 				}
-				return $image . $uhtml . '<br/>' . $roles;
+				$row_user_data = $uhtml . '<br/>' . $roles;
 
-			case 'scip':
+				/**
+				 * WSAL Filter: `wsal_auditlog_row_user_data`
+				 *
+				 * Filters user data before displaying on the audit log.
+				 *
+				 * @since 3.3.1
+				 *
+				 * @param string  $row_user_data          - User data to display in audit log row.
+				 * @param integer $this->current_alert_id - Event database ID.
+				 */
+				$eventuser = apply_filters( 'wsal_auditlog_row_user_data', $row_user_data, $this->current_alert_id );
+
+
+
 				$scip = $item->GetSourceIP( $this->item_meta[ $item->getId() ] );
 				if ( is_string( $scip ) ) {
 					$scip = str_replace( array( '"', '[', ']' ), '', $scip );
@@ -461,39 +471,74 @@ class AuditLogListView extends \WP_List_Table {
 				// If there's only one IP...
 				$link = 'https://whatismyipaddress.com/ip/' . $scip . '?utm_source=plugin&utm_medium=referral&utm_campaign=WPSAL';
 				if ( class_exists( 'WSAL_SearchExtension' ) ) {
-					$tooltip = esc_attr__( 'Show me all activity originating from this IP Address', 'mwp-al-ext' );
+					$tooltip = esc_attr__( 'Show me all activity originating from this IP Address', 'wp-security-audit-log' );
 
 					if ( count( $oips ) < 2 ) {
-						return "<a class='search-ip' data-tooltip='$tooltip' data-ip='$scip' target='_blank' href='$link'>" . esc_html( $scip ) . '</a>';
+						$oips_html = "<a class='search-ip' data-tooltip='$tooltip' data-ip='$scip' target='_blank' href='$link'>" . esc_html( $scip ) . '</a>';
 					}
 				} else {
 					if ( count( $oips ) < 2 ) {
-						return "<a target='_blank' href='$link'>" . esc_html( $scip ) . '</a>';
+						$oips_html = "<a target='_blank' href='$link'>" . esc_html( $scip ) . '</a>';
 					}
 				}
 
 				// If there are many IPs...
 				if ( class_exists( 'WSAL_SearchExtension' ) ) {
-					$tooltip = esc_attr__( 'Show me all activity originating from this IP Address', 'mwp-al-ext' );
+					$tooltip = esc_attr__( 'Show me all activity originating from this IP Address', 'wp-security-audit-log' );
 
-					$html = "<a class='search-ip' data-tooltip='$tooltip' data-ip='$scip' target='_blank' href='https://whatismyipaddress.com/ip/$scip'>" . esc_html( $scip ) . '</a> <a href="javascript:;" onclick="jQuery(this).hide().next().show();">(more&hellip;)</a><div style="display: none;">';
+					$ip_html = "<a class='search-ip' data-tooltip='$tooltip' data-ip='$scip' target='_blank' href='https://whatismyipaddress.com/ip/$scip'>" . esc_html( $scip ) . '</a> <a href="javascript:;" onclick="jQuery(this).hide().next().show();">(more&hellip;)</a><div style="display: none;">';
 					foreach ( $oips as $ip ) {
 						if ( $scip != $ip ) {
-							$html .= '<div>' . $ip . '</div>';
+							$ip_html .= '<div>' . $ip . '</div>';
 						}
 					}
-					$html .= '</div>';
-					return $html;
+					$ip_html .= '</div>';
 				} else {
-					$html = "<a target='_blank' href='https://whatismyipaddress.com/ip/$scip'>" . esc_html( $scip ) . '</a> <a href="javascript:;" onclick="jQuery(this).hide().next().show();">(more&hellip;)</a><div style="display: none;">';
+					$ip_html = "<a target='_blank' href='https://whatismyipaddress.com/ip/$scip'>" . esc_html( $scip ) . '</a> <a href="javascript:;" onclick="jQuery(this).hide().next().show();">(more&hellip;)</a><div style="display: none;">';
 					foreach ( $oips as $ip ) {
 						if ( $scip != $ip ) {
-							$html .= '<div>' . $ip . '</div>';
+							$ip_html .= '<div>' . $ip . '</div>';
 						}
 					}
-					$html .= '</div>';
-					return $html;
+					$ip_html .= '</div>';
 				}
+
+
+
+				$eventobj = isset( $this->item_meta[ $item->getId() ]['Object'] ) ? MWPAL_Extension\Activity_Log::get_instance()->alerts->get_display_object_text( $this->item_meta[ $item->getId() ]['Object'] ) : '';
+
+				$eventtypeobj = isset( $this->item_meta[ $item->getId() ]['EventType'] ) ? MWPAL_Extension\Activity_Log::get_instance()->alerts->get_display_event_type_text( $this->item_meta[ $item->getId() ]['EventType'] ) : '';
+
+				ob_start();
+				?>
+				<table>
+					<tr>
+						<td class="wsal-grid-text-header"><?php esc_html_e( 'Date:' ); ?></td>
+						<td class="wsal-grid-text-data"><?php echo $eventdate; ?></td>
+					</tr>
+					<tr>
+						<td class="wsal-grid-text-header"><?php esc_html_e( 'Time:' ); ?></td>
+						<td class="wsal-grid-text-data"><?php echo $eventtime; ?></td>
+					</tr>
+					<tr>
+						<td class="wsal-grid-text-header"><?php esc_html_e( 'User:' ); ?></td>
+						<td class="wsal-grid-text-data"><?php echo $eventuser; ?></td>
+					</tr>
+					<tr>
+						<td class="wsal-grid-text-header"><?php esc_html_e( 'IP:' ); ?></td>
+						<td class="wsal-grid-text-data"><?php echo ( isset( $oips_html ) && ! empty( $oips_html ) ) ? $oips_html : $ip_html ?></td>
+					</tr>
+					<tr>
+						<td class="wsal-grid-text-header"><?php esc_html_e( 'Object:' ); ?></td>
+						<td class="wsal-grid-text-data"><?php echo $eventobj; ?></td>
+					</tr>
+					<tr>
+						<td class="wsal-grid-text-header"><?php esc_html_e( 'Event Type:' ); ?></td>
+						<td class="wsal-grid-text-data"><?php echo $eventtypeobj; ?></td>
+					</tr>
+				</table>
+				<?php
+				return ob_get_clean();
 
 			case 'mesg':
 				return '<div id="Event' . $item->id . '">' . $item->GetMessage( array( $this, 'meta_formatter' ), $this->item_meta[ $item->getId() ] ) . '</div>';
@@ -533,16 +578,12 @@ class AuditLogListView extends \WP_List_Table {
 	public function get_columns() {
 		// Audit log columns.
 		$cols = array(
-			'site'       => __( 'Site', 'mwp-al-ext' ),
-			'type'       => __( 'Event ID', 'mwp-al-ext' ),
-			'code'       => __( 'Severity', 'mwp-al-ext' ),
-			'crtd'       => __( 'Date', 'mwp-al-ext' ),
-			'user'       => __( 'User', 'mwp-al-ext' ),
-			'scip'       => __( 'Source IP', 'mwp-al-ext' ),
-			'object'     => __( 'Object', 'mwp-al-ext' ),
-			'event_type' => __( 'Event Type', 'mwp-al-ext' ),
-			'mesg'       => __( 'Message', 'mwp-al-ext' ),
-			'data'       => '',
+			'site' => __( 'Site', 'mwp-al-ext' ),
+			'type' => __( 'Event ID', 'mwp-al-ext' ),
+			'code' => __( 'Severity', 'mwp-al-ext' ),
+			'info' => __( 'Info', 'mwp-al-ext' ),
+			'mesg' => __( 'Message', 'mwp-al-ext' ),
+			'data' => '',
 		);
 
 		// Get selected columns.
@@ -563,23 +604,8 @@ class AuditLogListView extends \WP_List_Table {
 					case 'type':
 						$cols['code'] = __( 'Severity', 'mwp-al-ext' );
 						break;
-					case 'date':
-						$cols['crtd'] = __( 'Date', 'mwp-al-ext' );
-						break;
-					case 'username':
-						$cols['user'] = __( 'User', 'mwp-al-ext' );
-						break;
-					case 'source_ip':
-						$cols['scip'] = __( 'Source IP', 'mwp-al-ext' );
-						break;
-					case 'message':
-						$cols['mesg'] = __( 'Message', 'mwp-al-ext' );
-						break;
-					case 'event_type':
-						$cols['event_type'] = __( 'Event Type', 'mwp-al-ext' );
-						break;
-					case 'object':
-						$cols['object'] = __( 'Object', 'mwp-al-ext' );
+					case 'info':
+						$cols['info'] = __( 'Info', 'mwp-al-ext' );
 						break;
 				}
 			}
@@ -601,13 +627,9 @@ class AuditLogListView extends \WP_List_Table {
 	 */
 	public function get_sortable_columns() {
 		return array(
-			'read'       => array( 'is_read', false ),
-			'type'       => array( 'alert_id', false ),
-			'crtd'       => array( 'created_on', true ),
-			'user'       => array( 'user', true ),
-			'scip'       => array( 'scip', false ),
-			'event_type' => array( 'event_type', true ),
-			'object'     => array( 'object', true ),
+			'read' => array( 'is_read', false ),
+			'type' => array( 'alert_id', false ),
+			'info' => array( 'created_on', true ),
 		);
 	}
 
@@ -899,7 +921,7 @@ class AuditLogListView extends \WP_List_Table {
 				<label class="screen-reader-text" for="<?php echo esc_attr( $input_id ); ?>"><?php echo esc_html( $text ); ?>:</label>
 				<input type="search" id="<?php echo esc_attr( $input_id ); ?>" name="s" value="<?php _admin_search_query(); ?>" placeholder="<?php esc_attr_e( 'Search events', 'mwp-al-ext' ); ?>" />
 				<?php submit_button( $text, '', '', false, array( 'id' => 'almwp-search-submit' ) ); ?>
-				<input type="button" id="mwpal-clear-search" class="almwp-button" value="<?php esc_attr_e( 'Clear Search Results', 'mwp-al-ext' ); ?>" disabled>
+				<input type="button" id="mwpal-clear-search" class="almwp-button" value="<?php esc_attr_e( 'Clear Search Results', 'mwp-al-ext' ); ?>">
 			</div>
 			<div id="mwpal-search-list" class="mwpal-search-filters-list no-filters"></div>
 		</div>
