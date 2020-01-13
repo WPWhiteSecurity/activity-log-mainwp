@@ -637,10 +637,6 @@ final class AlertManager {
 				if ( ! is_array( $site_data ) && isset( $site_data->events ) ) {
 					$this->log_events( $site_data->events, $site_id );
 				}
-
-				if ( ! is_array( $site_data ) && isset( $site_data->users ) ) {
-					save_child_site_users( $site_id, $site_data->users );
-				}
 			}
 		}
 	}
