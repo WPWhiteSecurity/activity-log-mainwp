@@ -138,7 +138,7 @@ class Settings {
 	 * @return array
 	 */
 	public function get_mwp_child_sites() {
-		$activity_log = \WSAL\MainWPExtension\Activity_Log::get_instance();
+		$activity_log = \WSAL\MainWPExtension\mwpal_extension();
 		return apply_filters( 'mainwp-getsites', $activity_log->get_child_file(), $activity_log->get_child_key(), null );
 	}
 
@@ -272,7 +272,7 @@ class Settings {
 
 		// Get MainWP Child sites.
 		$mwp_sites    = $this->get_mwp_child_sites();
-		$activity_log = \WSAL\MainWPExtension\Activity_Log::get_instance();
+		$activity_log = \WSAL\MainWPExtension\mwpal_extension();
 
 		if ( empty( $child_sites ) && ! is_array( $child_sites ) && ! empty( $mwp_sites ) ) {
 			foreach ( $mwp_sites as $site ) {

@@ -610,9 +610,9 @@ final class AlertManager {
 			// Get server IP.
 			$server_ip = MWPAL_Extension\mwpal_extension()->settings->get_server_ip();
 
-			foreach ( $sites_data as $site_id => $site_events ) {
-				// If $site_events is array, then MainWP failed to fetch logs from the child site.
-				if ( ! empty( $site_events ) && is_array( $site_events ) ) {
+			foreach ( $sites_data as $site_id => $site_data ) {
+				// If $site_data is array, then MainWP failed to fetch logs from the child site.
+				if ( ! empty( $site_data ) && is_array( $site_data ) ) {
 					// Search for the site data.
 					$key = array_search( $site_id, array_column( $mwp_sites, 'id' ), false );
 
@@ -630,10 +630,17 @@ final class AlertManager {
 							)
 						);
 					}
-				} elseif ( empty( $site_events ) || ! isset( $site_events->events ) ) {
+				} elseif ( empty( $site_data ) || ! isset( $site_data->events ) ) {
 					continue;
 				}
-				$this->log_events( $site_events->events, $site_id );
+
+				if ( ! is_array( $site_data ) && isset( $site_data->events ) ) {
+					$this->log_events( $site_data->events, $site_id );
+				}
+
+				if ( ! is_array( $site_data ) && isset( $site_data->users ) ) {
+					save_child_site_users( $site_id, $site_data->users );
+				}
 			}
 		}
 	}
