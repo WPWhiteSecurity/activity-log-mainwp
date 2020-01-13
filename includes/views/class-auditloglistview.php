@@ -104,6 +104,18 @@ class AuditLogListView extends \WP_List_Table {
 	}
 
 	/**
+	 * Adds some classes to the table.
+	 *
+	 * @method get_table_classes
+	 * @since  1.4.0
+	 * @return array
+	 */
+	protected function get_table_classes() {
+		$table_classes = array( 'widefat', 'fixed', 'striped', $this->_args['plural'], 'almwp-table', 'almwp-table-list' );
+		return $table_classes;
+	}
+
+	/**
 	 * Empty View.
 	 */
 	public function no_items() {
@@ -178,7 +190,7 @@ class AuditLogListView extends \WP_List_Table {
 									<img src="<?php echo MWPAL_BASE_URL; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static string ?>assets/img/mwp-al-ext-150x150.jpg">
 								</div>
 								<div class="notice-message-desc">
-									<p><strong><?php esc_html_e( 'The WP Security Audit Log plugin installed on the below child websites is version 4. Please update this extension to version 4 to download the logs from these websites.', 'mwp-al-ext' ); ?></strong></p>
+									<p><strong><?php esc_html_e( 'The following sites are running a version of WP Security Audit Log plugin that is not supported, so the logs were not retrieved. Please upgrade the plugins to version 4.', 'mwp-al-ext' ); ?></strong></p>
 									<p><i>
 										<?php
 										echo esc_html( implode( ', ', $incompatible_sites ) );
@@ -264,10 +276,17 @@ class AuditLogListView extends \WP_List_Table {
 						}
 						?>
 					</select>
-					<input type="button" class="button-primary" id="mwpal-wsal-manual-retrieve" value="<?php esc_html_e( 'Retrieve Activity Logs Now', 'mwp-al-ext' ); ?>" />
+					<input type="button" class="almwp-button" id="mwpal-wsal-manual-retrieve" value="<?php esc_html_e( 'Retrieve Activity Logs Now', 'mwp-al-ext' ); ?>" />
 				</div>
 				<?php
 			endif;
+			$user_selected_view = 'list';
+			?>
+			<div class="display-type-buttons">
+				<span class="almwp-button dashicons-before dashicons-list-view almwp-list-view-toggle <?php echo ( $this instanceof AuditLogListView ) ? esc_attr( 'disabled' ) : ''; ?>"><?php esc_html_e( 'List View', 'wp-security-audit-log' ); ?></span>
+				<a href="<?php echo esc_url( add_query_arg( 'view', 'grid' ) ); ?>" class="almwp-button dashicons-before dashicons-grid-view almwp-grid-view-toggle <?php echo ( $this instanceof AuditLogGridView ) ? esc_attr( 'disabled' ) : ''; ?>"><?php esc_html_e( 'Grid View', 'wp-security-audit-log' ); ?></a>
+			</div>
+			<?php
 		endif;
 	}
 
@@ -330,6 +349,16 @@ class AuditLogListView extends \WP_List_Table {
 					$const->name = __( 'Warning', 'mwp-al-ext' );
 				} elseif ( 'E_NOTICE' === $const->name ) {
 					$const->name = __( 'Notification', 'mwp-al-ext' );
+				} elseif ( 'WSAL_CRITICAL' === $const->name ) {
+					$const->name = __( 'Critical', 'mwp-al-ext' );
+				} elseif ( 'WSAL_HIGH' === $const->name ) {
+					$const->name = __( 'High', 'mwp-al-ext' );
+				} elseif ( 'WSAL_MEDIUM' === $const->name ) {
+					$const->name = __( 'Medium', 'mwp-al-ext' );
+				} elseif ( 'WSAL_LOW' === $const->name ) {
+					$const->name = __( 'Low', 'mwp-al-ext' );
+				} elseif ( 'WSAL_INFORMATIONAL' === $const->name ) {
+					$const->name = __( 'Info', 'mwp-al-ext' );
 				}
 				return '<a class="tooltip" href="#" data-tooltip="' . esc_html( $const->name ) . '"><span class="log-type log-type-' . $const->value . '"></span></a>';
 
@@ -484,6 +513,12 @@ class AuditLogListView extends \WP_List_Table {
 				return '<a class="more-info thickbox" data-tooltip="' . $tooltip . '" title="' . __( 'Alert Data Inspector', 'mwp-al-ext' ) . '"'
 					. ' href="' . $url . '">&hellip;</a>';
 
+			case 'object':
+				return isset( $this->item_meta[ $item->getId() ]['Object'] ) ? MWPAL_Extension\Activity_Log::get_instance()->alerts->get_display_object_text( $this->item_meta[ $item->getId() ]['Object'] ) : '';
+
+			case 'event_type':
+				return isset( $this->item_meta[ $item->getId() ]['EventType'] ) ? MWPAL_Extension\Activity_Log::get_instance()->alerts->get_display_event_type_text( $this->item_meta[ $item->getId() ]['EventType'] ) : '';
+
 			default:
 				/* translators: Column Name */
 				return isset( $item->$column_name ) ? esc_html( $item->$column_name ) : sprintf( esc_html__( 'Column "%s" not found', 'mwp-al-ext' ), $column_name );
@@ -498,14 +533,16 @@ class AuditLogListView extends \WP_List_Table {
 	public function get_columns() {
 		// Audit log columns.
 		$cols = array(
-			'site' => __( 'Site', 'mwp-al-ext' ),
-			'type' => __( 'Event ID', 'mwp-al-ext' ),
-			'code' => __( 'Sev.', 'mwp-al-ext' ),
-			'crtd' => __( 'Date', 'mwp-al-ext' ),
-			'user' => __( 'User', 'mwp-al-ext' ),
-			'scip' => __( 'Source IP', 'mwp-al-ext' ),
-			'mesg' => __( 'Message', 'mwp-al-ext' ),
-			'data' => '',
+			'site'       => __( 'Site', 'mwp-al-ext' ),
+			'type'       => __( 'Event ID', 'mwp-al-ext' ),
+			'code'       => __( 'Severity', 'mwp-al-ext' ),
+			'crtd'       => __( 'Date', 'mwp-al-ext' ),
+			'user'       => __( 'User', 'mwp-al-ext' ),
+			'scip'       => __( 'Source IP', 'mwp-al-ext' ),
+			'object'     => __( 'Object', 'mwp-al-ext' ),
+			'event_type' => __( 'Event Type', 'mwp-al-ext' ),
+			'mesg'       => __( 'Message', 'mwp-al-ext' ),
+			'data'       => '',
 		);
 
 		// Get selected columns.
@@ -524,7 +561,7 @@ class AuditLogListView extends \WP_List_Table {
 						$cols['type'] = __( 'Event ID', 'mwp-al-ext' );
 						break;
 					case 'type':
-						$cols['code'] = __( 'Sev.', 'mwp-al-ext' );
+						$cols['code'] = __( 'Severity', 'mwp-al-ext' );
 						break;
 					case 'date':
 						$cols['crtd'] = __( 'Date', 'mwp-al-ext' );
@@ -537,6 +574,12 @@ class AuditLogListView extends \WP_List_Table {
 						break;
 					case 'message':
 						$cols['mesg'] = __( 'Message', 'mwp-al-ext' );
+						break;
+					case 'event_type':
+						$cols['event_type'] = __( 'Event Type', 'mwp-al-ext' );
+						break;
+					case 'object':
+						$cols['object'] = __( 'Object', 'mwp-al-ext' );
 						break;
 				}
 			}
@@ -558,11 +601,13 @@ class AuditLogListView extends \WP_List_Table {
 	 */
 	public function get_sortable_columns() {
 		return array(
-			'read' => array( 'is_read', false ),
-			'type' => array( 'alert_id', false ),
-			'crtd' => array( 'created_on', true ),
-			'user' => array( 'user', true ),
-			'scip' => array( 'scip', false ),
+			'read'       => array( 'is_read', false ),
+			'type'       => array( 'alert_id', false ),
+			'crtd'       => array( 'created_on', true ),
+			'user'       => array( 'user', true ),
+			'scip'       => array( 'scip', false ),
+			'event_type' => array( 'event_type', true ),
+			'object'     => array( 'object', true ),
 		);
 	}
 
@@ -653,6 +698,14 @@ class AuditLogListView extends \WP_List_Table {
 				$events_query->addMetaJoin(); // Since LEFT JOIN clause causes the result values to duplicate.
 				$events_query->addCondition( 'meta.name = %s', 'CurrentUserID' ); // A where condition is added to make sure that we're only requesting the relevant meta data rows from metadata table.
 				$events_query->addOrderBy( 'CASE WHEN meta.name = "CurrentUserID" THEN meta.value END', $is_descending );
+			} elseif ( 'event_type' === $order_by ) {
+				$events_query->addMetaJoin(); // Since LEFT JOIN clause causes the result values to duplicate.
+				$events_query->addCondition( 'meta.name = %s', 'EventType' ); // A where condition is added to make sure that we're only requesting the relevant meta data rows from metadata table.
+				$events_query->addOrderBy( 'CASE WHEN meta.name = "EventType" THEN meta.value END', $is_descending );
+			} elseif ( 'object' === $order_by ) {
+				$events_query->addMetaJoin(); // Since LEFT JOIN clause causes the result values to duplicate.
+				$events_query->addCondition( 'meta.name = %s', 'Object' ); // A where condition is added to make sure that we're only requesting the relevant meta data rows from metadata table.
+				$events_query->addOrderBy( 'CASE WHEN meta.name = "Object" THEN meta.value END', $is_descending );
 			} else {
 				$tmp = new \WSAL\MainWPExtension\Models\Occurrence();
 				// Making sure the field exists to order by.
@@ -816,6 +869,9 @@ class AuditLogListView extends \WP_List_Table {
 			case '%ContactSupport%' === $name:
 				return '<a href="https://www.wpsecurityauditlog.com/contact/" target="_blank">' . esc_html__( 'contact our support', 'mwp-al-ext' ) . '</a>';
 
+			case '%LineBreak%' === $name:
+				return '<br>';
+
 			default:
 				return '<strong>' . esc_html( $value ) . '</strong>';
 		}
@@ -839,13 +895,13 @@ class AuditLogListView extends \WP_List_Table {
 		}
 		?>
 		<div class="mwpal-search-box">
-			<span class="mwpal-filters"><div id="mwpal-search-list" class="mwpal-search-filters-list no-filters"></div></span>
-			<p class="search-box">
+			<div class="search-box">
 				<label class="screen-reader-text" for="<?php echo esc_attr( $input_id ); ?>"><?php echo esc_html( $text ); ?>:</label>
-				<input type="search" id="<?php echo esc_attr( $input_id ); ?>" name="s" value="<?php _admin_search_query(); ?>" />
-				<?php submit_button( $text, '', '', false, array( 'id' => 'search-submit' ) ); ?>
-				<input type="button" id="mwpal-clear-search" class="button" value="<?php esc_attr_e( 'Clear Search Results', 'mwp-al-ext' ); ?>" disabled>
-			</p>
+				<input type="search" id="<?php echo esc_attr( $input_id ); ?>" name="s" value="<?php _admin_search_query(); ?>" placeholder="<?php esc_attr_e( 'Search events', 'mwp-al-ext' ); ?>" />
+				<?php submit_button( $text, '', '', false, array( 'id' => 'almwp-search-submit' ) ); ?>
+				<input type="button" id="mwpal-clear-search" class="almwp-button" value="<?php esc_attr_e( 'Clear Search Results', 'mwp-al-ext' ); ?>" disabled>
+			</div>
+			<div id="mwpal-search-list" class="mwpal-search-filters-list no-filters"></div>
 		</div>
 		<?php
 	}
