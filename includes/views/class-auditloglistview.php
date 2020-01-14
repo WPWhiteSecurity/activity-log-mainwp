@@ -399,7 +399,7 @@ class AuditLogListView extends \WP_List_Table {
 					$image = '<span class="dashicons dashicons-wordpress wsal-system-icon"></span>';
 					$uhtml = '<i>' . __( 'System', 'mwp-al-ext' ) . '</i>';
 					$roles = '';
-				} elseif ( $user_data && 'System' !== $user_data->username ) {
+				} elseif ( $user_data && 'System' !== $username ) {
 					$image = get_avatar( $user_data->user_email, 32 ); // Avatar.
 
 					// Checks for display name.
@@ -411,7 +411,7 @@ class AuditLogListView extends \WP_List_Table {
 					) {
 						$display_name = $user_data->first_name . ' ' . $user_data->last_name;
 					} else {
-						$display_name = $user_data->username;
+						$display_name = $username;
 					}
 
 					if ( $this->query_args->site_id && 'live' === $this->query_args->get_events ) {
