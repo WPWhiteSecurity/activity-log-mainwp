@@ -388,36 +388,66 @@ class AuditLogGridView extends \WP_List_Table {
 						)
 					) : '<i>' . __( 'Unknown', 'wp-security-audit-log' ) . '</i>';
 
-				$username = $item->GetUsername( $this->item_meta[ $item->getId() ] ); // Get username.
-				$user     = get_user_by( 'login', $username ); // Get user.
-				if ( empty( $this->name_type ) ) {
-					$this->name_type = $type_username;
+				$username  = $item->GetUsername( $this->item_meta[ $item->getId() ] ); // Get username.
+				$user_data = $item->get_user_data( $this->item_meta[ $item->getId() ] ); // Get user data.
+
+				if ( empty( $user_data ) ) {
+					$user_data = get_user_by( 'login', $username );
+					if ( isset( $user_data->data ) && ! empty( $user_data->data ) ) {
+						$user_data = $user_data->data;
+					}
 				}
 
-				// Check if the username and user exists.
-				if ( $username && $user ) {
+				// Check if the usernames exists & matches pre-defined cases.
+				if ( 'Plugin' === $username ) {
+					$image = '<img src="' . trailingslashit( MWPAL_BASE_URL ) . 'assets/img/wsal-logo.png" width="32" alt="WSAL Logo"/>';
+					$uhtml = '<i>' . __( 'Plugin', 'mwp-al-ext' ) . '</i>';
+					$roles = '';
+				} elseif ( 'Plugins' === $username ) {
+					$image = '<span class="dashicons dashicons-wordpress wsal-system-icon"></span>';
+					$uhtml = '<i>' . __( 'Plugins', 'mwp-al-ext' ) . '</i>';
+					$roles = '';
+				} elseif ( 'Website Visitor' === $username ) {
+					$image = '<span class="dashicons dashicons-wordpress wsal-system-icon"></span>';
+					$uhtml = '<i>' . __( 'Website Visitor', 'mwp-al-ext' ) . '</i>';
+					$roles = '';
+				} elseif ( 'System' === $username ) {
+					$image = '<span class="dashicons dashicons-wordpress wsal-system-icon"></span>';
+					$uhtml = '<i>' . __( 'System', 'mwp-al-ext' ) . '</i>';
+					$roles = '';
+				} elseif ( $user_data && 'System' !== $user_data->username ) {
+					$image = get_avatar( $user_data->user_email, 32 ); // Avatar.
 
 					// Checks for display name.
-					if ( 'display_name' === $this->name_type && ! empty( $user->display_name ) ) {
-						$display_name = $user->display_name;
+					if ( 'display_name' === $type_username && ! empty( $user_data->display_name ) ) {
+						$display_name = $user_data->display_name;
 					} elseif (
-						'first_last_name' === $this->name_type
-						&& ( ! empty( $user->first_name ) || ! empty( $user->last_name ) )
+						'first_last_name' === $type_username
+						&& ( ! empty( $user_data->first_name ) || ! empty( $user_data->last_name ) )
 					) {
-						$display_name = $user->first_name . ' ' . $user->last_name;
+						$display_name = $user_data->first_name . ' ' . $user_data->last_name;
 					} else {
-						$display_name = $user->user_login;
+						$display_name = $user_data->username;
 					}
 
-					if ( class_exists( 'WSAL_SearchExtension' ) ) {
-						$tooltip = esc_attr__( 'Show me all activity by this User', 'wp-security-audit-log' );
-
-						$uhtml = '<a class="search-user" data-tooltip="' . $tooltip . '" data-user="' . $user->user_login . '" href="' . admin_url( 'user-edit.php?user_id=' . $user->ID )
-							. '" target="_blank">' . esc_html( $display_name ) . '</a>';
+					if ( $this->query_args->site_id && 'live' === $this->query_args->get_events ) {
+						$site_id = (string) $this->query_args->site_id;
 					} else {
-						$uhtml = '<a href="' . admin_url( 'user-edit.php?user_id=' . $user->ID )
-						. '" target="_blank">' . esc_html( $display_name ) . '</a>';
+						$site_id = (string) $item->site_id;
 					}
+
+					$site_index = array_search( $site_id, array_column( $mwp_child_sites, 'id' ), true );
+					$site_url   = '#';
+
+					if ( false !== $site_index && isset( $mwp_child_sites[ $site_index ] ) ) {
+						$site_url = $mwp_child_sites[ $site_index ]['url'];
+						$user_url = add_query_arg( 'user_id', $user_data->user_id, trailingslashit( $site_url ) . 'wp-admin/user-edit.php' );
+					} else {
+						$user_url = add_query_arg( 'user_id', $user_data->ID, admin_url( 'user-edit.php' ) );
+					}
+
+					// User html.
+					$uhtml = '<a href="' . esc_url( $user_url ) . '" target="_blank">' . esc_html( $display_name ) . '</a>';
 
 					$roles = $item->GetUserRoles( $this->item_meta[ $item->getId() ] );
 					if ( is_array( $roles ) && count( $roles ) ) {
@@ -425,19 +455,11 @@ class AuditLogGridView extends \WP_List_Table {
 					} elseif ( is_string( $roles ) && '' != $roles ) {
 						$roles = esc_html( ucwords( str_replace( array( '"', '[', ']' ), ' ', $roles ) ) );
 					} else {
-						$roles = '<i>' . __( 'Unknown', 'wp-security-audit-log' ) . '</i>';
+						$roles = '<i>' . __( 'Unknown', 'mwp-al-ext' ) . '</i>';
 					}
-				} elseif ( 'Plugin' == $username ) {
-					$uhtml = '<i>' . __( 'Plugin', 'wp-security-audit-log' ) . '</i>';
-					$roles = '';
-				} elseif ( 'Plugins' == $username ) {
-					$uhtml = '<i>' . __( 'Plugins', 'wp-security-audit-log' ) . '</i>';
-					$roles = '';
-				} elseif ( 'Website Visitor' == $username ) {
-					$uhtml = '<i>' . __( 'Website Visitor', 'wp-security-audit-log' ) . '</i>';
-					$roles = '';
 				} else {
-					$uhtml = '<i>' . __( 'System', 'wp-security-audit-log' ) . '</i>';
+					$image = '<span class="dashicons dashicons-wordpress wsal-system-icon"></span>';
+					$uhtml = '<i>' . __( 'System', 'mwp-al-ext' ) . '</i>';
 					$roles = '';
 				}
 				$row_user_data = $uhtml . '<br/>' . $roles;
