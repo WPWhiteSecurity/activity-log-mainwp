@@ -219,6 +219,8 @@ class Settings {
 			'info'       => '1',
 			'date'       => '1',
 			'username'   => '1',
+			'event_type' => '1',
+			'object'     => '1',
 			'source_ip'  => '1',
 			'message'    => '1',
 		);
@@ -234,6 +236,8 @@ class Settings {
 				'info'       => '0',
 				'date'       => '0',
 				'username'   => '0',
+				'event_type' => '0',
+				'object'     => '0',
 				'source_ip'  => '0',
 				'message'    => '0',
 			);
