@@ -138,7 +138,7 @@ class Settings {
 	 * @return array
 	 */
 	public function get_mwp_child_sites() {
-		$activity_log = \WSAL\MainWPExtension\Activity_Log::get_instance();
+		$activity_log = \WSAL\MainWPExtension\mwpal_extension();
 		return apply_filters( 'mainwp-getsites', $activity_log->get_child_file(), $activity_log->get_child_key(), null );
 	}
 
@@ -216,8 +216,11 @@ class Settings {
 			'site'       => '1',
 			'alert_code' => '1',
 			'type'       => '1',
+			'info'       => '1',
 			'date'       => '1',
 			'username'   => '1',
+			'event_type' => '1',
+			'object'     => '1',
 			'source_ip'  => '1',
 			'message'    => '1',
 		);
@@ -230,8 +233,11 @@ class Settings {
 				'site'       => '0',
 				'alert_code' => '0',
 				'type'       => '0',
+				'info'       => '0',
 				'date'       => '0',
 				'username'   => '0',
+				'event_type' => '0',
+				'object'     => '0',
 				'source_ip'  => '0',
 				'message'    => '0',
 			);
@@ -270,7 +276,7 @@ class Settings {
 
 		// Get MainWP Child sites.
 		$mwp_sites    = $this->get_mwp_child_sites();
-		$activity_log = \WSAL\MainWPExtension\Activity_Log::get_instance();
+		$activity_log = \WSAL\MainWPExtension\mwpal_extension();
 
 		if ( empty( $child_sites ) && ! is_array( $child_sites ) && ! empty( $mwp_sites ) ) {
 			foreach ( $mwp_sites as $site ) {
@@ -642,7 +648,165 @@ class Settings {
 
 		return false;
 	}
-	
+
+	/**
+	 * Meta data formater.
+	 *
+	 * @param string  $name   - Name of the data.
+	 * @param mixed   $value  - Value of the data.
+	 * @param integer $occ_id - Event occurrence id.
+	 * @return string
+	 */
+	public function meta_formatter( $name, $value, $occ_id ) {
+		switch ( true ) {
+			case '%Message%' == $name:
+				return esc_html( $value );
+
+			case '%PromoMessage%' == $name:
+				return '<p class="promo-alert">' . $value . '</p>';
+
+			case '%PromoLink%' == $name:
+			case '%CommentLink%' == $name:
+			case '%CommentMsg%' == $name:
+				return $value;
+
+			case '%MetaLink%' == $name:
+				if ( ! empty( $value ) ) {
+					return "<a href=\"#\" data-disable-custom-nonce='" . wp_create_nonce( 'disable-custom-nonce' . $value ) . "' onclick=\"WsalDisableCustom(this, '" . $value . "');\"> Exclude Custom Field from the Monitoring</a>";
+				} else {
+					return '';
+				}
+
+			case '%RevisionLink%' === $name:
+				$check_value = (string) $value;
+				if ( 'NULL' !== $check_value ) {
+					return ' Click <a target="_blank" href="' . esc_url( $value ) . '">here</a> to see the content changes.';
+				} else {
+					return false;
+				}
+
+			case '%EditorLinkPost%' == $name:
+				return ' View the <a target="_blank" href="' . esc_url( $value ) . '">post</a>';
+
+			case '%EditorLinkPage%' == $name:
+				return ' View the <a target="_blank" href="' . esc_url( $value ) . '">page</a>';
+
+			case '%CategoryLink%' == $name:
+				return ' View the <a target="_blank" href="' . esc_url( $value ) . '">category</a>';
+
+			case '%TagLink%' == $name:
+				return ' View the <a target="_blank" href="' . esc_url( $value ) . '">tag</a>';
+
+			case '%EditorLinkForum%' == $name:
+				return ' View the <a target="_blank" href="' . esc_url( $value ) . '">forum</a>';
+
+			case '%EditorLinkTopic%' == $name:
+				return ' View the <a target="_blank" href="' . esc_url( $value ) . '">topic</a>';
+
+			case in_array( $name, array( '%MetaValue%', '%MetaValueOld%', '%MetaValueNew%' ) ):
+				return '<strong>' . (
+					strlen( $value ) > 50 ? ( esc_html( substr( $value, 0, 50 ) ) . '&hellip;' ) : esc_html( $value )
+				) . '</strong>';
+
+			case '%ClientIP%' == $name:
+				if ( is_string( $value ) ) {
+					return '<strong>' . str_replace( array( '"', '[', ']' ), '', $value ) . '</strong>';
+				} else {
+					return '<i>unknown</i>';
+				}
+
+			case '%LinkFile%' === $name:
+				if ( 'NULL' != $value ) {
+					$site_id = $this->get_view_site_id(); // Site id for multisite.
+					return '<a href="javascript:;" onclick="download_404_log( this )" data-log-file="' . esc_attr( $value ) . '" data-site-id="' . esc_attr( $site_id ) . '" data-nonce-404="' . esc_attr( wp_create_nonce( 'wsal-download-404-log-' . $value ) ) . '" title="' . esc_html__( 'Download the log file', 'mwp-al-ext' ) . '">' . esc_html__( 'Download the log file', 'mwp-al-ext' ) . '</a>';
+				} else {
+					return 'Click <a href="' . esc_url( add_query_arg( 'page', 'wsal-togglealerts', admin_url( 'admin.php' ) ) ) . '">here</a> to log such requests to file';
+				}
+
+			case '%URL%' === $name:
+				return ' or <a href="javascript:;" data-exclude-url="' . esc_url( $value ) . '" data-exclude-url-nonce="' . wp_create_nonce( 'wsal-exclude-url-' . $value ) . '" onclick="wsal_exclude_url( this )">exclude this URL</a> from being reported.';
+
+			case '%LogFileLink%' === $name: // Failed login file link.
+				return '';
+
+			case '%Attempts%' === $name: // Failed login attempts.
+				$check_value = (int) $value;
+				if ( 0 === $check_value ) {
+					return '';
+				} else {
+					return $value;
+				}
+
+			case '%LogFileText%' === $name: // Failed login file text.
+				return '<a href="javascript:;" onclick="download_failed_login_log( this )" data-download-nonce="' . esc_attr( wp_create_nonce( 'wsal-download-failed-logins' ) ) . '" title="' . esc_html__( 'Download the log file.', 'mwp-al-ext' ) . '">' . esc_html__( 'Download the log file.', 'mwp-al-ext' ) . '</a>';
+
+			case strncmp( $value, 'http://', 7 ) === 0:
+			case strncmp( $value, 'https://', 7 ) === 0:
+				return '<a href="' . esc_html( $value ) . '" title="' . esc_html( $value ) . '" target="_blank">' . esc_html( $value ) . '</a>';
+
+			case '%PostStatus%' === $name:
+				if ( ! empty( $value ) && 'publish' === $value ) {
+					return '<strong>' . esc_html__( 'published', 'mwp-al-ext' ) . '</strong>';
+				} else {
+					return '<strong>' . esc_html( $value ) . '</strong>';
+				}
+
+			case '%multisite_text%' === $name:
+				if ( $this->is_multisite() && $value ) {
+					$site_info = get_blog_details( $value, true );
+					if ( $site_info ) {
+						return ' on site <a href="' . esc_url( $site_info->siteurl ) . '">' . esc_html( $site_info->blogname ) . '</a>';
+					}
+					return;
+				}
+				return;
+
+			case '%ReportText%' === $name:
+				return;
+
+			case '%ChangeText%' === $name:
+				if ( $occ_id ) {
+					$url_args = array(
+						'action'     => 'AjaxInspector',
+						'occurrence' => $occ_id,
+						'TB_iframe'  => 'true',
+						'width'      => 600,
+						'height'     => 550,
+					);
+					$url      = add_query_arg( $url_args, admin_url( 'admin-ajax.php' ) );
+					return ' View the changes in <a class="thickbox"  title="' . __( 'Alert Data Inspector', 'mwp-al-ext' ) . '"'
+					. ' href="' . $url . '">data inspector.</a>';
+				} else {
+					return;
+				}
+
+			case '%ScanError%' === $name:
+				if ( 'NULL' === $value ) {
+					return false;
+				}
+				/* translators: Mailto link for support. */
+				return ' with errors. ' . sprintf( __( 'Contact us on %s for assistance', 'mwp-al-ext' ), '<a href="mailto:support@wpsecurityauditlog.com" target="_blank">support@wpsecurityauditlog.com</a>' );
+
+			case '%TableNames%' === $name:
+				$value = str_replace( ',', ', ', $value );
+				return '<strong>' . esc_html( $value ) . '</strong>';
+
+			case '%FileSettings%' === $name:
+				$file_settings_args = array(
+					'page' => 'wsal-settings',
+					'tab'  => 'file-changes',
+				);
+				$file_settings      = add_query_arg( $file_settings_args, admin_url( 'admin.php' ) );
+				return '<a href="' . esc_url( $file_settings ) . '">' . esc_html__( 'plugin settings', 'mwp-al-ext' ) . '</a>';
+
+			case '%ContactSupport%' === $name:
+				return '<a href="https://www.wpsecurityauditlog.com/contact/" target="_blank">' . esc_html__( 'contact our support', 'mwp-al-ext' ) . '</a>';
+
+			default:
+				return '<strong>' . esc_html( $value ) . '</strong>';
+		}
+	}
+
 	/**
 	 * Set disabled events.
 	 *
