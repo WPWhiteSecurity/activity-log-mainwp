@@ -15,7 +15,7 @@
 
 /*
 	Activity Log for MainWP
-	Copyright(c) 2019  WP White Security  (email : info@wpwhitesecurity.com)
+	Copyright(c) 2020  WP White Security  (email : info@wpwhitesecurity.com)
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License, version 2, as

@@ -6,7 +6,7 @@ License URI: https://www.gnu.org/licenses/gpl.html
 Tags: activity log, mainwp, mainwp extension, wordpress security, wordpress security audit log, audit log, mainwp user tracking, wordpress activity log, security activity log, wordpress admin, mainwp admin, user tracking
 Requires at least: 3.6
 Tested up to: 5.3
-Stable tag: 1.3
+Stable tag: 1.4
 Requires PHP: 5.5
 
 See the activity logs of all child sites & MainWP in one central location - the MainWP dashboard.
@@ -16,7 +16,7 @@ See the activity logs of all child sites & MainWP in one central location - the 
 <strong>THE ACTIVITY LOG PLUGIN FOR MAINWP & CHILD SITES</strong><br />
 
 MainWP is an invaluable tool for those who manage multiple WordPress websites. However, it only shows you the technical aspects of the child websites.
- 
+
 Gain a detailed overview of what is happening on the MainWP dashboard and what customers are doing on the child sites - install the [Activity Logs for MainWP extension](https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=AL4MWP&utm_content=plugin+repos+description) to keep a log of all user and under the hood activity that happen on the MainWP dashboard child sites.
 
 #### Maintained & Supported by WP White Security
@@ -129,6 +129,11 @@ Please refer to our [Support & Documentation pages](https://www.wpsecurityauditl
 
 == Changelog ==
 
+= 1.4 (2020-01-14) =
+
+* **New functionality**
+	* Support for [activity logs of WP Security Audit Log version 4](https://www.wpsecurityauditlog.com/releases/update-4/).
+
 = 1.3 (2019-12-11) =
 
 Release Notes: [New MainWP activity logs retention settings & other updates](https://www.wpsecurityauditlog.com/releases/activity-log-mainwp-1-3/)
@@ -139,7 +144,7 @@ Release Notes: [New MainWP activity logs retention settings & other updates](htt
 
 * **Improvement**
 	* Added new compatibility check & notification for WP Security Audit Log v4 (new activity log).
-	
+
 * **Bug fixes**
 	* Plugin tries to retrieve logs from removed child sites.
 	* First install wizard not firing in some edge cases.
@@ -153,7 +158,7 @@ Release Notes: [New MainWP activity logs retention settings & other updates](htt
 
 * **Improvement**
 	* Plugin retrieves list of child sites in batches to better handle large number of sites on bigger networks.
-	
+
 * **Bug fixes**
 	* Child site not removed from activity log database even after being removed by user.
 	* Removed unnecessary code for navtabs which was causing a console error.
@@ -165,7 +170,7 @@ Release Notes: [Announcing Activity Log for MainWP Premium](https://www.wpsecuri
 * **New Feature**
 	* Added activity log tab in individual site child overview dashboard.
 	* Added support for [Activity Log for MainWP Premium](https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/premium-benefits/).
-	
+
 * **Improvement**
 	* Improved support for MainWP4.
 
@@ -173,16 +178,16 @@ Release Notes: [Announcing Activity Log for MainWP Premium](https://www.wpsecuri
 
 * **Improvement**
 	* Updated the Freemius SDK
-	
+
 * **Bug fix**
 	* Plugin no longer crashes website when MainWP is deactivated.
-	
+
 = 1.0.4 (2019-06-11) =
 
 * **New Feature**
 	* New pruning setting for [MainWP dashboard & network activity log events](https://www.wpsecurityauditlog.com/support-documentation/list-wordpress-audit-trail-alerts/#mainwp).
 	* Settings to disable / enable specific MainWP dashboard & network event IDs.
-	
+
 * **Improvement**
 	* Fixed UI issues to support MainWP 4.
 
@@ -191,13 +196,13 @@ Release Notes: [Announcing Activity Log for MainWP Premium](https://www.wpsecuri
 * **New Feature**
 	* Infinite Scroll in the activity log viewer (switch between pagination and infinite scroll in the extension settings).
 	* Integrated Freemius SDK (preparation for the premium features).
-	
+
 * **Performance Update**
 	* Improved several queries and improved activity log viewer performance.
-	
+
 * **Improvement**
 	* New setting to retrieve activity logs when MainWP syncs website data (default: Off).
-	
+
 = 1.0.2 (2019-02-08) =
 
 * **Security Fix**
@@ -209,7 +214,7 @@ Release Notes: [Announcing Activity Log for MainWP Premium](https://www.wpsecuri
 	* Improved wizard for when WP Security Audit Log is not installed on any child sites.
 	* Improved the retrieving events process for when child sites have no activity log events.
 	* Updated the help text in the extension settings.
-	
+
 * **Bug Fixes**
 	* Handling an error for when Activity Log for MainWP is installed on a WordPress site without MainWP.
 
