@@ -53,25 +53,6 @@ class Activity_Log {
 	public $version = '1.4';
 
 	/**
-	 * The minimum wsal version this plugin is compatible with.
-	 *
-	 * @since 1.3.0
-	 * @var string
-	 */
-	public $min_compatible_wsal_version = '4.0.0-alpha';
-
-	/**
-	 * The maximum wsal version this plugin is compatible with.
-	 *
-	 * NOTE: before wsal releases a breaking change this number should be
-	 * adjusted to state the latest version before the change was made.
-	 *
-	 * @since 1.3.0
-	 * @var string
-	 */
-	public $max_compatible_wsal_version = '5.0.0';
-
-	/**
 	 * Single Static Instance of the plugin.
 	 *
 	 * @var Activity_Log

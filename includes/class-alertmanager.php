@@ -514,13 +514,6 @@ final class AlertManager {
 				);
 			}
 
-			// Check if this site is valid version.
-			$sites_data = self::check_wsal_version_compatible( $sites_data, $site_id );
-
-			if ( isset( $sites_data['incompatible__skipped'] ) ) {
-				return $sites_data;
-			}
-
 			// Post data for child sites.
 			if ( empty( $post_data ) ) {
 				$post_data = array(
@@ -538,59 +531,6 @@ final class AlertManager {
 				'extra_excution',
 				$post_data
 			);
-		}
-		return $sites_data;
-	}
-
-	/**
-	 * Ensures that this version of ALMWP is compatible with the child
-	 * sites version of WSAL.
-	 *
-	 * @method check_wsal_version_compatible
-	 * @since  1.3.0
-	 * @param  array   $sites_data holder for the sites data.
-	 * @param  integer $site_id the site id in MWP to check.
-	 * @return array
-	 */
-	public static function check_wsal_version_compatible( $sites_data = array(), $site_id = 0 ) {
-		// make sure we start with an array.
-		$sites_data = ( is_array( $sites_data ) ) ? $sites_data : array();
-
-		// if we have an id and can get MainWP_DB class.
-		if ( class_exists( 'MainWP_DB' ) && 0 !== $site_id ) {
-			// For this version of the plugin we need WSAL to be v4+.
-			$site_data = \MainWP_DB::Instance()->getWebsiteById( $site_id );
-			$plugins   = json_decode( $site_data->plugins, true );
-			// find WSAL in the plugins list.
-			$incompatible_sites = get_option( 'mwpal-incompatible-wsal-version', array() );
-			foreach ( $plugins as $plugin ) {
-				if ( 'WP Security Audit Log' === $plugin['name'] && $plugin['active'] ) {
-					// check WSAL version is compatible with this ALMWP version.
-					$almwp                 = \WSAL\MainWPExtension\Activity_Log::get_instance();
-					$wsal_min_version      = $almwp->min_compatible_wsal_version;
-					$wsal_max_version      = $almwp->max_compatible_wsal_version;
-					$is_compatible_version = ( version_compare( (string) $plugin['version'], $wsal_min_version, '>=' ) && version_compare( (string) $plugin['version'], $wsal_max_version, '<' ) );
-					// bail early if the WSAL version is not compatible.
-					if ( false === $is_compatible_version ) {
-						// Plugin is not compatible... update an option so a notice appears.
-						if ( ! in_array( $site_data->name, $incompatible_sites, true ) ) {
-							$incompatible_sites[] = $site_data->name;
-							update_option( 'mwpal-incompatible-wsal-version', $incompatible_sites );
-						}
-						delete_transient( 'mwpal-hide-incompatible-wsal-version-notice' );
-						// early return.
-						$sites_data['incompatible__skipped'] = true;
-						return $sites_data;
-					} else {
-						$key = array_search( $site_data->name, $incompatible_sites, true );
-						if ( false !== $key ) {
-							unset( $incompatible_sites[ $key ] );
-							update_option( 'mwpal-incompatible-wsal-version', $incompatible_sites );
-							delete_transient( 'mwpal-hide-incompatible-wsal-version-notice' );
-						}
-					}
-				}
-			}
 		}
 		return $sites_data;
 	}
