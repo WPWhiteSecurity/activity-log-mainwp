@@ -279,27 +279,27 @@ final class AlertManager {
 				$loggers = $this->get_loggers();
 
 				// Get meta data of event.
-				$meta_data = $event->meta_data;
+				$meta_data = $event['meta_data'];
 				$user_data = isset( $meta_data['UserData'] ) ? $meta_data['UserData'] : false;
 
 				// Username.
-				if ( isset( $user_data->username ) ) {
-					$meta_data['Username'] = $user_data->username;
+				if ( isset( $user_data['username'] ) ) {
+					$meta_data['Username'] = $user_data['username'];
 				}
 
 				// First name.
-				if ( isset( $user_data->first_name ) ) {
-					$meta_data['FirstName'] = $user_data->first_name;
+				if ( isset( $user_data['first_name'] ) ) {
+					$meta_data['FirstName'] = $user_data['first_name'];
 				}
 
 				// Last name.
-				if ( isset( $user_data->last_name ) ) {
-					$meta_data['LastName'] = $user_data->last_name;
+				if ( isset( $user_data['last_name'] ) ) {
+					$meta_data['LastName'] = $user_data['last_name'];
 				}
 
 				// Log the events in DB.
 				foreach ( $loggers as $logger ) {
-					$logger->log( $event->alert_id, $meta_data, $event->created_on, $site_id );
+					$logger->log( $event['alert_id'], $meta_data, $event['created_on'], $site_id );
 				}
 			}
 		}
@@ -467,7 +467,7 @@ final class AlertManager {
 				// Set $trigger_retrieving to false to avoid logging 7711 multiple times.
 				$trigger_retrieving = false;
 
-				if ( $trigger_ready && ( isset( $sites_data[ $site_id ]->events ) || isset( $sites_data[ $site_id ]['incompatible__skipped'] ) ) ) {
+				if ( $trigger_ready && ( isset( $sites_data[ $site_id ]['events'] ) || isset( $sites_data[ $site_id ]['incompatible__skipped'] ) ) ) {
 					// Extension is ready after retrieving.
 					$this->trigger(
 						7712,
@@ -551,8 +551,8 @@ final class AlertManager {
 			$server_ip = MWPAL_Extension\mwpal_extension()->settings->get_server_ip();
 
 			foreach ( $sites_data as $site_id => $site_data ) {
-				// If $site_data is array, then MainWP failed to fetch logs from the child site.
-				if ( ! empty( $site_data ) && is_array( $site_data ) ) {
+				// If $site_data doesn't have the keys we expected then it failed to retrieve logs.
+				if ( ! empty( $site_data ) && ! ( isset( $site_data['events'] ) && isset( $site_data['users'] ) ) ) {
 					// Search for the site data.
 					$key = array_search( $site_id, array_column( $mwp_sites, 'id' ), false );
 
@@ -570,17 +570,20 @@ final class AlertManager {
 							)
 						);
 					}
-				} elseif ( empty( $site_data ) || ! isset( $site_data->events ) ) {
+				} elseif ( empty( $site_data ) || ! isset( $site_data['events'] ) ) {
 					continue;
 				}
 
-				if ( ! is_array( $site_data ) && isset( $site_data->events ) ) {
-					$this->log_events( $site_data->events, $site_id );
+				if ( isset( $site_data['events'] ) ) {
+					$this->log_events( $site_data['events'], $site_id );
+				}
+
+				if ( isset( $site_data['users'] ) ) {
+					save_child_site_users( $site_id, $site_data['users'] );
 				}
 			}
 		}
 	}
-
 	/**
 	 * Get event objects.
 	 *

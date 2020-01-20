@@ -416,16 +416,16 @@ class AuditLogGridView extends \WP_List_Table {
 					$uhtml = '<i>' . __( 'System', 'mwp-al-ext' ) . '</i>';
 					$roles = '';
 				} elseif ( $user_data && 'System' !== $username ) {
-					$image = get_avatar( $user_data->user_email, 32 ); // Avatar.
+					$image = get_avatar( $user_data['user_email'], 32 ); // Avatar.
 
 					// Checks for display name.
-					if ( 'display_name' === $type_username && ! empty( $user_data->display_name ) ) {
-						$display_name = $user_data->display_name;
+					if ( 'display_name' === $type_username && ! empty( $user_data['display_name'] ) ) {
+						$display_name = $user_data['display_name'];
 					} elseif (
 						'first_last_name' === $type_username
-						&& ( ! empty( $user_data->first_name ) || ! empty( $user_data->last_name ) )
+						&& ( ! empty( $user_data['first_name'] ) || ! empty( $user_data['last_name'] ) )
 					) {
-						$display_name = $user_data->first_name . ' ' . $user_data->last_name;
+						$display_name = $user_data['first_name'] . ' ' . $user_data['last_name'];
 					} else {
 						$display_name = $username;
 					}
@@ -441,9 +441,9 @@ class AuditLogGridView extends \WP_List_Table {
 
 					if ( false !== $site_index && isset( $mwp_child_sites[ $site_index ] ) ) {
 						$site_url = $mwp_child_sites[ $site_index ]['url'];
-						$user_url = add_query_arg( 'user_id', $user_data->user_id, trailingslashit( $site_url ) . 'wp-admin/user-edit.php' );
+						$user_url = add_query_arg( 'user_id', $user_data['user_id'], trailingslashit( $site_url ) . 'wp-admin/user-edit.php' );
 					} else {
-						$user_url = add_query_arg( 'user_id', $user_data->ID, admin_url( 'user-edit.php' ) );
+						$user_url = add_query_arg( 'user_id', $user_data['ID'], admin_url( 'user-edit.php' ) );
 					}
 
 					// User html.
