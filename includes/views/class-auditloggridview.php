@@ -394,7 +394,7 @@ class AuditLogGridView extends \WP_List_Table {
 				if ( empty( $user_data ) ) {
 					$user_data = get_user_by( 'login', $username );
 					if ( isset( $user_data->data ) && ! empty( $user_data->data ) ) {
-						$user_data = $user_data->data;
+						$user_data = json_decode( wp_json_encode( $user_data->data ), true );
 					}
 				}
 
