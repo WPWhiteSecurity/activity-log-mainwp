@@ -577,10 +577,6 @@ final class AlertManager {
 				if ( isset( $site_data['events'] ) ) {
 					$this->log_events( $site_data['events'], $site_id );
 				}
-
-				if ( isset( $site_data['users'] ) ) {
-					save_child_site_users( $site_id, $site_data['users'] );
-				}
 			}
 		}
 	}
