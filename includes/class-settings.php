@@ -278,7 +278,7 @@ class Settings {
 		$mwp_sites    = $this->get_mwp_child_sites();
 		$activity_log = \WSAL\MainWPExtension\mwpal_extension();
 
-		if ( empty( $child_sites ) && ! is_array( $child_sites ) && ! empty( $mwp_sites ) ) {
+		if ( empty( $child_sites ) && ! empty( $mwp_sites ) ) {
 			foreach ( $mwp_sites as $site ) {
 				$post_data = array( 'action' => 'check_wsal' );
 
@@ -296,11 +296,11 @@ class Settings {
 			if ( ! empty( $results ) && is_array( $results ) ) {
 				$child_sites = array();
 
-				foreach ( $results as $site_id => $site_obj ) {
-					if ( empty( $site_obj ) ) {
+				foreach ( $results as $site_id => $site_array ) {
+					if ( empty( $site_array ) ) {
 						continue;
-					} elseif ( true === $site_obj->wsal_installed ) {
-						$child_sites[ $site_id ] = $site_obj;
+					} elseif ( true === $site_array['wsal_installed'] ) {
+						$child_sites[ $site_id ] = $site_array;
 					}
 				}
 				$this->update_option( 'wsal-child-sites', $child_sites );

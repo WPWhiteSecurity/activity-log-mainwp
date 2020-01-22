@@ -6,7 +6,7 @@ License URI: https://www.gnu.org/licenses/gpl.html
 Tags: activity log, mainwp, mainwp extension, wordpress security, wordpress security audit log, audit log, mainwp user tracking, wordpress activity log, security activity log, wordpress admin, mainwp admin, user tracking
 Requires at least: 3.6
 Tested up to: 5.3
-Stable tag: 1.4
+Stable tag: 1.4.1
 Requires PHP: 5.5
 
 See the activity logs of all child sites & MainWP in one central location - the MainWP dashboard.
@@ -120,7 +120,7 @@ Please refer to our [Support & Documentation pages](https://www.wpsecurityauditl
 
 1. The audit log viewer in the MainWP dashboard from where you can see the activity log of the MainWP network and also of all the child sites you are managing.
 2. You can filter the activity log by child site or the MainWP dashboard by using the site selector drop down menu.
-3. The WordPress activity logs in the MainWP dashboard filtered by a single child site.
+3. The alert inspector showing additional details about the activity log entry inlcuing the UserAgent. 
 4. Once you install the plugin you are greeted with a one-time setup wizard.
 5. You can use the wizard to select which child sites you'd like to add to the activity log.
 6. You can add more child sites or remove any from the central activity log in the MainWP dashboard at any time from the extension's settings.
@@ -128,6 +128,11 @@ Please refer to our [Support & Documentation pages](https://www.wpsecurityauditl
 8. By default the extension retrieves the child sites' logs every three hours, though you can configure this schedule from the extension settings.
 
 == Changelog ==
+
+= 1.4.1 (2020-01-21) =
+
+ * **Improvement**
+	* Updated the plugin to support the latest version of MainWP updates.
 
 = 1.4 (2020-01-14) =
 
