@@ -120,7 +120,7 @@ Please refer to our [Support & Documentation pages](https://www.wpsecurityauditl
 
 1. The audit log viewer in the MainWP dashboard from where you can see the activity log of the MainWP network and also of all the child sites you are managing.
 2. You can filter the activity log by child site or the MainWP dashboard by using the site selector drop down menu.
-3. The WordPress activity logs in the MainWP dashboard filtered by a single child site.
+3. The alert inspector showing additional details about the activity log entry inlcuing the UserAgent. 
 4. Once you install the plugin you are greeted with a one-time setup wizard.
 5. You can use the wizard to select which child sites you'd like to add to the activity log.
 6. You can add more child sites or remove any from the central activity log in the MainWP dashboard at any time from the extension's settings.
