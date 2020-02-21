@@ -58,7 +58,10 @@ class ConstantManager {
 		if ( defined( $name ) && constant( $name ) !== $value ) {
 			throw new Exception( 'Constant already defined with a different value.' );
 		} else {
-			define( $name, $value );
+			// if it's not already defined then define it.
+			if ( ! defined( $name ) ) {
+				define( $name, $value );
+			}
 		}
 		// Add constant to da list.
 		$this->UseConstant( $name, $description );
