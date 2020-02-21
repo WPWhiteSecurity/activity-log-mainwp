@@ -1354,16 +1354,19 @@ class View extends Abstract_View {
 						'extra_excution',
 						$post_data
 					);
-					// skip early incase of connection error.
-					if ( ! is_object( $response ) ) {
+
+					if ( is_array( $response ) && isset( $response['error'] ) ) {
 						// Some error occurred. This might be connectivity
 						// problem or it could be sites added/removed from
 						// MainWP. Skip this itteration early.
-						if ( is_array( $response ) && isset( $response['error'] ) ) {
-							MWPAL_Extension\mwpal_extension()->log( esc_html__( 'Error when refreshing child sites: ', 'mwp-al-ext' ) . $response['error'] );
-						}
+						MWPAL_Extension\mwpal_extension()->log( esc_html__( 'Error when refreshing child sites: ', 'mwp-al-ext' ) . $response['error'] );
 						continue;
+					} elseif ( is_array( $response ) && isset( $response['wsal_installed'] ) ) {
+						// wsal is installed, for back compat reasons cast the
+						// array to an object before storing.
+						$response = (object) $response;
 					}
+
 					// Check if WSAL is installed on the child site.
 					if ( true === $response->wsal_installed ) {
 						$disabled_sites[ $site_id ]                 = $response;
