@@ -1354,16 +1354,19 @@ class View extends Abstract_View {
 						'extra_excution',
 						$post_data
 					);
-					// skip early incase of connection error.
-					if ( ! is_object( $response ) ) {
+
+					if ( is_array( $response ) && isset( $response['error'] ) ) {
 						// Some error occurred. This might be connectivity
 						// problem or it could be sites added/removed from
 						// MainWP. Skip this itteration early.
-						if ( is_array( $response ) && isset( $response['error'] ) ) {
-							MWPAL_Extension\mwpal_extension()->log( esc_html__( 'Error when refreshing child sites: ', 'mwp-al-ext' ) . $response['error'] );
-						}
+						MWPAL_Extension\mwpal_extension()->log( esc_html__( 'Error when refreshing child sites: ', 'mwp-al-ext' ) . $response['error'] );
 						continue;
+					} elseif ( is_array( $response ) && isset( $response['wsal_installed'] ) ) {
+						// wsal is installed, for back compat reasons cast the
+						// array to an object before storing.
+						$response = (object) $response;
 					}
+
 					// Check if WSAL is installed on the child site.
 					if ( true === $response->wsal_installed ) {
 						$disabled_sites[ $site_id ]                 = $response;
@@ -1418,8 +1421,7 @@ class View extends Abstract_View {
 					if ( false !== $key ) {
 						// get wsal status from the remote site.
 						$site_status = $this->check_remote_wsal_status( (int) $site );
-						if ( is_a( $site_status, 'stdClass' ) ) {
-
+						if ( ! isset( $site_status->error ) ) {
 							unset( $active_sites[ $key ] );
 							// remove from the active sites list.
 							MWPAL_Extension\mwpal_extension()->settings->set_wsal_child_sites( $active_sites );
@@ -1438,9 +1440,10 @@ class View extends Abstract_View {
 					$key = array_search( $site, $active_sites, true );
 					if ( false === $key ) {
 						$site_status = $this->check_remote_wsal_status( (int) $site );
-						if ( is_a( $site_status, 'stdClass' ) ) {
-
-							$active_sites[] = $site;
+						if ( ! isset( $site_status->error ) && ( isset( $site_status->wsal_installed ) && $site_status->wsal_installed ) ) {
+							if ( ! in_array( $site, $active_sites, true ) ) {
+								$active_sites[] = $site;
+							}
 							MWPAL_Extension\mwpal_extension()->settings->set_wsal_child_sites( $active_sites );
 						}
 					}
@@ -1634,7 +1637,8 @@ class View extends Abstract_View {
 		$post_data = array( 'action' => 'check_wsal' );
 
 		// Call to child site to check if WSAL is installed or not.
-		$response = apply_filters(
+		// NOTE: cast to an object for back compat before possible storing.
+		$response = (object) apply_filters(
 			'mainwp_fetchurlauthed',
 			MWPAL_Extension\mwpal_extension()->get_child_file(),
 			MWPAL_Extension\mwpal_extension()->get_child_key(),
