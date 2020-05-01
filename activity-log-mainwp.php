@@ -397,8 +397,7 @@ class Activity_Log {
 
 		// Plugin Extension Name.
 		if ( ! defined( 'MWPAL_EXTENSION_NAME' ) ) {
-			$filename = str_replace( trailingslashit( WP_PLUGIN_DIR ), '', MWPAL_BASE_DIR );
-			$filename = untrailingslashit( $filename );
+			$filename = preg_replace( '#\/[^/]*$#', '', MWPAL_BASE_NAME );
 			$filename = str_replace( '-', ' ', $filename );
 			$filename = ucwords( $filename );
 			$filename = str_replace( ' ', '-', $filename );
@@ -436,7 +435,7 @@ class Activity_Log {
 			if ( ! $this->settings->get_option( 'setup-complete' ) ) {
 				$redirect_url = add_query_arg( 'page', 'activity-log-mainwp-setup', admin_url( 'admin.php' ) );
 			} else {
-				$redirect_url = add_query_arg( 'page', MWPAL_EXTENSION_NAME, admin_url( 'index.php' ) );
+				$redirect_url = add_query_arg( 'page', MWPAL_EXTENSION_NAME, admin_url( 'admin.php' ) );
 			}
 		}
 
