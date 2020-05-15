@@ -10,8 +10,6 @@
 
 namespace WSAL\MainWPExtension\Views;
 
-use \WSAL\MainWPExtension\Activity_Log as Activity_Log;
-
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;

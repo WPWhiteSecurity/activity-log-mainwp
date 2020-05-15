@@ -10,7 +10,7 @@
 
 namespace WSAL\MainWPExtension\Sensors;
 
-use \WSAL\MainWPExtension\Activity_Log as Activity_Log;
+use \WSAL\MainWPExtension as MWPAL_Extension;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -95,11 +95,14 @@ class Sensor_MainWP extends Abstract_Sensor {
 		if ( empty( $user ) ) {
 			$user = get_user_by( 'login', $user_login );
 		}
-		$user_roles = $this->activity_log->settings->get_current_user_roles( $user->roles );
-		if ( $this->activity_log->settings->is_login_super_admin( $user_login ) ) {
+
+		$user_roles = MWPAL_Extension\mwpal_extension()->settings->get_current_user_roles( $user->roles );
+
+		if ( MWPAL_Extension\mwpal_extension()->settings->is_login_super_admin( $user_login ) ) {
 			$user_roles[] = 'superadmin';
 		}
-		$this->activity_log->alerts->trigger(
+
+		MWPAL_Extension\mwpal_extension()->alerts->trigger(
 			1000,
 			array(
 				'mainwp_dash'      => true,
@@ -114,12 +117,12 @@ class Sensor_MainWP extends Abstract_Sensor {
 	 */
 	public function event_logout() {
 		if ( 0 !== $this->current_user->ID ) {
-			$this->activity_log->alerts->Trigger(
+			MWPAL_Extension\mwpal_extension()->alerts->Trigger(
 				1001,
 				array(
 					'mainwp_dash'      => true,
 					'CurrentUserID'    => $this->current_user->ID,
-					'CurrentUserRoles' => $this->activity_log->settings->get_current_user_roles( $this->current_user->roles ),
+					'CurrentUserRoles' => MWPAL_Extension\mwpal_extension()->settings->get_current_user_roles( $this->current_user->roles ),
 				)
 			);
 		}
@@ -138,13 +141,13 @@ class Sensor_MainWP extends Abstract_Sensor {
 		}
 
 		// Get MainWP child sites.
-		$mwp_sites = $this->activity_log->settings->get_mwp_child_sites();
+		$mwp_sites = MWPAL_Extension\mwpal_extension()->settings->get_mwp_child_sites();
 
 		// Search for the site data.
 		$key = array_search( $new_site_id, array_column( $mwp_sites, 'id' ), false );
 
 		if ( false !== $key && isset( $mwp_sites[ $key ] ) ) {
-			$this->activity_log->alerts->trigger(
+			MWPAL_Extension\mwpal_extension()->alerts->trigger(
 				7700,
 				array(
 					'friendly_name' => $mwp_sites[ $key ]['name'],
@@ -164,13 +167,12 @@ class Sensor_MainWP extends Abstract_Sensor {
 	 * @param stdClass $website – Removed website.
 	 */
 	public function site_removed( $website ) {
-		// Return if empty.
 		if ( empty( $website ) ) {
 			return;
 		}
 
 		if ( isset( $website->name ) ) {
-			$this->activity_log->alerts->trigger(
+			MWPAL_Extension\mwpal_extension()->alerts->trigger(
 				7701,
 				array(
 					'friendly_name' => $website->name,
@@ -195,13 +197,13 @@ class Sensor_MainWP extends Abstract_Sensor {
 		}
 
 		// Get MainWP child sites.
-		$mwp_sites = $this->activity_log->settings->get_mwp_child_sites();
+		$mwp_sites = MWPAL_Extension\mwpal_extension()->settings->get_mwp_child_sites();
 
 		// Search for the site data.
 		$key = array_search( $site_id, array_column( $mwp_sites, 'id' ), false );
 
 		if ( false !== $key && isset( $mwp_sites[ $key ] ) ) {
-			$this->activity_log->alerts->trigger(
+			MWPAL_Extension\mwpal_extension()->alerts->trigger(
 				7702,
 				array(
 					'friendly_name' => $mwp_sites[ $key ]['name'],
@@ -221,7 +223,6 @@ class Sensor_MainWP extends Abstract_Sensor {
 	 * @param stdClass $website – Removed website.
 	 */
 	public function site_synced( $website ) {
-		// Return if empty.
 		if ( empty( $website ) ) {
 			return;
 		}
@@ -235,7 +236,7 @@ class Sensor_MainWP extends Abstract_Sensor {
 		}
 
 		if ( isset( $website->name ) ) {
-			$this->activity_log->alerts->trigger(
+			MWPAL_Extension\mwpal_extension()->alerts->trigger(
 				7703,
 				array(
 					'friendly_name' => $website->name,
@@ -261,12 +262,12 @@ class Sensor_MainWP extends Abstract_Sensor {
 			return;
 		}
 
-		if ( $this->activity_log->settings->is_events_global_sync() ) {
-			$this->activity_log->alerts->retrieve_events_manually();
+		if ( MWPAL_Extension\mwpal_extension()->settings->is_events_global_sync() ) {
+			MWPAL_Extension\mwpal_extension()->alerts->retrieve_events_manually();
 		}
 
 		// Trigger global sync event.
-		$this->activity_log->alerts->trigger( 7704, array( 'mainwp_dash' => true ) );
+		MWPAL_Extension\mwpal_extension()->alerts->trigger( 7704, array( 'mainwp_dash' => true ) );
 	}
 
 	/**
@@ -302,7 +303,7 @@ class Sensor_MainWP extends Abstract_Sensor {
 	public function extension_menu_edited( $slug, $action ) {
 		// Check if the slug is not empty and it is active.
 		if ( ! empty( $slug ) && \is_plugin_active( $slug ) ) {
-			$this->activity_log->alerts->trigger(
+			MWPAL_Extension\mwpal_extension()->alerts->trigger(
 				7709,
 				array(
 					'mainwp_dash' => true,
@@ -339,10 +340,6 @@ class Sensor_MainWP extends Abstract_Sensor {
 	 * @param string $extension – Name of extension.
 	 */
 	private function extension_log_event( $event = 0, $extension ) {
-		if ( ! \WSAL\MainWPExtension\mwpal_extension()->is_mainwp_active() ) {
-			return;
-		}
-
 		$extension_dir = explode( '/', $extension );
 		$extension_dir = isset( $extension_dir[0] ) ? $extension_dir[0] : false;
 
@@ -391,7 +388,7 @@ class Sensor_MainWP extends Abstract_Sensor {
 			}
 
 			// Log the event.
-			$this->activity_log->alerts->trigger( $event, $event_data );
+			MWPAL_Extension\mwpal_extension()->alerts->trigger( $event, $event_data );
 		}
 	}
 
@@ -503,11 +500,11 @@ class Sensor_MainWP extends Abstract_Sensor {
 	public function report_aum_monitor_event( $event_id, $site_url ) {
 		if ( ! empty( $event_id ) && ! empty( $site_url ) ) {
 			// Search for site in MainWP sites.
-			$site = $this->activity_log->settings->get_mwp_site_by( 'url', $site_url );
+			$site = MWPAL_Extension\mwpal_extension()->settings->get_mwp_site_by( 'url', $site_url );
 
 			// If site is found then report it as MainWP child site.
 			if ( false !== $site ) {
-				$this->activity_log->alerts->trigger(
+				MWPAL_Extension\mwpal_extension()->alerts->trigger(
 					$event_id,
 					array(
 						'friendly_name' => $site['name'],
@@ -518,7 +515,7 @@ class Sensor_MainWP extends Abstract_Sensor {
 				);
 			} else {
 				// Else report as other site.
-				$this->activity_log->alerts->trigger(
+				MWPAL_Extension\mwpal_extension()->alerts->trigger(
 					$event_id,
 					array(
 						'friendly_name' => $site_url,
@@ -534,6 +531,6 @@ class Sensor_MainWP extends Abstract_Sensor {
 	 * Report Advanced Uptime Monitor Auto Add Sites.
 	 */
 	public function aum_monitor_auto_add() {
-		$this->activity_log->alerts->trigger( 7754, array( 'mainwp_dash' => true ) );
+		MWPAL_Extension\mwpal_extension()->alerts->trigger( 7754, array( 'mainwp_dash' => true ) );
 	}
 }

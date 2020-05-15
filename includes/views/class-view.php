@@ -98,6 +98,7 @@ class View extends Abstract_View {
 		add_action( 'wp_ajax_update_active_wsal_sites', array( $this, 'update_active_wsal_sites' ) );
 		add_action( 'wp_ajax_retrieve_events_manually', array( $this, 'retrieve_events_manually' ) );
 		add_action( 'wp_ajax_mwpal_advert_dismissed', array( $this, 'mwpal_advert_dismissed' ) );
+		add_action( 'wp_ajax_mwpal_user_notice_dismissed', array( $this, 'user_notice_dismissed' ) );
 		add_action( 'wp_ajax_mwpal_purge_logs', array( $this, 'purge_logs' ) );
 		add_action( 'admin_footer', array( $this, 'mwpal_extensions_print_scripts' ) );
 		if ( MWPAL_Extension\mwpal_extension()->settings->is_infinite_scroll() ) {
@@ -894,7 +895,7 @@ class View extends Abstract_View {
 						<div class="inside">
 							<table class="form-table">
 								<tr>
-									<th><label for="events-pruning"><?php esc_html_e( 'MainWP Network Activity Log Events Pruning', 'mwp-al-ext' ); ?></label></th>
+									<th><label for="events-pruning"><?php esc_html_e( 'MainWP network activity logs retention policy', 'mwp-al-ext' ); ?></label></th>
 									<td>
 										<fieldset>
 											<?php
@@ -904,7 +905,7 @@ class View extends Abstract_View {
 											<label for="pruning-enabled">
 												<input type="radio" name="events-pruning" id="pruning-enabled" value="enabled" style="margin-top:-2px" <?php checked( $events_pruning ); ?>>
 												<span>
-													<?php esc_html_e( 'Prune events older than:', 'mwp-al-ext' ); ?>
+													<?php esc_html_e( 'Delete events older than:', 'mwp-al-ext' ); ?>
 													<input type="number" name="events-pruning-date" value="<?php echo esc_html( $pruning_date->date ); ?>">
 													<select name="events-pruning-unit" style="margin-top: -2px;">
 														<option value="months" <?php selected( $pruning_date->unit, 'months' ); ?>><?php esc_html_e( 'Months', 'mwp-al-ext' ); ?></option>
@@ -915,21 +916,31 @@ class View extends Abstract_View {
 											<br>
 											<label for="pruning-disabled">
 												<input type="radio" name="events-pruning" id="pruning-disabled" value="disabled" style="margin-top:-2px" <?php checked( $events_pruning, false ); ?>>
-												<span><?php esc_html_e( 'Do not prune any events', 'mwp-al-ext' ); ?></span>
+												<span><?php esc_html_e( 'Do not delete any events.', 'mwp-al-ext' ); ?></span>
 											</label>
 										</fieldset>
 									</td>
 								</tr>
 								<tr>
-									<th><label for="purge-trigger"><?php esc_html_e( 'Purge the activity log data stored in the MainWP dashboard', 'mwp-al-ext' ); ?></label></th>
+									<th><label for="purge-trigger"><?php esc_html_e( 'Delete the activity log data stored in the MainWP database', 'mwp-al-ext' ); ?></label></th>
 									<td>
 										<fieldset>
 											<label for="pruning-enabled">
-												<input type="button" class="button-primary" name="events-pruning-now" id="purge-trigger" value="<?php esc_html_e( 'Purge activity log data', 'mwp-al-ext' ); ?>">
+												<input type="button" class="button-primary" name="events-pruning-now" id="purge-trigger" value="<?php esc_html_e( 'Delete activity log', 'mwp-al-ext' ); ?>">
 											</label>
 										</fieldset>
 									</td>
 								</tr>
+
+								<div id="log-purged-popup" class="ui modal">
+								  <div class="content">
+								    <p><?php esc_html_e( 'Activity log data has been purged.', 'mwp-al-ext' ); ?></p>
+								  </div>
+								  <div class="actions">
+								    <div class="ui button close-log-purged-popup"><?php esc_html_e( 'OK', 'mwp-al-ext' ); ?></div>
+								  </div>
+								</div>
+
 							</table>
 						</div>
 					</div>
@@ -1296,6 +1307,9 @@ class View extends Abstract_View {
 			$run_id = ( isset( $_POST['mwpal_run_id'] ) ) ? filter_var( wp_unslash( $_POST['mwpal_run_id'] ), FILTER_SANITIZE_STRING ) : uniqid();
 			$forced = ( isset( $_POST['mwpal_forced'] ) ) ? filter_var( wp_unslash( $_POST['mwpal_forced'] ), FILTER_VALIDATE_BOOLEAN ) : false;
 
+			// Clear list of disabled sites.
+			MWPAL_Extension\mwpal_extension()->settings->update_option( 'disabled-wsal-sites', '' );
+
 			/*
 			 * Check transient to see if we are in the middle of a run.
 			 */
@@ -1367,8 +1381,11 @@ class View extends Abstract_View {
 						$response = (object) $response;
 					}
 
+					// Cast reponse to an araay to avoid incomplete object PHP error.
+					$response = (array) $response;
+
 					// Check if WSAL is installed on the child site.
-					if ( true === $response->wsal_installed ) {
+					if ( isset( $response['wsal_installed'] ) && true === $response['wsal_installed'] ) {
 						$disabled_sites[ $site_id ]                 = $response;
 						$running_flag['disabled_sites'][ $site_id ] = $response;
 					}
@@ -1439,8 +1456,8 @@ class View extends Abstract_View {
 				foreach ( $request_sites as $site ) {
 					$key = array_search( $site, $active_sites, true );
 					if ( false === $key ) {
-						$site_status = $this->check_remote_wsal_status( (int) $site );
-						if ( ! isset( $site_status->error ) && ( isset( $site_status->wsal_installed ) && $site_status->wsal_installed ) ) {
+						$site_status = (array) $this->check_remote_wsal_status( (int) $site );
+						if ( ! isset( $site_status['error'] ) && ( isset( $site_status['wsal_installed'] ) && $site_status['wsal_installed'] ) ) {
 							if ( ! in_array( $site, $active_sites, true ) ) {
 								$active_sites[] = $site;
 							}
@@ -1583,6 +1600,12 @@ class View extends Abstract_View {
 		if ( 'Extensions' !== $page ) {
 			return;
 		}
+
+		// if this is the premium plugin then bail early to stop the button for
+		// 'Upgrade to Premium' showing on the extensiton.
+		if ( function_exists( 'almainwp_fs' ) && almainwp_fs()->is__premium_only() ) {
+			return;
+		}
 		?>
 		<script>
 			jQuery( document ).ready( function( $ ) {
@@ -1616,6 +1639,47 @@ class View extends Abstract_View {
 			)
 		);
 		die();
+	}
+
+	/**
+	 * Dismiss a user level notice. Stores a user meta value with the data.
+	 *
+	 * @since  1.4.0
+	 * @return void
+	 */
+	public function user_notice_dismissed() {
+		// Verify mwp nonce.
+		check_ajax_referer( 'search-script-nonce', 'nonce' );
+
+		$dissmissed_notice = false;
+		$notice_type       = filter_input( INPUT_POST, 'notice', FILTER_SANITIZE_STRING );
+		if ( null !== $notice_type && false !== $notice_type && in_array( $notice_type, $this->get_allowed_notices(), true ) ) {
+			$dissmissed_notice = update_user_meta( get_current_user_id(), "mwpal-is-notice-dismissed-{$notice_type}", true );
+		}
+
+		// Send ajax response.
+		wp_send_json(
+			array(
+				'status' => $dissmissed_notice,
+			)
+		);
+		die();
+	}
+
+	/**
+	 * Gets a list of allowed notice types.
+	 *
+	 * @method get_allowed_notices
+	 * @since  1.4.0
+	 * @return array
+	 */
+	public function get_allowed_notices() {
+		return (array) apply_filters(
+			'mwp_allowed_notices',
+			array(
+				'search-filters-changed',
+			)
+		);
 	}
 
 	/**

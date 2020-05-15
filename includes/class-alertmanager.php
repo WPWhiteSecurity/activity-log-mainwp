@@ -577,9 +577,14 @@ final class AlertManager {
 				if ( isset( $site_data['events'] ) ) {
 					$this->log_events( $site_data['events'], $site_id );
 				}
+
+				if ( isset( $site_data['users'] ) ) {
+					save_child_site_users( $site_id, $site_data['users'] );
+				}
 			}
 		}
 	}
+
 	/**
 	 * Get event objects.
 	 *
@@ -587,32 +592,41 @@ final class AlertManager {
 	 */
 	public function get_event_objects_data() {
 		$objects = array(
-			'user'                => __( 'User', 'mwp-al-ext' ),
-			'system'              => __( 'System', 'mwp-al-ext' ),
-			'plugin'              => __( 'Plugin', 'mwp-al-ext' ),
-			'database'            => __( 'Database', 'mwp-al-ext' ),
-			'post'                => __( 'Post', 'mwp-al-ext' ),
-			'file'                => __( 'File', 'mwp-al-ext' ),
-			'tag'                 => __( 'Tag', 'mwp-al-ext' ),
-			'comment'             => __( 'Comment', 'mwp-al-ext' ),
-			'setting'             => __( 'Setting', 'mwp-al-ext' ),
-			'file'                => __( 'File', 'mwp-al-ext' ),
-			'system-setting'      => __( 'System Setting', 'mwp-al-ext' ),
-			'bbpress'             => __( 'BBPress', 'mwp-al-ext' ),
-			'bbpress-forum'       => __( 'BBPress Forum', 'mwp-al-ext' ),
-			'woocommerce-product' => __( 'WooCommerce Product', 'mwp-al-ext' ),
-			'woocommerce-store'   => __( 'WooCommerce Store', 'mwp-al-ext' ),
-			'mainwp-network'      => __( 'MainWP Network', 'mwp-al-ext' ),
-			'mainwp'              => __( 'MainWP', 'mwp-al-ext' ),
-			'yoast-seo'           => __( 'Yoast SEO', 'mwp-al-ext' ),
-			'category'            => __( 'Category', 'mwp-al-ext' ),
-			'custom-field'        => __( 'Custom Field', 'mwp-al-ext' ),
-			'widget'              => __( 'Widget', 'mwp-al-ext' ),
-			'menu'                => __( 'Menu', 'mwp-al-ext' ),
-			'theme'               => __( 'Theme', 'mwp-al-ext' ),
-			'activity-logs'       => __( 'Activity Logs', 'mwp-al-ext' ),
-			'multisite-network'   => __( 'Multisite Network', 'mwp-al-ext' ),
-			'ip-address'          => __( 'IP Address', 'mwp-al-ext' ),
+			'user'                  => __( 'User', 'mwp-al-ext' ),
+			'system'                => __( 'System', 'mwp-al-ext' ),
+			'plugin'                => __( 'Plugin', 'mwp-al-ext' ),
+			'database'              => __( 'Database', 'mwp-al-ext' ),
+			'post'                  => __( 'Post', 'mwp-al-ext' ),
+			'file'                  => __( 'File', 'mwp-al-ext' ),
+			'tag'                   => __( 'Tag', 'mwp-al-ext' ),
+			'comment'               => __( 'Comment', 'mwp-al-ext' ),
+			'setting'               => __( 'Setting', 'mwp-al-ext' ),
+			'file'                  => __( 'File', 'mwp-al-ext' ),
+			'system-setting'        => __( 'System Setting', 'mwp-al-ext' ),
+			'woocommerce-product'   => __( 'WooCommerce Product', 'mwp-al-ext' ),
+			'woocommerce-store'     => __( 'WooCommerce Store', 'mwp-al-ext' ),
+			'woocommerce-coupon'    => __( 'WooCommerce Coupon', 'mwp-al-ext' ),
+			'woocommerce-category'  => __( 'WooCommerce Category', 'mwp-al-ext' ),
+			'woocommerce-order'     => __( 'WooCommerce Order', 'mwp-al-ext' ),
+			'woocommerce-tag'       => __( 'WooCommerce Tag', 'mwp-al-ext' ),
+			'mainwp-network'        => __( 'MainWP Network', 'mwp-al-ext' ),
+			'mainwp'                => __( 'MainWP', 'mwp-al-ext' ),
+			'yoast-seo'             => __( 'Yoast SEO', 'mwp-al-ext' ),
+			'yoast-seo-metabox'     => __( 'Yoast SEO Meta Box', 'mwp-al-ext' ),
+			'category'              => __( 'Category', 'mwp-al-ext' ),
+			'custom-field'          => __( 'Custom Field', 'mwp-al-ext' ),
+			'widget'                => __( 'Widget', 'mwp-al-ext' ),
+			'menu'                  => __( 'Menu', 'mwp-al-ext' ),
+			'theme'                 => __( 'Theme', 'mwp-al-ext' ),
+			'activity-logs'         => __( 'Activity Logs', 'mwp-al-ext' ),
+			'multisite-network'     => __( 'Multisite Network', 'mwp-al-ext' ),
+			'ip-address'            => __( 'IP Address', 'mwp-al-ext' ),
+			'wpforms'               => __( 'WPForms', 'mwp-al-ext' ),
+			'wpforms-notifications' => __( 'Notifications in WPForms', 'mwp-al-ext' ),
+			'wpforms-entries'       => __( 'Entries in WPForms', 'mwp-al-ext' ),
+			'wpforms-fields'        => __( 'Fields in WPForms', 'mwp-al-ext' ),
+			'bbpress'               => __( 'BBPress', 'mwp-al-ext' ),
+			'bbpress-forum'         => __( 'BBPress Forum', 'mwp-al-ext' ),
 		);
 		// add the MainWP items.
 		array_merge(
@@ -688,6 +702,18 @@ final class AlertManager {
 			case 'woocommerce-store':
 				$display = __( 'WooCommerce Store', 'mwp-al-ext' );
 				break;
+			case 'woocommerce-coupon':
+				$display = __( 'WooCommerce Coupon', 'mwp-al-ext' );
+				break;
+			case 'woocommerce-category':
+				$display = __( 'WooCommerce Category', 'mwp-al-ext' );
+				break;
+			case 'woocommerce-order':
+				$display = __( 'WooCommerce Order', 'mwp-al-ext' );
+				break;
+			case 'woocommerce-tag':
+				$display = __( 'WooCommerce Tag', 'mwp-al-ext' );
+				break;
 			case 'mainwp-network':
 				$display = __( 'MainWP Network', 'mwp-al-ext' );
 				break;
@@ -696,6 +722,9 @@ final class AlertManager {
 				break;
 			case 'yoast-seo':
 				$display = __( 'Yoast SEO', 'mwp-al-ext' );
+				break;
+			case 'yoast-seo-metabox':
+				$display = __( 'Yoast SEO Meta box', 'mwp-al-ext' );
 				break;
 			case 'category':
 				$display = __( 'Category', 'mwp-al-ext' );
@@ -739,6 +768,27 @@ final class AlertManager {
 			case 'mainwp':
 				$display = __( 'MainWP', 'mwp-al-ext' );
 				break;
+			case 'wpforms':
+				$display = esc_html__( 'Forms in WPForms', 'mwp-al-ext' );
+				break;
+			case 'wpforms-notifications':
+				$display = esc_html__( 'Notifications in WPForms', 'mwp-al-ext' );
+				break;
+			case 'wpforms_notifications':
+				$display = esc_html__( 'Notifications in WPForms', 'mwp-al-ext' );
+				break;
+			case 'wpforms-entries':
+				$display = esc_html__( 'Entries in WPForms', 'mwp-al-ext' );
+				break;
+			case 'wpforms_entries':
+				$display = esc_html__( 'Entries in WPForms', 'mwp-al-ext' );
+				break;
+			case 'wpforms-fields':
+				$display = esc_html__( 'Fields in WPForms', 'mwp-al-ext' );
+				break;
+			case 'wpforms_fields':
+				$display = esc_html__( 'Fields in WPForms', 'mwp-al-ext' );
+				break;
 			default:
 				break;
 		}
@@ -779,9 +829,11 @@ final class AlertManager {
 			'stopped'      => __( 'Stopped', 'mwp-al-ext' ),
 			'removed'      => __( 'Removed', 'mwp-al-ext' ),
 			'unblocked'    => __( 'Unblocked', 'mwp-al-ext' ),
+			'renamed'      => __( 'Renamed', 'mwp-al-ext' ),
+			'duplicated'   => __( 'Duplicated', 'mwp-al-ext' ),
 		);
 		// add the MainWP items.
-		array_merge(
+		$types = array_merge(
 			$types,
 			array(
 				'synced'   => __( 'Synced', 'mwp-al-ext' ),

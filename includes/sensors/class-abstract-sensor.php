@@ -10,7 +10,7 @@
 
 namespace WSAL\MainWPExtension\Sensors;
 
-use \WSAL\MainWPExtension\Activity_Log as Activity_Log;
+use \WSAL\MainWPExtension as MWPAL_Extension;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -21,22 +21,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Abstract sensor class of the extension.
  */
 abstract class Abstract_Sensor {
-
-	/**
-	 * Instance of main plugin class.
-	 *
-	 * @var \WSAL\MainWPExtension\Activity_Log
-	 */
-	public $activity_log;
-
-	/**
-	 * Constructor.
-	 *
-	 * @param Activity_Log $activity_log – Instance of main class.
-	 */
-	public function __construct( Activity_Log $activity_log ) {
-		$this->activity_log = $activity_log;
-	}
 
 	/**
 	 * Method: Hook events related to sensor.
@@ -51,8 +35,9 @@ abstract class Abstract_Sensor {
 	 * @param mix    $args    - Message arguments.
 	 */
 	protected function log( $type, $message, $args ) {
-		$this->activity_log->alerts->trigger(
-			$type, array(
+		MWPAL_Extension\mwpal_extension()->alerts->trigger(
+			$type,
+			array(
 				'Message' => $message,
 				'Context' => $args,
 				'Trace'   => debug_backtrace(),

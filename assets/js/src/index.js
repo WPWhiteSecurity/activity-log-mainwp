@@ -311,8 +311,13 @@ jQuery( document ).ready( function() {
 		} )
 		.success( function( msg ) {
 			console.log( msg );
+			jQuery("#log-purged-popup").modal( 'show' );
 			jQuery( pruneButton ).attr("disabled", false);
 		} );
+	} );
+
+	jQuery( '.close-log-purged-popup' ).on( 'click', {}, function() {
+		jQuery("#log-purged-popup").modal( 'hide' );
 	} );
 
 });

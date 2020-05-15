@@ -477,21 +477,19 @@ class ActiveRecord implements ActiveRecordInterface {
 	/**
 	 * Function used in WSAL reporting extension.
 	 *
-	 * @param int       $_site_id - Site ID.
-	 * @param int       $_user_id - User ID.
-	 * @param string    $_role_name - User role.
-	 * @param int       $_alert_code - Alert code.
-	 * @param timestamp $_start_timestamp - From created_on.
-	 * @param timestamp $_end_timestamp - To created_on.
-	 * @param timestamp $_next_date - (Optional) Created on >.
-	 * @param int       $_limit - (Optional) Limit.
-	 * @param string    $_post_types - (Optional) Post types.
-	 * @param string    $_post_statuses - (Optional) Post statuses.
+	 * @param int    $_site_id         - Site ID.
+	 * @param int    $_user_id         - User ID.
+	 * @param string $_role_name       - User role.
+	 * @param int    $_alert_code      - Alert code.
+	 * @param string $_start_timestamp - From created_on.
+	 * @param string $_end_timestamp   - To created_on.
+	 * @param string $_next_date       - (Optional) Created on >.
+	 * @param int    $_limit           - (Optional) Limit.
+	 * @param int    $usernames        - (Optional) Usernames.
 	 * @return array Report results
 	 */
-	public function GetReporting( $_site_id, $_user_id, $_role_name, $_alert_code, $_start_timestamp, $_end_timestamp, $_next_date = null, $_limit = 0, $_post_types = '', $_post_statuses = '' ) {
+	public function GetReporting( $_site_id, $_user_id, $_role_name, $_alert_code, $_start_timestamp, $_end_timestamp, $_next_date = null, $_limit = 0, $usernames = 'null' ) {
 		global $wpdb;
-		$user_names = $this->GetUserNames( $_user_id );
 
 		$_wpdb = $this->connection;
 		$_wpdb->set_charset( $_wpdb->dbh, 'utf8mb4', 'utf8mb4_general_ci' );
@@ -504,99 +502,47 @@ class ActiveRecord implements ActiveRecordInterface {
 
 		$condition_date = ! empty( $_next_date ) ? ' AND occ.created_on < ' . $_next_date : '';
 
-		if ( 'null' === $_post_types && 'null' === $_post_statuses ) {
-			$sql = "SELECT DISTINCT
-				occ.id,
-				occ.alert_id,
-				occ.site_id,
-				occ.created_on,
-				replace(replace(replace((SELECT t1.value FROM $table_meta AS t1 WHERE t1.name = 'CurrentUserRoles' AND t1.occurrence_id = occ.id LIMIT 1), '[', ''), ']', ''), '\\'', '') AS roles,
-				(SELECT replace(t2.value, '\"','') FROM $table_meta as t2 WHERE t2.name = 'ClientIP' AND t2.occurrence_id = occ.id LIMIT 1) AS ip,
-				(SELECT replace(t3.value, '\"', '') FROM $table_meta as t3 WHERE t3.name = 'UserAgent' AND t3.occurrence_id = occ.id LIMIT 1) AS ua,
-				COALESCE(
-					(SELECT replace(t4.value, '\"', '') FROM $table_meta as t4 WHERE t4.name = 'Username' AND t4.occurrence_id = occ.id LIMIT 1),
-					(SELECT replace(t5.value, '\"', '') FROM $table_meta as t5 WHERE t5.name = 'CurrentUserID' AND t5.occurrence_id = occ.id LIMIT 1)
-				) as user_id
-				FROM $table_occ AS occ
-				JOIN $table_meta AS meta ON meta.occurrence_id = occ.id
-				WHERE
-					(@siteId is NULL OR find_in_set(occ.site_id, @siteId) > 0)
-					AND (
-						@userId is NULL
-						OR (
-							(meta.name = 'CurrentUserID' AND find_in_set(meta.value, @userId) > 0)
-							OR
-							(meta.name = 'Username' AND replace(meta.value, '\"', '') IN ($user_names))
-						)
-					)
-					AND (
-						@roleName is NULL
-						OR (
-							meta.name = 'CurrentUserRoles'
-							AND
-							replace(replace(replace(meta.value, ']', ''), '[', ''), '\\'', '') REGEXP @roleName
-						)
-					)
-					AND (@alertCode is NULL OR find_in_set(occ.alert_id, @alertCode) > 0)
-					AND (@startTimestamp is NULL OR occ.created_on >= @startTimestamp)
-					AND (@endTimestamp is NULL OR occ.created_on <= @endTimestamp)
-					{$condition_date}
-				ORDER BY
-					created_on DESC
-			";
-		} else {
-			$sql = "SELECT
-				occ.id,
-				occ.alert_id,
-				occ.site_id,
-				occ.created_on,
-				replace(replace(replace((SELECT t1.value FROM $table_meta AS t1 WHERE t1.name = 'CurrentUserRoles' AND t1.occurrence_id = occ.id LIMIT 1), '[', ''), ']', ''), '\\'', '') AS roles,
-				(SELECT replace(t2.value, '\"','') FROM $table_meta as t2 WHERE t2.name = 'ClientIP' AND t2.occurrence_id = occ.id LIMIT 1) AS ip,
-				(SELECT replace(t3.value, '\"', '') FROM $table_meta as t3 WHERE t3.name = 'UserAgent' AND t3.occurrence_id = occ.id LIMIT 1) AS ua,
-				COALESCE(
-					(SELECT replace(t4.value, '\"', '') FROM $table_meta as t4 WHERE t4.name = 'Username' AND t4.occurrence_id = occ.id LIMIT 1),
-					(SELECT replace(t5.value, '\"', '') FROM $table_meta as t5 WHERE t5.name = 'CurrentUserID' AND t5.occurrence_id = occ.id LIMIT 1)
-				) as user_id
-			FROM
-				$table_occ as occ
+		$sql = "SELECT DISTINCT
+			occ.id,
+			occ.alert_id,
+			occ.site_id,
+			occ.created_on,
+			replace(replace(replace((SELECT t1.value FROM $table_meta AS t1 WHERE t1.name = 'CurrentUserRoles' AND t1.occurrence_id = occ.id LIMIT 1), '[', ''), ']', ''), '\\'', '') AS roles,
+			(SELECT replace(t2.value, '\"','') FROM $table_meta as t2 WHERE t2.name = 'ClientIP' AND t2.occurrence_id = occ.id LIMIT 1) AS ip,
+			(SELECT replace(t3.value, '\"', '') FROM $table_meta as t3 WHERE t3.name = 'UserAgent' AND t3.occurrence_id = occ.id LIMIT 1) AS ua,
+			COALESCE(
+				(SELECT replace(t4.value, '\"', '') FROM $table_meta as t4 WHERE t4.name = 'Username' AND t4.occurrence_id = occ.id LIMIT 1),
+				(SELECT replace(t5.value, '\"', '') FROM $table_meta as t5 WHERE t5.name = 'CurrentUserID' AND t5.occurrence_id = occ.id LIMIT 1)
+			) as user_id
+			FROM $table_occ AS occ
+			JOIN $table_meta AS meta ON meta.occurrence_id = occ.id
 			WHERE
 				(@siteId is NULL OR find_in_set(occ.site_id, @siteId) > 0)
 				AND (
 					@userId is NULL
 					OR (
-						EXISTS(SELECT 1 FROM $table_meta as meta WHERE meta.occurrence_id = occ.id AND meta.name='CurrentUserID' AND find_in_set(meta.value, @userId) > 0)
+						(meta.name = 'CurrentUserID' AND find_in_set(meta.value, @userId) > 0)
 						OR
-						EXISTS(SELECT 1 FROM $table_meta as meta WHERE meta.occurrence_id = occ.id AND meta.name='Username' AND replace(meta.value, '\"', '') IN ($user_names))
+						(meta.name = 'Username' AND replace(meta.value, '\"', '') IN ($usernames))
 					)
 				)
 				AND (
 					@roleName is NULL
-					OR
-					EXISTS(SELECT 1 FROM $table_meta as meta WHERE meta.occurrence_id = occ.id AND meta.name='CurrentUserRoles' AND replace(replace(replace(meta.value, ']', ''), '[', ''), '\\'', '') REGEXP @roleName)
+					OR (
+						meta.name = 'CurrentUserRoles'
+						AND
+						replace(replace(replace(meta.value, ']', ''), '[', ''), '\\'', '') REGEXP @roleName
+					)
 				)
 				AND (@alertCode is NULL OR find_in_set(occ.alert_id, @alertCode) > 0)
 				AND (@startTimestamp is NULL OR occ.created_on >= @startTimestamp)
 				AND (@endTimestamp is NULL OR occ.created_on <= @endTimestamp)
-				AND (
-					@postType is NULL
-					OR
-					EXISTS(SELECT 1 FROM $table_meta as meta WHERE meta.occurrence_id = occ.id AND meta.name='PostType' AND find_in_set(meta.value, @postType) > 0)
-				)
-				AND (
-					@postStatus is NULL
-					OR
-					EXISTS(SELECT 1 FROM $table_meta as meta WHERE meta.occurrence_id = occ.id AND meta.name='PostStatus' AND find_in_set(meta.value, @postStatus) > 0)
-				)
 				{$condition_date}
 			ORDER BY
 				created_on DESC
-			";
-		}
-
+		";
 		$_wpdb->query( "SET @siteId = $_site_id" );
 		$_wpdb->query( "SET @userId = $_user_id" );
-		$_wpdb->query( "SET @postType = $_post_types" );
-		$_wpdb->query( "SET @postStatus = $_post_statuses" );
 		$_wpdb->query( "SET @roleName = $_role_name" );
 		$_wpdb->query( "SET @alertCode = $_alert_code" );
 		$_wpdb->query( "SET @startTimestamp = $_start_timestamp" );
@@ -608,16 +554,8 @@ class ActiveRecord implements ActiveRecordInterface {
 		$results = $_wpdb->get_results( $sql );
 
 		if ( ! empty( $results ) ) {
-			foreach ( $results as $row ) {
-				$sql     = "SELECT t6.ID FROM $wpdb->users AS t6 WHERE t6.user_login = \"$row->user_id\"";
-				$user_id = $wpdb->get_var( $sql );
-				if ( null == $user_id ) {
-					$sql     = "SELECT t4.ID FROM $wpdb->users AS t4 WHERE t4.ID = \"$row->user_id\"";
-					$user_id = $wpdb->get_var( $sql );
-				}
-				$row->user_id        = $user_id;
-				$results['lastDate'] = $row->created_on;
-			}
+			$last_event          = end( $results );
+			$results['lastDate'] = $last_event->created_on;
 		}
 
 		return $results;
@@ -733,11 +671,11 @@ class ActiveRecord implements ActiveRecordInterface {
 	 * @param string    $_ip_address - (Optional) IP address.
 	 * @param int       $_alert_code - (Optional) Alert code.
 	 * @param int       $_limit - (Optional) Limit.
+	 * @param string    $usernames - (Optional) String of usernames.
 	 * @return array Report results grouped by IP and Username
 	 */
-	public function GetReportGrouped( $_site_id, $_start_timestamp, $_end_timestamp, $_user_id = 'null', $_role_name = 'null', $_ip_address = 'null', $_alert_code = 'null', $_limit = 0 ) {
+	public function GetReportGrouped( $_site_id, $_start_timestamp, $_end_timestamp, $_user_id = 'null', $_role_name = 'null', $_ip_address = 'null', $_alert_code = 'null', $_limit = 0, $usernames = 'null' ) {
 		global $wpdb;
-		$user_names = $this->GetUserNames( $_user_id );
 
 		$_wpdb = $this->connection;
 		$_wpdb->set_charset( $_wpdb->dbh, 'utf8mb4', 'utf8mb4_general_ci' );
@@ -767,7 +705,7 @@ class ActiveRecord implements ActiveRecordInterface {
 					(@siteId is NULL OR find_in_set(occ.site_id, @siteId) > 0)
 					AND (@userId is NULL OR (
 						(meta.name = 'CurrentUserID' AND find_in_set(meta.value, @userId) > 0)
-						OR (meta.name = 'Username' AND replace(meta.value, '\"', '') IN ($user_names))
+						OR (meta.name = 'Username' AND replace(meta.value, '\"', '') IN ($usernames))
 					))
 					AND (@roleName is NULL OR (meta.name = 'CurrentUserRoles'
 					AND replace(replace(replace(meta.value, ']', ''), '[', ''), '\\'', '') REGEXP @roleName
@@ -794,7 +732,7 @@ class ActiveRecord implements ActiveRecordInterface {
 					(@siteId is NULL OR find_in_set(occ.site_id, @siteId) > 0)
 					AND (@userId is NULL OR (
 						(meta.name = 'CurrentUserID' AND find_in_set(meta.value, @userId) > 0)
-						OR (meta.name = 'Username' AND replace(meta.value, '\"', '') IN ($user_names))
+						OR (meta.name = 'Username' AND replace(meta.value, '\"', '') IN ($usernames))
 					))
 					AND (@roleName is NULL OR (meta.name = 'CurrentUserRoles'
 					AND replace(replace(replace(meta.value, ']', ''), '[', ''), '\\'', '') REGEXP @roleName
