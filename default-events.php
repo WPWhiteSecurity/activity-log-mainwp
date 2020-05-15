@@ -613,14 +613,14 @@ function mwpal_defaults_init() {
 
 			__( 'Yoast SEO', 'mwp-al-ext' ) => array(
 				__( 'Post Changes', 'mwp-al-ext' ) => array(
-					array( 8801, WSAL_INFORMATIONAL, __( 'User changed title of a SEO post', 'mwp-al-ext' ), __( 'Changed the Meta title of the post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% Previous title: %OldSEOTitle% %LineBreak% New title: %NewSEOTitle% %LineBreak% %EditorLinkPost%', 'mwp-al-ext' ), 'post', 'modified' ),
-					array( 8802, WSAL_INFORMATIONAL, __( 'User changed the meta description of a SEO post', 'mwp-al-ext' ), __( 'Changed the Meta Description of the post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% Previous description: %old_desc% %LineBreak% New description: %new_desc% %LineBreak% %EditorLinkPost%', 'mwp-al-ext' ), 'post', 'modified' ),
-					array( 8803, WSAL_INFORMATIONAL, __( 'User changed setting to allow search engines to show post in search results of a SEO post', 'mwp-al-ext' ), __( 'Changed the setting to allow search engines to show post in search results for the post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% Previous setting: %OldStatus% %LineBreak% New setting: %NewStatus% %LineBreak% %EditorLinkPost%', 'mwp-al-ext' ), 'post', 'modified' ),
-					array( 8804, WSAL_INFORMATIONAL, __( 'User Enabled/Disabled the option for search engine to follow links of a SEO post', 'mwp-al-ext' ), __( 'The option for search engine to follow links in post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% %EditorLinkPost%', 'mwp-al-ext' ), 'post', 'enabled' ),
-					array( 8805, WSAL_LOW, __( 'User set the meta robots advanced setting of a SEO post', 'mwp-al-ext' ), __( 'Changed the Meta Robots Advanced setting for the post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% Previous setting: %OldStatus% %LineBreak% New setting: %NewStatus% %LineBreak% %EditorLinkPost%', 'mwp-al-ext' ), 'post', 'modified' ),
-					array( 8806, WSAL_INFORMATIONAL, __( 'User changed the canonical URL of a SEO post', 'mwp-al-ext' ), __( 'Changed the Canonical URL of the post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% Previous URL: %OldCanonicalUrl% %LineBreak% New URL: %NewCanonicalUrl% %LineBreak% %EditorLinkPost%', 'mwp-al-ext' ), 'post', 'modified' ),
-					array( 8807, WSAL_INFORMATIONAL, __( 'User changed the focus keyword of a SEO post', 'mwp-al-ext' ), __( 'Changed the focus keyword for the post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% Previous keyword: %old_keywords% %LineBreak% New keyword: %new_keywords% %LineBreak% %EditorLinkPost%', 'mwp-al-ext' ), 'post', 'modified' ),
-					array( 8808, WSAL_INFORMATIONAL, __( 'User Enabled/Disabled the option Cornerston Content of a SEO post', 'mwp-al-ext' ), __( 'The option Cornerstone Content in the post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% %EditorLinkPost%', 'mwp-al-ext' ), 'post', 'enabled' ),
+					array( 8801, WSAL_INFORMATIONAL, __( 'User changed title of a SEO post', 'mwp-al-ext' ), __( 'Changed the Meta title of the post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% Previous title: %OldSEOTitle% %LineBreak% New title: %NewSEOTitle% %LineBreak% %EditorLinkPost%', 'mwp-al-ext' ), 'yoast-seo-metabox', 'modified' ),
+					array( 8802, WSAL_INFORMATIONAL, __( 'User changed the meta description of a SEO post', 'mwp-al-ext' ), __( 'Changed the Meta Description of the post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% Previous description: %old_desc% %LineBreak% New description: %new_desc% %LineBreak% %EditorLinkPost%', 'mwp-al-ext' ), 'yoast-seo-metabox', 'modified' ),
+					array( 8803, WSAL_INFORMATIONAL, __( 'User changed setting to allow search engines to show post in search results of a SEO post', 'mwp-al-ext' ), __( 'Changed the setting to allow search engines to show post in search results for the post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% Previous setting: %OldStatus% %LineBreak% New setting: %NewStatus% %LineBreak% %EditorLinkPost%', 'mwp-al-ext' ), 'yoast-seo-metabox', 'modified' ),
+					array( 8804, WSAL_INFORMATIONAL, __( 'User Enabled/Disabled the option for search engine to follow links of a SEO post', 'mwp-al-ext' ), __( 'The option for search engine to follow links in post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% %EditorLinkPost%', 'mwp-al-ext' ), 'yoast-seo-metabox', 'enabled' ),
+					array( 8805, WSAL_LOW, __( 'User set the meta robots advanced setting of a SEO post', 'mwp-al-ext' ), __( 'Changed the Meta Robots Advanced setting for the post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% Previous setting: %OldStatus% %LineBreak% New setting: %NewStatus% %LineBreak% %EditorLinkPost%', 'mwp-al-ext' ), 'yoast-seo-metabox', 'modified' ),
+					array( 8806, WSAL_INFORMATIONAL, __( 'User changed the canonical URL of a SEO post', 'mwp-al-ext' ), __( 'Changed the Canonical URL of the post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% Previous URL: %OldCanonicalUrl% %LineBreak% New URL: %NewCanonicalUrl% %LineBreak% %EditorLinkPost%', 'mwp-al-ext' ), 'yoast-seo-metabox', 'modified' ),
+					array( 8807, WSAL_INFORMATIONAL, __( 'User changed the focus keyword of a SEO post', 'mwp-al-ext' ), __( 'Changed the focus keyword for the post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% Previous keyword: %old_keywords% %LineBreak% New keyword: %new_keywords% %LineBreak% %EditorLinkPost%', 'mwp-al-ext' ), 'yoast-seo-metabox', 'modified' ),
+					array( 8808, WSAL_INFORMATIONAL, __( 'User Enabled/Disabled the option Cornerston Content of a SEO post', 'mwp-al-ext' ), __( 'The option Cornerstone Content in the post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% %EditorLinkPost%', 'mwp-al-ext' ), 'yoast-seo-metabox', 'enabled' ),
 				),
 
 				__( 'Website Changes', 'mwp-al-ext' ) => array(
@@ -668,6 +668,67 @@ function mwpal_defaults_init() {
 					array( 7752, WSAL_INFORMATIONAL, __( 'User started the monitor for the site', 'mwp-al-ext' ), __( 'Started monitor for site child site: %LineBreak% %friendly_name% %LineBreak% %site_url%', 'mwp-al-ext' ), 'uptime-monitor', 'started' ),
 					array( 7753, WSAL_MEDIUM, __( 'User stopped the monitor for the site', 'mwp-al-ext' ), __( 'Stopped monitor for site child site: %LineBreak% %friendly_name% %LineBreak% %site_url%', 'mwp-al-ext' ), 'uptime-monitor', 'stopped' ),
 					array( 7754, WSAL_INFORMATIONAL, __( 'User created monitors for all child sites', 'mwp-al-ext' ), __( 'Created monitors for all child sites.', 'mwp-al-ext' ), 'uptime-monitor', 'created' ),
+				),
+			),
+
+			__( 'WPForms', 'mwp-al-ext' ) => array(
+				__( 'Form Content', 'mwp-al-ext' ) => array(
+					array(
+						5500,
+						WSAL_LOW,
+						__( 'A form was created, modified or deleted', 'mwp-al-ext' ),
+						__( 'Form name %PostTitle% %LineBreak% ID: %PostID% %LineBreak% %EditorLinkForm%', 'mwp-al-ext' ),
+						'wpforms',
+						'created',
+					),
+					array(
+						5501,
+						WSAL_MEDIUM,
+						__( 'A field was created, deleted or modified', 'mwp-al-ext' ),
+						__( 'Field name %field_name% %LineBreak% Form name %form_name% %LineBreak% Form ID: %PostID% %LineBreak% %EditorLinkForm%', 'mwp-al-ext' ),
+						'wpforms_fields',
+						'deleted',
+					),
+					array(
+						5502,
+						WSAL_MEDIUM,
+						__( 'A form was duplicated', 'mwp-al-ext' ),
+						__( 'Source form %OldPostTitle% %LineBreak% New form name %PostTitle% %LineBreak% Source form ID %SourceID% %LineBreak% New form ID: %PostID% %LineBreak% %EditorLinkForm%', 'mwp-al-ext' ),
+						'wpforms',
+						'duplicated',
+					),
+					array(
+						5503,
+						WSAL_LOW,
+						__( 'A notification was added to a form, enabled or modified', 'mwp-al-ext' ),
+						__( 'Notification name %notifiation_name% %LineBreak% Form name %form_name% %LineBreak% Form ID %PostID% %LineBreak% %EditorLinkForm%', 'mwp-al-ext' ),
+						'wpforms_notifications',
+						'added',
+					),
+					array(
+						5504,
+						WSAL_MEDIUM,
+						__( 'An entry was deleted', 'mwp-al-ext' ),
+						__( 'Entry email address: %entry_email% %LineBreak% Entry ID: %entry_id% %LineBreak% Form name: %form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EditorLinkForm%', 'mwp-al-ext' ),
+						'wpforms_entries',
+						'deleted',
+					),
+					array(
+						5505,
+						WSAL_LOW,
+						__( 'Notifications were disabled for a form', 'mwp-al-ext' ),
+						__( 'All the notifications in the form. %LineBreak% Form name %form_name% %LineBreak% Form ID %PostID% %LineBreak% %EditorLinkForm%', 'mwp-al-ext' ),
+						'wpforms_notifications',
+						'deleted',
+					),
+					array(
+						5506,
+						WSAL_LOW,
+						__( 'A form was renamed', 'mwp-al-ext' ),
+						__( 'New form name %new_form_name% %LineBreak% Old form name %old_form_name% %LineBreak% Form ID %PostID% %LineBreak% %EditorLinkForm%', 'mwp-al-ext' ),
+						'wpforms',
+						'renamed',
+					),
 				),
 			),
 		)

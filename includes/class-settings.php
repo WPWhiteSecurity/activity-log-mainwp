@@ -297,9 +297,9 @@ class Settings {
 				$child_sites = array();
 
 				foreach ( $results as $site_id => $site_array ) {
-					if ( empty( $site_array ) ) {
+					if ( empty( $site_array ) || ! is_array( $site_array ) ) {
 						continue;
-					} elseif ( true === $site_array['wsal_installed'] ) {
+					} elseif ( is_array( $site_array ) && isset( $site_array['wsal_installed'] ) && true === $site_array['wsal_installed'] ) {
 						$child_sites[ $site_id ] = $site_array;
 					}
 				}

@@ -157,7 +157,7 @@ class MySQLDB extends AbstractConnector implements ConnectorInterface {
 	 * @param bool $exclude_options - True if excluding.
 	 */
 	public function installAll( $exclude_options = false ) {
-		$plugin = \WSAL\MainWPExtension\Activity_Log::get_instance();
+		$plugin = \WSAL\MainWPExtension\mwpal_extension();
 
 		foreach ( glob( $this->getAdaptersDirectory() . DIRECTORY_SEPARATOR . '*.php' ) as $file ) {
 			$file_path  = explode( DIRECTORY_SEPARATOR, $file );
@@ -184,7 +184,7 @@ class MySQLDB extends AbstractConnector implements ConnectorInterface {
 	 * Uninstall all DB tables.
 	 */
 	public function uninstallAll() {
-		$plugin = \WSAL\MainWPExtension\Activity_Log::get_instance();
+		$plugin = \WSAL\MainWPExtension\mwpal_extension();
 
 		foreach ( glob( $this->getAdaptersDirectory() . DIRECTORY_SEPARATOR . '*.php' ) as $file ) {
 			$file_path  = explode( DIRECTORY_SEPARATOR, $file );

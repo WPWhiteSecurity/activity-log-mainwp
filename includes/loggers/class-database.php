@@ -9,7 +9,7 @@
 
 namespace WSAL\MainWPExtension\Loggers;
 
-use WSAL\MainWPExtension as MWPAL_Extension;
+use \WSAL\MainWPExtension as MWPAL_Extension;
 use \WSAL\MainWPExtension\Loggers\AbstractLogger as AbstractLogger;
 use \WSAL\MainWPExtension\Models\Occurrence as Occurrence;
 use \WSAL\MainWPExtension\Models\OccurrenceQuery as OccurrenceQuery;
