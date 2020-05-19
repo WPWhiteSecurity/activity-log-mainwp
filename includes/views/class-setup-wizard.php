@@ -275,8 +275,8 @@ final class Setup_Wizard {
 				</fieldset>
 				<p class="description"><?php /* translators: %s: Note */ echo sprintf( esc_html__( '%s You can add or remove child websites at a later stage from the extensions settings.', 'mwp-al-ext' ), '<strong>' . esc_html__( 'Note:', 'mwp-al-ext' ) . '</strong>' ); ?></p>
 				<div class="mwpal-setup-actions">
-					<button class="button button-primary" type="submit" name="save_step" value="<?php esc_attr_e( 'Next', 'wp-security-audit-log' ); ?>">
-						<?php esc_html_e( 'Finish', 'wp-security-audit-log' ); ?>
+					<button class="button button-primary" type="submit" name="save_step" value="<?php esc_attr_e( 'Next', 'mwp-al-ext' ); ?>">
+						<?php esc_html_e( 'Finish', 'mwp-al-ext' ); ?>
 					</button>
 				</div>
 			</form>

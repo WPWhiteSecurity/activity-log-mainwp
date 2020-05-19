@@ -5,8 +5,8 @@ License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.html
 Tags: activity log, mainwp, mainwp extension, wordpress security, wordpress security audit log, audit log, mainwp user tracking, wordpress activity log, security activity log, wordpress admin, mainwp admin, user tracking
 Requires at least: 3.6
-Tested up to: 5.3
-Stable tag: 1.4.2
+Tested up to: 5.4
+Stable tag: 1.5.0
 Requires PHP: 5.5
 
 See the activity logs of all child sites & MainWP in one central location - the MainWP dashboard.
@@ -129,6 +129,28 @@ Please refer to our [Support & Documentation pages](https://www.wpsecurityauditl
 
 == Changelog ==
 
+= 1.5.0 (2020-02-19) =
+
+Release Notes: [MainWP extension: new search & filters module & improved UX](https://www.wpsecurityauditlog.com/releases/al4mwp-1-5/)
+
+* **New Features**
+	* New activity log search & filters module with much better UX.
+
+* **Improvement**
+	* Reports module now supports the latest data format changes used in MainWP.
+	* Plugin is now fully translatable.
+	* Added the new [activity log objects](https://www.wpsecurityauditlog.com/support-documentation/objects-event-types-wordpress-activity-log/) which are used by the main plugin.
+	* Improved the responsiveness and UI of the activity log viewer.
+	* Added a confirmation for when the activity log is purged from the MainWP database.
+	
+* **Bug fixes**
+	* Consolidated the Text Domain throughout the plugin.
+	* List of child sites in plugin settings incorrectly displaying sites on some setups.
+	* Correct plugin name is now displayed in the extention page.
+	* Rewritten some of the settings page text.
+	* After activating the plugin user is redirected to the wrong page.
+	* Fixed some rendering issues in the plugin's pages.
+	
 = 1.4.2 (2020-02-21) =
 
 * **Improvement**

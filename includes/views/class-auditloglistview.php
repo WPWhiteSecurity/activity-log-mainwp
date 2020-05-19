@@ -179,35 +179,6 @@ class AuditLogListView extends \WP_List_Table {
 				</div>
 			</div>
 			<?php endif;
-			$incompatible_sites = get_option( 'mwpal-incompatible-wsal-version', array() );
-			if ( ! empty( $incompatible_sites ) && ! get_transient( 'mwpal-hide-incompatible-wsal-version-notice' ) ) {
-				?>
-				<div class="notice notice-error mwpal-notice">
-					<div class="content">
-						<div class=mwpal-notice-left>
-							<div class="notice-message">
-								<div class="notice-message-img">
-									<img src="<?php echo MWPAL_BASE_URL; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static string ?>assets/img/mwp-al-ext-150x150.jpg">
-								</div>
-								<div class="notice-message-desc">
-									<p><strong><?php esc_html_e( 'The following sites are running a version of WP Security Audit Log plugin that is not supported, so the logs were not retrieved. Please upgrade the plugins to version 4.', 'mwp-al-ext' ); ?></strong></p>
-									<p><i>
-										<?php
-										echo esc_html( implode( ', ', $incompatible_sites ) );
-										?>
-									</i></p>
-								</div>
-							</div>
-						</div>
-						<div class="mwpal-notice-right">
-							<div class="close-btn">
-								<a data-notice="mwpal-hide-incompatible-wsal-version-notice" href="javascript:;"><?php esc_html_e( 'Close', 'mwp-al-ext' ); ?></a>
-							</div>
-						</div>
-					</div>
-				</div>
-				<?php
-			};
 		}
 	}
 
@@ -257,25 +228,27 @@ class AuditLogListView extends \WP_List_Table {
 				$current_site = MWPAL_Extension\mwpal_extension()->settings->get_view_site_id();
 				?>
 				<div class="mwp-ssa mwp-ssa-<?php echo esc_attr( $which ); ?>">
-					<select class="mwp-ssas">
-						<option value="0"><?php esc_html_e( 'All Sites', 'mwp-al-ext' ); ?></option>
-						<option value="dashboard" <?php selected( $current_site, 'dashboard' ); ?>><?php esc_html_e( 'MainWP Dashboard', 'mwp-al-ext' ); ?></option>
-						<?php
-						if ( is_array( $wsal_child_sites ) ) {
-							foreach ( $wsal_child_sites as $site_id => $site_data ) {
-								$key = array_search( $site_id, array_column( $this->mwp_child_sites, 'id' ), false );
-								if ( false !== $key ) {
-									?>
-									<option value="<?php echo esc_attr( $this->mwp_child_sites[ $key ]['id'] ); ?>"
-										<?php selected( (int) $this->mwp_child_sites[ $key ]['id'], $current_site ); ?>>
-										<?php echo esc_html( $this->mwp_child_sites[ $key ]['name'] ) . ' (' . esc_html( $this->mwp_child_sites[ $key ]['url'] ) . ')'; ?>
-									</option>
-									<?php
+					<?php if ( ! isset( $_REQUEST['mwpal_search_widget_ip'] ) ) : ?>
+						<select class="mwp-ssas">
+							<option value="0"><?php esc_html_e( 'All Sites', 'mwp-al-ext' ); ?></option>
+							<option value="dashboard" <?php selected( $current_site, 'dashboard' ); ?>><?php esc_html_e( 'MainWP Dashboard', 'mwp-al-ext' ); ?></option>
+							<?php
+							if ( is_array( $wsal_child_sites ) ) {
+								foreach ( $wsal_child_sites as $site_id => $site_data ) {
+									$key = array_search( $site_id, array_column( $this->mwp_child_sites, 'id' ), false );
+									if ( false !== $key ) {
+										?>
+										<option value="<?php echo esc_attr( $this->mwp_child_sites[ $key ]['id'] ); ?>"
+											<?php selected( (int) $this->mwp_child_sites[ $key ]['id'], $current_site ); ?>>
+											<?php echo esc_html( $this->mwp_child_sites[ $key ]['name'] ) . ' (' . esc_html( $this->mwp_child_sites[ $key ]['url'] ) . ')'; ?>
+										</option>
+										<?php
+									}
 								}
 							}
-						}
-						?>
-					</select>
+							?>
+						</select>
+					<?php endif; ?>
 					<input type="button" class="almwp-button" id="mwpal-wsal-manual-retrieve" value="<?php esc_html_e( 'Retrieve Activity Logs Now', 'mwp-al-ext' ); ?>" />
 				</div>
 				<?php
@@ -283,8 +256,8 @@ class AuditLogListView extends \WP_List_Table {
 			$user_selected_view = 'list';
 			?>
 			<div class="display-type-buttons">
-				<span class="almwp-button dashicons-before dashicons-list-view almwp-list-view-toggle <?php echo ( $this instanceof AuditLogListView ) ? esc_attr( 'disabled' ) : ''; ?>"><?php esc_html_e( 'List View', 'wp-security-audit-log' ); ?></span>
-				<a href="<?php echo esc_url( add_query_arg( 'view', 'grid' ) ); ?>" class="almwp-button dashicons-before dashicons-grid-view almwp-grid-view-toggle <?php echo ( $this instanceof AuditLogGridView ) ? esc_attr( 'disabled' ) : ''; ?>"><?php esc_html_e( 'Grid View', 'wp-security-audit-log' ); ?></a>
+				<span class="almwp-button dashicons-before dashicons-list-view almwp-list-view-toggle <?php echo ( $this instanceof AuditLogListView ) ? esc_attr( 'disabled' ) : ''; ?>"><?php esc_html_e( 'List View', 'mwp-al-ext' ); ?></span>
+				<a href="<?php echo esc_url( add_query_arg( 'view', 'grid' ) ); ?>" class="almwp-button dashicons-before dashicons-grid-view almwp-grid-view-toggle <?php echo ( $this instanceof AuditLogGridView ) ? esc_attr( 'disabled' ) : ''; ?>"><?php esc_html_e( 'Grid View', 'mwp-al-ext' ); ?></a>
 			</div>
 			<?php
 		endif;
@@ -874,6 +847,9 @@ class AuditLogListView extends \WP_List_Table {
 
 			case '%LineBreak%' === $name:
 				return '<br>';
+
+			case '%EditorLinkForm%' === $name:
+				return '<a target="_blank" href="' . esc_url( $value ) . '">' . __( 'View form in the editor', 'mwp-al-ext' ) . '</a>';
 
 			default:
 				return '<strong>' . esc_html( $value ) . '</strong>';

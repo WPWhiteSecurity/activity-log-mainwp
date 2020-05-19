@@ -83,7 +83,7 @@ class Occurrence extends ActiveRecord {
 	 * @return \WSAL\MainWPExtension\Alert
 	 */
 	public function GetAlert() {
-		return \WSAL\MainWPExtension\Activity_Log::get_instance()->alerts->GetAlert( $this->alert_id );
+		return \WSAL\MainWPExtension\mwpal_extension()->alerts->GetAlert( $this->alert_id );
 	}
 
 	/**
