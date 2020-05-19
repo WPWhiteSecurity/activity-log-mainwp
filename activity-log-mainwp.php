@@ -402,62 +402,44 @@ if ( function_exists( 'almainwp_fs' ) ) {
 				define( 'MWPAL_VERSION', $this->version );
 			}
 
-		// Plugin Name.
-		if ( ! defined( 'MWPAL_BASE_NAME' ) ) {
-			define( 'MWPAL_BASE_NAME', plugin_basename( __FILE__ ) );
-		}
+			// Plugin Name.
+			if ( ! defined( 'MWPAL_BASE_NAME' ) ) {
+				define( 'MWPAL_BASE_NAME', plugin_basename( __FILE__ ) );
+			}
 
-		// Plugin Directory URL.
-		if ( ! defined( 'MWPAL_BASE_URL' ) ) {
-			define( 'MWPAL_BASE_URL', plugin_dir_url( __FILE__ ) );
-		}
+			// Plugin Directory URL.
+			if ( ! defined( 'MWPAL_BASE_URL' ) ) {
+				define( 'MWPAL_BASE_URL', plugin_dir_url( __FILE__ ) );
+			}
 
-		// Plugin Directory Path.
-		if ( ! defined( 'MWPAL_BASE_DIR' ) ) {
-			define( 'MWPAL_BASE_DIR', plugin_dir_path( __FILE__ ) );
-		}
+			// Plugin Directory Path.
+			if ( ! defined( 'MWPAL_BASE_DIR' ) ) {
+				define( 'MWPAL_BASE_DIR', plugin_dir_path( __FILE__ ) );
+			}
 
-		// Plugin Extension Name.
-		if ( ! defined( 'MWPAL_EXTENSION_NAME' ) ) {
-			$filename = preg_replace( '#\/[^/]*$#', '', MWPAL_BASE_NAME );
-			$filename = str_replace( '-', ' ', $filename );
-			$filename = ucwords( $filename );
-			$filename = str_replace( ' ', '-', $filename );
-			define( 'MWPAL_EXTENSION_NAME', 'Extensions-' . $filename );
-		}
+			// Plugin Extension Name.
+			if ( ! defined( 'MWPAL_EXTENSION_NAME' ) ) {
+				$filename = preg_replace( '#\/[^/]*$#', '', MWPAL_BASE_NAME );
+				$filename = str_replace( '-', ' ', $filename );
+				$filename = ucwords( $filename );
+				$filename = str_replace( ' ', '-', $filename );
+				define( 'MWPAL_EXTENSION_NAME', 'Extensions-' . $filename );
+			}
 
-		// Plugin Min PHP Version.
-		if ( ! defined( 'MWPAL_MIN_PHP_VERSION' ) ) {
-			define( 'MWPAL_MIN_PHP_VERSION', '5.5.0' );
-		}
+			// Plugin Min PHP Version.
+			if ( ! defined( 'MWPAL_MIN_PHP_VERSION' ) ) {
+				define( 'MWPAL_MIN_PHP_VERSION', '5.5.0' );
+			}
 
-		// Plugin Options Prefix.
-		if ( ! defined( 'MWPAL_OPT_PREFIX' ) ) {
-			define( 'MWPAL_OPT_PREFIX', 'mwpal-' );
-		}
+			// Plugin Options Prefix.
+			if ( ! defined( 'MWPAL_OPT_PREFIX' ) ) {
+				define( 'MWPAL_OPT_PREFIX', 'mwpal-' );
+			}
 
-		// Plugin uploads directory path.
-		if ( ! defined( 'MWPAL_UPLOADS_DIR' ) ) {
-			$uploads_dir = wp_upload_dir();
-			define( 'MWPAL_UPLOADS_DIR', trailingslashit( $uploads_dir['basedir'] ) . 'activity-log-for-mainwp/' );
-		}
-	}
-
-	/**
-	 * Redirect to MainWP Extensions Page.
-	 *
-	 * @return void
-	 */
-	public function redirect_on_activate() {
-		$redirect_url = false;
-		if ( 'yes' === $this->settings->is_extension_activated() ) {
-			// clear the activation flag so this runs only once.
-			$this->settings->delete_option( 'activity-extension-activated' );
-
-			if ( ! $this->settings->get_option( 'setup-complete' ) ) {
-				$redirect_url = add_query_arg( 'page', 'activity-log-mainwp-setup', admin_url( 'admin.php' ) );
-			} else {
-				$redirect_url = add_query_arg( 'page', MWPAL_EXTENSION_NAME, admin_url( 'admin.php' ) );
+			// Plugin uploads directory path.
+			if ( ! defined( 'MWPAL_UPLOADS_DIR' ) ) {
+				$uploads_dir = wp_upload_dir();
+				define( 'MWPAL_UPLOADS_DIR', trailingslashit( $uploads_dir['basedir'] ) . 'activity-log-for-mainwp/' );
 			}
 		}
 
