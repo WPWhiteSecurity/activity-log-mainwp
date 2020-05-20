@@ -947,7 +947,7 @@ class View extends Abstract_View {
 
 					<div id="mwpal-setting-contentbox-3" class="postbox">
 						<h2 class="hndle ui-sortable-handle"><span><i class="fa fa-cog"></i> <?php esc_html_e( 'List of Child Sites in the Activity Log for MainWP', 'mwp-al-ext' ); ?></span></h2>
-						<div class="mainwp-postbox-actions-top"><p class="description"><?php esc_html_e( 'Use the below settings to add or remove child sites\' activity logs from the central activity log in the MainWP dashboard. The column on the left is a list of MainWP child sites that have the WP Security Audit Log plugin installed but their logs are not shown in the MainWP dashboard.', 'mwp-al-ext' ); ?></p></div>
+						<div class="mainwp-postbox-actions-top"><p class="description"><?php esc_html_e( 'Use the below settings to add or remove child sites\' activity logs from the central activity log in the MainWP dashboard. The column on the left is a list of MainWP child sites that have the WP Activity Log plugin installed but their logs are not shown in the MainWP dashboard.', 'mwp-al-ext' ); ?></p></div>
 						<div class="inside">
 							<table class="form-table">
 								<tbody>
@@ -955,7 +955,7 @@ class View extends Abstract_View {
 										<td>
 											<div class="mwpal-wcs-container">
 												<div id="mwpal-wcs">
-													<p><?php esc_html_e( 'Child sites with WP Security Audit Log installed but not in the MainWP Activity Log', 'mwp-al-ext' ); ?></p>
+													<p><?php esc_html_e( 'Child sites with WP Activity Log installed but not in the MainWP Activity Log', 'mwp-al-ext' ); ?></p>
 													<div class="sites-container">
 														<?php
 														$disabled_sites = MWPAL_Extension\mwpal_extension()->settings->get_option( 'disabled-wsal-sites', array() );
@@ -1610,7 +1610,7 @@ class View extends Abstract_View {
 		<script>
 			jQuery( document ).ready( function( $ ) {
 				var mwpalExtension = $( 'div[extension-slug$="/activity-log-mainwp.php"]' );
-				mwpalExtension.append( '<div class="ui middle aligned extra content"><a href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/pricing/?utm_source=plugin&utm_medium=referral&utm_campaign=AL4MWP&utm_content=extensions+upgrade' ); ?>" target="_blank" class="ui mini right floated button"><?php echo __( 'Upgrade to Premium', 'mwp-al-ext' ); ?></a></div>' );
+				mwpalExtension.append( '<div class="ui middle aligned extra content"><a href="<?php echo esc_url( 'https://wpactivitylog.com/extensions/mainwp-activity-log/pricing/?utm_source=plugin&utm_medium=referral&utm_campaign=AL4MWP&utm_content=extensions+upgrade' ); ?>" target="_blank" class="ui mini right floated button"><?php echo __( 'Upgrade to Premium', 'mwp-al-ext' ); ?></a></div>' );
 			} );
 		</script>
 		<?php

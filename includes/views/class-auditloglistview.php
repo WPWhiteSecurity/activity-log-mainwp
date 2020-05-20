@@ -169,8 +169,8 @@ class AuditLogListView extends \WP_List_Table {
 					</div>
 					<div class="mwpal-notice-right">
 						<div class="upgrade-btn">
-							<a target="_blank" href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/pricing/?utm_source=plugin&utm_medium=referral&utm_campaign=AL4MWP&utm_content=banner+upgrade+now' ); ?>" class="ui button green"><?php esc_html_e( 'Upgrade Now', 'mwp-al-ext' ); ?></a>
-							<a target="_blank" href="<?php echo esc_url( 'https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/premium-benefits/?utm_source=plugin&utm_medium=referral&utm_campaign=AL4MWP&utm_content=banner+tell+me+more' ); ?>" class="ui button"><?php esc_html_e( 'Tell Me More', 'mwp-al-ext' ); ?></a>
+							<a target="_blank" href="<?php echo esc_url( 'https://wpactivitylog.com/extensions/mainwp-activity-log/pricing/?utm_source=plugin&utm_medium=referral&utm_campaign=AL4MWP&utm_content=banner+upgrade+now' ); ?>" class="ui button green"><?php esc_html_e( 'Upgrade Now', 'mwp-al-ext' ); ?></a>
+							<a target="_blank" href="<?php echo esc_url( 'https://wpactivitylog.com/extensions/mainwp-activity-log/premium-benefits/?utm_source=plugin&utm_medium=referral&utm_campaign=AL4MWP&utm_content=banner+tell+me+more' ); ?>" class="ui button"><?php esc_html_e( 'Tell Me More', 'mwp-al-ext' ); ?></a>
 						</div>
 						<div class="close-btn">
 							<a href="javascript:;"><?php esc_html_e( 'Close', 'mwp-al-ext' ); ?></a>
@@ -828,7 +828,7 @@ class AuditLogListView extends \WP_List_Table {
 					return false;
 				}
 				/* translators: Mailto link for support. */
-				return ' with errors. ' . sprintf( __( 'Contact us on %s for assistance', 'mwp-al-ext' ), '<a href="mailto:support@wpsecurityauditlog.com" target="_blank">support@wpsecurityauditlog.com</a>' );
+				return ' with errors. ' . sprintf( __( 'Contact us on %s for assistance', 'mwp-al-ext' ), '<a href="mailto:support@wpactivitylog.com" target="_blank">support@wpactivitylog.com</a>' );
 
 			case '%TableNames%' === $name:
 				$value = str_replace( ',', ', ', $value );
@@ -843,7 +843,7 @@ class AuditLogListView extends \WP_List_Table {
 				return '<a href="' . esc_url( $file_settings ) . '">' . esc_html__( 'plugin settings', 'mwp-al-ext' ) . '</a>';
 
 			case '%ContactSupport%' === $name:
-				return '<a href="https://www.wpsecurityauditlog.com/contact/" target="_blank">' . esc_html__( 'contact our support', 'mwp-al-ext' ) . '</a>';
+				return '<a href="https://www.wpactivitylog.com/contact/" target="_blank">' . esc_html__( 'contact our support', 'mwp-al-ext' ) . '</a>';
 
 			case '%LineBreak%' === $name:
 				return '<br>';

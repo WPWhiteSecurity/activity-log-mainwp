@@ -144,7 +144,7 @@ final class Setup_Wizard {
 			<?php do_action( 'admin_head' ); ?>
 		</head>
 		<body class="wsal-setup wp-core-ui">
-			<h1 id="wsal-logo"><a href="https://wpsecurityauditlog.com/" target="_blank"><img src="<?php echo esc_url( trailingslashit( MWPAL_BASE_URL ) ); ?>assets/img/wsal-logo-full.png" alt="WP Security Audit Log" /></a></h1>
+			<h1 id="wsal-logo"><a href="https://wpactivitylog.com/" target="_blank"><img src="<?php echo esc_url( trailingslashit( MWPAL_BASE_URL ) ); ?>assets/img/wsal-logo-full.png" alt="WP Activity Log" /></a></h1>
 		<?php
 	}
 
@@ -225,7 +225,7 @@ final class Setup_Wizard {
 	private function step_welcome() {
 		?>
 		<p><?php esc_html_e( 'Thank you for installing the Activity Log for MainWP Extension.', 'mwp-al-ext' ); ?></p>
-		<p><?php esc_html_e( 'This extension allows you to see the activity logs of all the child websites which have WP Security Audit Log installed from the MainWP dashboard.', 'mwp-al-ext' ); ?></p>
+		<p><?php esc_html_e( 'This extension allows you to see the activity logs of all the child websites which have WP Activity Log installed from the MainWP dashboard.', 'mwp-al-ext' ); ?></p>
 		<div class="mwpal-setup-actions">
 			<a class="button button-primary"
 				href="<?php echo esc_url( $this->get_next_step() ); ?>">
@@ -246,7 +246,7 @@ final class Setup_Wizard {
 			?>
 			<form method="post" class="mwpal-setup-form">
 				<?php wp_nonce_field( 'mwpal-step-wsal-sites' ); ?>
-				<p><?php esc_html_e( 'These are the child sites which have the WP Security Audit Log plugin installed. The activity log extension will automatically retrieve the logs from them to show them in the MainWP dashboard.', 'mwp-al-ext' ); ?></p>
+				<p><?php esc_html_e( 'These are the child sites which have the WP Activity Log plugin installed. The activity log extension will automatically retrieve the logs from them to show them in the MainWP dashboard.', 'mwp-al-ext' ); ?></p>
 				<p><?php esc_html_e( 'Deselect those which you do not want to retrieve logs from:', 'mwp-al-ext' ); ?></p>
 				<fieldset>
 					<div class="sites-container">
@@ -283,7 +283,7 @@ final class Setup_Wizard {
 			<?php
 		else :
 			?>
-			<p><?php /* Translators: %s: Getting started guide hyperlink */ echo sprintf( esc_html__( 'It seems that the WP Security Audit Log plugin is not installed on any of the child sites. Please exit this wizard, install the WP Security Audit Log plugin on the child sites and then add the sites from the Extensions settings. Refer to the %s for more information.', 'mwp-al-ext' ), '<a href="https://www.wpsecurityauditlog.com/support-documentation/gettting-started-activity-log-mainwp-extension/" target="_blank">' . esc_html__( 'Getting Started Guide', 'mwp-al-ext' ) . '</a>' ); ?></p>
+			<p><?php /* Translators: %s: Getting started guide hyperlink */ echo sprintf( esc_html__( 'It seems that the WP Activity Log plugin is not installed on any of the child sites. Please exit this wizard, install the WP Activity Log plugin on the child sites and then add the sites from the Extensions settings. Refer to the %s for more information.', 'mwp-al-ext' ), '<a href="https://www.wpactivitylog.com/support/kb/gettting-started-activity-log-mainwp-extension/" target="_blank">' . esc_html__( 'Getting Started Guide', 'mwp-al-ext' ) . '</a>' ); ?></p>
 			<div class="mwpal-setup-actions">
 				<a class="button button-primary"
 					href="<?php echo esc_url( $this->get_next_step() ); ?>">
