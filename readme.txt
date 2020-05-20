@@ -88,7 +88,7 @@ Follow the [Activity Logs for MainWP getting started guide](https://www.wpactivi
 
 * [What is a WordPress Activity Log?](https://wpactivitylog.com/wordpress-activity-log/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description)
 * [List of WordPress Activity Log events](https://wpactivitylog.com/support/kb/what-are-activity-log-events-ids/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description)
-* [Activity Log for MainWP Extension Page](https://www.wpactivitylog.com/activity-log-mainwp-extension/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=AL4MWP&utm_content=plugin+repos+description)
+* [Activity Log for MainWP Extension Page](https://wpactivitylog.com/extensions/mainwp-activity-log/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=AL4MWP&utm_content=plugin+repos+description)
 * [Official WP Activity Log Plugin Website](https://wpactivitylog.com/extensions/mainwp-activity-log/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description)
 
 == Installation ==
