@@ -785,7 +785,7 @@ class Settings {
 					return false;
 				}
 				/* translators: Mailto link for support. */
-				return ' with errors. ' . sprintf( __( 'Contact us on %s for assistance', 'mwp-al-ext' ), '<a href="mailto:support@wpactivitylog.com" target="_blank">support@wpactivitylog.com</a>' );
+				return ' with errors. ' . sprintf( __( 'Contact us on %s for assistance', 'mwp-al-ext' ), '<a href="mailto:support@wpactivitylog.com" target="_blank">support@wpwhitesecurity.com</a>' );
 
 			case '%TableNames%' === $name:
 				$value = str_replace( ',', ', ', $value );
@@ -800,7 +800,7 @@ class Settings {
 				return '<a href="' . esc_url( $file_settings ) . '">' . esc_html__( 'plugin settings', 'mwp-al-ext' ) . '</a>';
 
 			case '%ContactSupport%' === $name:
-				return '<a href="https://www.wpactivitylog.com/contact/" target="_blank">' . esc_html__( 'contact our support', 'mwp-al-ext' ) . '</a>';
+				return '<a href="https://wpactivitylog.com/contact/" target="_blank">' . esc_html__( 'contact our support', 'mwp-al-ext' ) . '</a>';
 
 			default:
 				return '<strong>' . esc_html( $value ) . '</strong>';
