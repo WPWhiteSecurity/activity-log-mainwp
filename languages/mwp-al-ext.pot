@@ -24,7 +24,7 @@ msgstr ""
 #, php-format
 msgid ""
 "This extension should be installed on the MainWP dashboard site. On the "
-"child sites please install the WP Security Audit Log plugin. Refer to the %s "
+"child sites please install the WP Activity Log plugin. Refer to the %s "
 "for more information."
 msgstr ""
 
@@ -2074,7 +2074,7 @@ msgid "Reset plugin's settings to default"
 msgstr ""
 
 #: default-events.php:416
-msgid "Reset the WP Security Audit Log plugin settings to default"
+msgid "Reset the WP Activity Log plugin settings to default"
 msgstr ""
 
 #: default-events.php:417
@@ -4115,7 +4115,7 @@ msgstr ""
 
 #: extensions/reports/includes/generators/class-html-report-generator.php:119
 #: extensions/reports/includes/generators/class-html-report-generator.php:382
-msgid "WP Security Audit Log Reporter"
+msgid "WP Activity Log Reporter"
 msgstr ""
 
 #: extensions/reports/includes/generators/class-html-report-generator.php:151
@@ -4617,21 +4617,21 @@ msgstr ""
 #: extensions/search/includes/class-filters-manager.php:359
 #: extensions/search/includes/class-filters-manager.php:396
 msgid ""
-"Refer to the <a href=\"https://www.wpsecurityauditlog.com/support-"
+"Refer to the <a href=\"https://www.wpactivitylog.com/support-"
 "documentation/list-wordpress-audit-trail-alerts/\" target=\"_blank\" rel="
 "\"nofollow noopener\">list of Event IDs</a> for reference."
 msgstr ""
 
 #: extensions/search/includes/class-filters-manager.php:371
 msgid ""
-"Refer to the <a href=\"https://www.wpsecurityauditlog.com/support-"
+"Refer to the <a href=\"https://www.wpactivitylog.com/support-"
 "documentation/metadata-wordpress-activity-log-events/\"  target=\"_blank\" "
 "rel=\"nofollow noopener\">metadata in the activity log</a> for reference."
 msgstr ""
 
 #: extensions/search/includes/class-filters-manager.php:383
 msgid ""
-"Refer to the <a href=\"https://www.wpsecurityauditlog.com/support-"
+"Refer to the <a href=\"https://www.wpactivitylog.com/support-"
 "documentation/severity-levels-wordpress-activity-log/\" target=\"_blank\" "
 "rel=\"nofollow noopener\">severity levels in the activity log</a> for "
 "reference."
@@ -5501,7 +5501,7 @@ msgstr ""
 #: includes/views/class-setup-wizard.php:228
 msgid ""
 "This extension allows you to see the activity logs of all the child websites "
-"which have WP Security Audit Log installed from the MainWP dashboard."
+"which have WP Activity Log installed from the MainWP dashboard."
 msgstr ""
 
 #: includes/views/class-setup-wizard.php:232
@@ -5511,7 +5511,7 @@ msgstr ""
 
 #: includes/views/class-setup-wizard.php:249
 msgid ""
-"These are the child sites which have the WP Security Audit Log plugin "
+"These are the child sites which have the WP Activity Log plugin "
 "installed. The activity log extension will automatically retrieve the logs "
 "from them to show them in the MainWP dashboard."
 msgstr ""
@@ -5542,8 +5542,8 @@ msgstr ""
 #: includes/views/class-setup-wizard.php:286
 #, php-format
 msgid ""
-"It seems that the WP Security Audit Log plugin is not installed on any of "
-"the child sites. Please exit this wizard, install the WP Security Audit Log "
+"It seems that the WP Activity Log plugin is not installed on any of "
+"the child sites. Please exit this wizard, install the WP Activity Log "
 "plugin on the child sites and then add the sites from the Extensions "
 "settings. Refer to the %s for more information."
 msgstr ""
@@ -5749,13 +5749,13 @@ msgstr ""
 msgid ""
 "Use the below settings to add or remove child sites' activity logs from the "
 "central activity log in the MainWP dashboard. The column on the left is a "
-"list of MainWP child sites that have the WP Security Audit Log plugin "
+"list of MainWP child sites that have the WP Activity Log plugin "
 "installed but their logs are not shown in the MainWP dashboard."
 msgstr ""
 
 #: includes/views/class-view.php:958
 msgid ""
-"Child sites with WP Security Audit Log installed but not in the MainWP "
+"Child sites with WP Activity Log installed but not in the MainWP "
 "Activity Log"
 msgstr ""
 
@@ -5825,7 +5825,7 @@ msgid "Upgrade to Premium"
 msgstr ""
 
 #. Plugin URI of the plugin/theme
-msgid "https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/"
+msgid "https://wpactivitylog.com/extensions/mainwp-activity-log/"
 msgstr ""
 
 #. Description of the plugin/theme

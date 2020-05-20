@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Activity Log for MainWP
- * Plugin URI: https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/
+ * Plugin URI: https://wpactivitylog.com/extensions/mainwp-activity-log/
  * Description: This extension for MainWP enables you to view the activity logs of all child sites in one central location, the MainWP dashboard.
  * Author: WP White Security
  * Version: 1.5.0
@@ -339,8 +339,8 @@ if ( function_exists( 'almainwp_fs' ) ) {
 							<?php
 							echo sprintf(
 								/* Translators: %s: Getting started guide hyperlink. */
-								esc_html__( 'This extension should be installed on the MainWP dashboard site. On the child sites please install the WP Security Audit Log plugin. Refer to the %s for more information.', 'mwp-al-ext' ),
-								'<a href="https://www.wpsecurityauditlog.com/support-documentation/gettting-started-activity-log-mainwp-extension/" target="_blank">' . esc_html__( 'Getting Started Guide', 'mwp-al-ext' ) . '</a>'
+								esc_html__( 'This extension should be installed on the MainWP dashboard site. On the child sites please install the WP Activity Log plugin. Refer to the %s for more information.', 'mwp-al-ext' ),
+								'<a href="https://www.wpactivitylog.com/support/kb/gettting-started-activity-log-mainwp-extension/" target="_blank">' . esc_html__( 'Getting Started Guide', 'mwp-al-ext' ) . '</a>'
 							);
 							?>
 						</div>
@@ -761,10 +761,12 @@ if ( function_exists( 'almainwp_fs' ) ) {
 		}
 
 		function custom_page_title( $title ) {
-			if ( almainwp_fs()->is_plan__premium_only( 'premium' ) && almainwp_fs()->has_active_valid_license() ) {
-				$title = esc_html__( 'Activity Log for MainWP (Premium)', 'mwp-al-ext' );
-			} else {
-				$title = esc_html__( 'Activity Log for MainWP', 'mwp-al-ext' );
+			if ( isset( $_REQUEST['page'] ) && 'Extensions-Activity-Log-Mainwp-Premium' === $_REQUEST['page'] || isset( $_REQUEST['page'] ) && 'Extensions-Activity-Log-Mainwp' === $_REQUEST['page'] ) {
+				if ( almainwp_fs()->is_plan__premium_only( 'premium' ) && almainwp_fs()->has_active_valid_license() ) {
+					$title = esc_html__( 'Activity Log for MainWP (Premium)', 'mwp-al-ext' );
+				} else {
+					$title = esc_html__( 'Activity Log for MainWP', 'mwp-al-ext' );
+				}
 			}
 
 			return $title;
