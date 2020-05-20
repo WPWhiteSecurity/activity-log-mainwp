@@ -1,6 +1,6 @@
 === Activity Log For MainWP ===
 Contributors: WPWhiteSecurity, robert681
-Plugin URI: https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/
+Plugin URI: https://wpactivitylog.com/extensions/mainwp-activity-log/
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.html
 Tags: activity log, mainwp, mainwp extension, wordpress security, wordpress security audit log, audit log, mainwp user tracking, wordpress activity log, security activity log, wordpress admin, mainwp admin, user tracking
@@ -17,11 +17,11 @@ See the activity logs of all child sites & MainWP in one central location - the 
 
 MainWP is an invaluable tool for those who manage multiple WordPress websites. However, it only shows you the technical aspects of the child websites.
 
-Gain a detailed overview of what is happening on the MainWP dashboard and what customers are doing on the child sites - install the [Activity Logs for MainWP extension](https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=AL4MWP&utm_content=plugin+repos+description) to keep a log of all user and under the hood activity that happen on the MainWP dashboard child sites.
+Gain a detailed overview of what is happening on the MainWP dashboard and what customers are doing on the child sites - install the [Activity Logs for MainWP extension](https://wpactivitylog.com/extensions/mainwp-activity-log/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=AL4MWP&utm_content=plugin+repos+description) to keep a log of all user and under the hood activity that happen on the MainWP dashboard child sites.
 
 #### Maintained & Supported by WP White Security
 
-WP White Security builds high-quality niche WordPress security & admin plugins like [WP Security Audit Log](https://www.wpsecurityauditlog.com/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description), the #1 WordPress activity log plugin. Browse our list of [WordPress plugins](https://www.wpwhitesecurity.com/wordpress-plugins/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=all+plugins&utm_content=plugin+repos+description) that help you better manage and improve the security of your WordPress website.
+WP White Security builds high-quality niche WordPress security & admin plugins like [WP Activity Log](https://www.wpactivitylog.com/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description), the #1 WordPress activity log plugin. Browse our list of [WordPress plugins](https://www.wpwhitesecurity.com/wordpress-plugins/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=all+plugins&utm_content=plugin+repos+description) that help you better manage and improve the security of your WordPress website.
 
 ###Keep a comprehensive log of what happens on your MainWP network & child sites
 
@@ -42,10 +42,10 @@ By keeping an activity log of everything that happens on your clients’ sites a
 * Stop all the customer blame games & have proof of what happened,
 * Keep a record of all your work to justify your fees.
 
-Learn about all the [benefits of having WordPress activity logs](https://www.wpsecurityauditlog.com/benefits-wordpress-activity-log/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description).
+Learn about all the [benefits of having WordPress activity logs](https://www.wpactivitylog.com/benefits-wordpress-activity-log/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description).
 
 ###Extend the functionality of Activity Log for MainWP
-[Upgrade to premium](https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/pricing/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=AL4MWP&utm_content=plugin+repos+description) to:
+[Upgrade to premium](https://wpactivitylog.com/extensions/mainwp-activity-log/pricing/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=AL4MWP&utm_content=plugin+repos+description) to:
 
 * Add search and filters to the activity log,
 * Search in the child sites’ activity log from the MainWP dashboard,
@@ -57,7 +57,7 @@ Learn about all the [benefits of having WordPress activity logs](https://www.wps
 
 Support for the free edition of the plugin is available via the WordPress forums for free.
 
-Premium world-class support is available via email to all [Activity Log for MainWP Premium](https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/pricing/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=AL4MWP&utm_content=plugin+repos+description) customers.
+Premium world-class support is available via email to all [Activity Log for MainWP Premium](https://wpactivitylog.com/extensions/mainwp-activity-log/pricing/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=AL4MWP&utm_content=plugin+repos+description) customers.
 
 > <strong>Note</strong>: paid customers support is always given priority  over free support. Paid customers support is provided via one-to-one email and over the phone.
 >
@@ -66,7 +66,7 @@ Premium world-class support is available via email to all [Activity Log for Main
 
 ####Activity Logs on Child Sites
 
-The extension uses WP Security Audit Log to keep a log of changes on child sites. Refer to the [list of WordPress activity log events IDs](https://www.wpsecurityauditlog.com/support-documentation/list-wordpress-audit-trail-alerts/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description) for a complete list.
+The extension uses WP Activity Log to keep a log of changes on child sites. Refer to the [list of WordPress activity log events IDs](https://wpactivitylog.com/support/kb/what-are-activity-log-events-ids/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description) for a complete list.
 
 ####Activity Logs on MainWP Dashboard
 
@@ -78,18 +78,18 @@ The extension also keeps a log of changes users do on the MainWP dashboard, such
 * Adding or removing extensions to the MainWP menu,
 * Changes in the MainWP extension Advanced Uptime Monitor.
 
-Refer to the [list of MainWP extension event log events](https://www.wpsecurityauditlog.com/support-documentation/list-wordpress-audit-trail-alerts/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=AL4MWP&utm_content=plugin+repos+description#mainwp) for a complete list of changes it can keep a log of.
+Refer to the [list of MainWP extension event log events](https://wpactivitylog.com/support/kb/what-are-activity-log-events-ids/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=AL4MWP&utm_content=plugin+repos+description#mainwp) for a complete list of changes it can keep a log of.
 
 ###Get Started Within Minutes!
 
-Follow the [Activity Logs for MainWP getting started guide](https://www.wpsecurityauditlog.com/support-documentation/gettting-started-activity-log-mainwp-extension/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=AL4MWP&utm_content=plugin+repos+description) for an easy to follow step by step procedure of how you can start keeping an activity log of all child site changes and view them from the MainWP dashboard.
+Follow the [Activity Logs for MainWP getting started guide](https://www.wpactivitylog.com/support/kb/gettting-started-activity-log-mainwp-extension/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=AL4MWP&utm_content=plugin+repos+description) for an easy to follow step by step procedure of how you can start keeping an activity log of all child site changes and view them from the MainWP dashboard.
 
 #### Related Links and Documentation
 
-* [What is a WordPress Activity Log?](https://www.wpsecurityauditlog.com/wordpress-user-monitoring-plugin-documentation/what-is-a-wordpress-audit-trail/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description)
-* [List of WordPress Activity Log events](http://www.wpsecurityauditlog.com/documentation/list-monitoring-wordpress-security-alerts-audit-log/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description)
-* [Activity Log for MainWP Extension Page](https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=AL4MWP&utm_content=plugin+repos+description)
-* [Official WP Security Audit Log Plugin Website](http://www.wpsecurityauditlog.com/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description)
+* [What is a WordPress Activity Log?](https://wpactivitylog.com/wordpress-activity-log/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description)
+* [List of WordPress Activity Log events](https://wpactivitylog.com/support/kb/what-are-activity-log-events-ids/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description)
+* [Activity Log for MainWP Extension Page](https://www.wpactivitylog.com/activity-log-mainwp-extension/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=AL4MWP&utm_content=plugin+repos+description)
+* [Official WP Activity Log Plugin Website](https://wpactivitylog.com/extensions/mainwp-activity-log/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description)
 
 == Installation ==
 
@@ -114,13 +114,13 @@ Follow the [Activity Logs for MainWP getting started guide](https://www.wpsecuri
 == Frequently Asked Questions ==
 
 = Support and Documentation =
-Please refer to our [Support & Documentation pages](https://www.wpsecurityauditlog.com/documentation/frequently-asked-questions-faqs/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description) for all the technical information and support documentation on the Activity Log for MainWP extension and the WP Security Audit Log plugin.
+Please refer to our [Support & Documentation pages](https://wpactivitylog.com/support/kb/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description) for all the technical information and support documentation on the Activity Log for MainWP extension and the WP Activity Log plugin.
 
 == Screenshots ==
 
 1. The audit log viewer in the MainWP dashboard from where you can see the activity log of the MainWP network and also of all the child sites you are managing.
 2. You can filter the activity log by child site or the MainWP dashboard by using the site selector drop down menu.
-3. The alert inspector showing additional details about the activity log entry inlcuing the UserAgent. 
+3. The alert inspector showing additional details about the activity log entry inlcuing the UserAgent.
 4. Once you install the plugin you are greeted with a one-time setup wizard.
 5. You can use the wizard to select which child sites you'd like to add to the activity log.
 6. You can add more child sites or remove any from the central activity log in the MainWP dashboard at any time from the extension's settings.
@@ -129,9 +129,17 @@ Please refer to our [Support & Documentation pages](https://www.wpsecurityauditl
 
 == Changelog ==
 
+= 1.5.1 (2020-05-20) =
+
+* **Improvement**
+	* Updating links to reflect name change.
+
+* **Bug fix**
+	* Ensure extension title is only shown in the extensions pages.
+
 = 1.5.0 (2020-02-19) =
 
-Release Notes: [MainWP extension: new search & filters module & improved UX](https://www.wpsecurityauditlog.com/releases/al4mwp-1-5/)
+Release Notes: [MainWP extension: new search & filters module & improved UX](https://www.wpactivitylog.com/al4mwp-1-5/)
 
 * **New Features**
 	* New activity log search & filters module with much better UX.
@@ -139,10 +147,10 @@ Release Notes: [MainWP extension: new search & filters module & improved UX](htt
 * **Improvement**
 	* Reports module now supports the latest data format changes used in MainWP.
 	* Plugin is now fully translatable.
-	* Added the new [activity log objects](https://www.wpsecurityauditlog.com/support-documentation/objects-event-types-wordpress-activity-log/) which are used by the main plugin.
+	* Added the new [activity log objects](https://www.wpactivitylog.com/support/kb/objects-event-types-wordpress-activity-log/) which are used by the main plugin.
 	* Improved the responsiveness and UI of the activity log viewer.
 	* Added a confirmation for when the activity log is purged from the MainWP database.
-	
+
 * **Bug fixes**
 	* Consolidated the Text Domain throughout the plugin.
 	* List of child sites in plugin settings incorrectly displaying sites on some setups.
@@ -150,12 +158,12 @@ Release Notes: [MainWP extension: new search & filters module & improved UX](htt
 	* Rewritten some of the settings page text.
 	* After activating the plugin user is redirected to the wrong page.
 	* Fixed some rendering issues in the plugin's pages.
-	
+
 = 1.4.2 (2020-02-21) =
 
 * **Improvement**
 	* Improved the add/remove child sites function to handle the new data types.
-	
+
 * **Bug fix**
 	* Plugin not processing properly the retrieved list of child sites.
 
@@ -167,18 +175,18 @@ Release Notes: [MainWP extension: new search & filters module & improved UX](htt
 = 1.4 (2020-01-14) =
 
 * **New functionality**
-	* Support for [activity logs of WP Security Audit Log version 4](https://www.wpsecurityauditlog.com/releases/update-4/).
+	* Support for [activity logs of WP Activity Log version 4](https://www.wpactivitylog.com/update-4/).
 
 = 1.3 (2019-12-11) =
 
-Release Notes: [New MainWP activity logs retention settings & other updates](https://www.wpsecurityauditlog.com/releases/activity-log-mainwp-1-3/)
+Release Notes: [New MainWP activity logs retention settings & other updates](https://www.wpactivitylog.com/activity-log-mainwp-1-3/)
 
 * **New Features**
 	* New activity logs retention setting for MainWP dashboard logs.
 	* Plugin now automatically fetches logs from child sites upon install (optional).
 
 * **Improvement**
-	* Added new compatibility check & notification for WP Security Audit Log v4 (new activity log).
+	* Added new compatibility check & notification for WP Activity Log v4 (new activity log).
 
 * **Bug fixes**
 	* Plugin tries to retrieve logs from removed child sites.
@@ -200,11 +208,11 @@ Release Notes: [New MainWP activity logs retention settings & other updates](htt
 
 = 1.1 (2019-09-18) =
 
-Release Notes: [Announcing Activity Log for MainWP Premium](https://www.wpsecurityauditlog.com/releases/activity-log-mainwp-premium-release/)
+Release Notes: [Announcing Activity Log for MainWP Premium](https://www.wpactivitylog.com/activity-log-mainwp-premium-release/)
 
 * **New Feature**
 	* Added activity log tab in individual site child overview dashboard.
-	* Added support for [Activity Log for MainWP Premium](https://www.wpsecurityauditlog.com/activity-log-mainwp-extension/premium-benefits/).
+	* Added support for [Activity Log for MainWP Premium](https://wpactivitylog.com/extensions/mainwp-activity-log/premium-benefits/).
 
 * **Improvement**
 	* Improved support for MainWP4.
@@ -220,7 +228,7 @@ Release Notes: [Announcing Activity Log for MainWP Premium](https://www.wpsecuri
 = 1.0.4 (2019-06-11) =
 
 * **New Feature**
-	* New pruning setting for [MainWP dashboard & network activity log events](https://www.wpsecurityauditlog.com/support-documentation/list-wordpress-audit-trail-alerts/#mainwp).
+	* New pruning setting for [MainWP dashboard & network activity log events](https://www.wpactivitylog.com/support/kb/list-wordpress-audit-trail-alerts/#mainwp).
 	* Settings to disable / enable specific MainWP dashboard & network event IDs.
 
 * **Improvement**
@@ -246,7 +254,7 @@ Release Notes: [Announcing Activity Log for MainWP Premium](https://www.wpsecuri
 = 1.0.1 (2019-01-07) =
 
 * **Improvements**
-	* Improved wizard for when WP Security Audit Log is not installed on any child sites.
+	* Improved wizard for when WP Activity Log is not installed on any child sites.
 	* Improved the retrieving events process for when child sites have no activity log events.
 	* Updated the help text in the extension settings.
 

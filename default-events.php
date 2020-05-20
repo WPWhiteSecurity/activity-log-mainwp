@@ -413,7 +413,7 @@ function mwpal_defaults_init() {
 
 				__( 'Activity log plugin', 'mwp-al-ext' ) => array(
 					array( 6000, WSAL_INFORMATIONAL, __( 'Events automatically pruned by system', 'mwp-al-ext' ), __( 'System automatically deleted %EventCount% event(s)', 'mwp-al-ext' ), 'activity-logs', 'deleted' ),
-					array( 6006, WSAL_MEDIUM, __( 'Reset plugin\'s settings to default', 'mwp-al-ext' ), __( 'Reset the WP Security Audit Log plugin settings to default', 'mwp-al-ext' ), 'plugin', 'modified' ),
+					array( 6006, WSAL_MEDIUM, __( 'Reset plugin\'s settings to default', 'mwp-al-ext' ), __( 'Reset the WP Activity Log plugin settings to default', 'mwp-al-ext' ), 'plugin', 'modified' ),
 					array( 6034, WSAL_CRITICAL, __( 'Purged the activity log', 'mwp-al-ext' ), __( 'Purged the activity log', 'mwp-al-ext' ), 'activity-logs', 'deleted' ),
 				),
 
