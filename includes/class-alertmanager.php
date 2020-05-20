@@ -165,7 +165,7 @@ final class AlertManager {
 			esc_attr( $class ),
 			'<span style="color:#dc3232; font-weight:bold;">' . esc_html__( 'ERROR:', 'mwp-al-ext' ) . '</span>',
 			esc_html( $message ),
-			'<a href="https://www.wpactivitylog.com/contact" target="_blank">' . esc_html__( 'Contact us', 'mwp-al-ext' ) . '</a>'
+			'<a href="https://wpactivitylog.com/contact/" target="_blank">' . esc_html__( 'Contact us', 'mwp-al-ext' ) . '</a>'
 		);
 	}
 
