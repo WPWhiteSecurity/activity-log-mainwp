@@ -228,7 +228,7 @@ if ( function_exists( 'almainwp_fs' ) ) {
 			add_action( 'init', array( $this, 'load_mwpal_text_domain' ) );
 			register_activation_hook( __FILE__, array( $this, 'install_extension' ) ); // Installation routine.
 			add_action( 'mwp_events_cleanup', array( $this, 'events_cleanup' ) ); // Schedule hook for refreshing events.
-			add_filter( 'mainwp-getextensions', array( &$this, 'get_this_extension' ) );
+			add_filter( 'mainwp_getextensions', array( &$this, 'get_this_extension' ) );
 			add_action( 'admin_init', array( &$this, 'redirect_on_activate' ) );
 			add_filter( 'plugin_action_links_' . MWPAL_BASE_NAME, array( $this, 'add_plugin_page_links' ), 20, 1 );
 			add_action( 'plugins_loaded', array( $this, 'load_mwpal_extension' ) );
@@ -237,14 +237,14 @@ if ( function_exists( 'almainwp_fs' ) ) {
 			add_action( 'mainwp_header_left', array( $this, 'custom_page_title' ) );
 
 			// This filter will return true if the main plugin is activated.
-			$this->mainwp_main_activated = apply_filters( 'mainwp-activated-check', false );
+			$this->mainwp_main_activated = apply_filters( 'mainwp_activated_check', false );
 
 			if ( false !== $this->mainwp_main_activated ) {
 				$this->activate_this_plugin();
 			} else {
 				// Because sometimes our main plugin is activated after the extension plugin is activated we also have a second step,
-				// listening to the 'mainwp-activated' action. This action is triggered by MainWP after initialisation.
-				add_action( 'mainwp-activated', array( &$this, 'activate_this_plugin' ) );
+				// listening to the 'mainwp_activated' action. This action is triggered by MainWP after initialisation.
+				add_action( 'mainwp_activated', array( &$this, 'activate_this_plugin' ) );
 			}
 
 			// Initialize freemius.
@@ -496,12 +496,12 @@ if ( function_exists( 'almainwp_fs' ) ) {
 		 */
 		public function activate_this_plugin() {
 			// Checking if the MainWP plugin is enabled. This filter will return true if the main plugin is activated.
-			$this->mainwp_main_activated = apply_filters( 'mainwp-activated-check', $this->mainwp_main_activated );
+			$this->mainwp_main_activated = apply_filters( 'mainwp_activated_check', $this->mainwp_main_activated );
 
-			// The 'mainwp-extension-enabled-check' hook. If the plugin is not enabled this will return false,
+			// The 'mainwp_extension_enabled_check' hook. If the plugin is not enabled this will return false,
 			// if the plugin is enabled, an array will be returned containing a key.
 			// This key is used for some data requests to our main.
-			$this->child_enabled = apply_filters( 'mainwp-extension-enabled-check', __FILE__ );
+			$this->child_enabled = apply_filters( 'mainwp_extension_enabled_check', __FILE__ );
 			$this->child_key     = $this->child_enabled['key'];
 		}
 

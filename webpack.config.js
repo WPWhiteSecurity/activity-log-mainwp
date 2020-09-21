@@ -59,6 +59,8 @@ module.exports = ( env, options ) => {
 		entry: {
 			'index': './assets/js/src/index.js',
 			'wizard': './assets/js/src/mwpal-setup-wizard.js',
+			'search/build.search': './assets/js/src/search/search.js',
+			'reports/build.reports': './assets/js/src/reports/reports.js',
 			'styles.build': './assets/css/src/styles.scss',
 			'mwpal-setup-wizard.build': './assets/css/src/mwpal-setup-wizard.scss'
 		},
@@ -82,7 +84,8 @@ module.exports = ( env, options ) => {
 						enforce: true
 					}
 				}
-			}
+			},
+			minimize: false
 		},
 		devtool: 'development' === mode ? 'cheap-eval-source-map' : false,
 		module: {
