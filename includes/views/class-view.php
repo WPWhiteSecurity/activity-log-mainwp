@@ -82,15 +82,15 @@ class View extends Abstract_View {
 	 */
 	public function __construct() {
 		add_action( 'admin_init', array( $this, 'setup_extension_tabs' ), 10 );
-		add_filter( 'mainwp-getsubpages-sites', array( $this, 'managesites_subpage' ), 10, 1 );
+		add_filter( 'mainwp_getsubpages_sites', array( $this, 'managesites_subpage' ), 10, 1 );
 		add_filter( 'mainwp_left_menu_sub', array( $this, 'mwp_left_menu_sub' ), 10, 1 );
 		add_filter( 'mainwp_subleft_menu_sub', array( $this, 'mwp_sub_menu_dropdown' ), 10, 1 );
 		add_filter( 'mainwp_main_menu', array( $this, 'mwpal_main_menu' ), 10, 1 );
 		add_filter( 'mainwp_main_menu_submenu', array( $this, 'mwpal_main_menu_submenu' ), 10, 1 );
-		add_action( 'mainwp-pageheader-extensions', array( $this, 'enqueue_styles' ), 10 );
-		add_action( 'mainwp-pagefooter-extensions', array( $this, 'enqueue_scripts' ), 10 );
-		add_action( 'mainwp-pageheader-sites', array( $this, 'enqueue_styles' ), 10 );
-		add_action( 'mainwp-pagefooter-sites', array( $this, 'enqueue_scripts' ), 10 );
+		add_action( 'mainwp_pageheader_extensions', array( $this, 'enqueue_styles' ), 10 );
+		add_action( 'mainwp_pagefooter_extensions', array( $this, 'enqueue_scripts' ), 10 );
+		add_action( 'mainwp_pageheader_sites', array( $this, 'enqueue_styles' ), 10 );
+		add_action( 'mainwp_pagefooter_sites', array( $this, 'enqueue_scripts' ), 10 );
 		add_action( 'admin_init', array( $this, 'handle_auditlog_form_submission' ), 20 );
 		add_action( 'wp_ajax_set_per_page_events', array( $this, 'set_per_page_events' ) );
 		add_action( 'wp_ajax_metadata_inspector', array( $this, 'metadata_inspector' ) );
@@ -606,9 +606,9 @@ class View extends Abstract_View {
 	 * Render Header.
 	 */
 	public function header() {
-		// The "mainwp-pageheader-extensions" action is used to render the tabs on the Extensions screen.
-		// It's used together with mainwp-pagefooter-extensions and mainwp-getextensions.
-		do_action( 'mainwp-pageheader-extensions', MWPAL_Extension\mwpal_extension()->get_child_file() );
+		// The "mainwp_pageheader_extensions" action is used to render the tabs on the Extensions screen.
+		// It's used together with mainwp_pagefooter_extensions and mainwp-getextensions.
+		do_action( 'mainwp_pageheader_extensions', MWPAL_Extension\mwpal_extension()->get_child_file() );
 	}
 
 	/**
@@ -1031,7 +1031,7 @@ class View extends Abstract_View {
 	 * Render Footer.
 	 */
 	public function footer() {
-		do_action( 'mainwp-pagefooter-extensions', MWPAL_Extension\mwpal_extension()->get_child_file() );
+		do_action( 'mainwp_pagefooter_extensions', MWPAL_Extension\mwpal_extension()->get_child_file() );
 	}
 
 	/**
@@ -1575,7 +1575,7 @@ class View extends Abstract_View {
 		/**
 		 * Do action before the view renders.
 		 */
-		do_action( 'mainwp-pageheader-sites', 'ActivityLog' );
+		do_action( 'mainwp_pageheader_sites', 'ActivityLog' );
 
 		// Display events table.
 		$this->get_list_view()->display();
@@ -1583,7 +1583,7 @@ class View extends Abstract_View {
 		/**
 		 * Do action before the view renders.
 		 */
-		do_action( 'mainwp-pagefooter-sites', 'ActivityLog' );
+		do_action( 'mainwp_pagefooter_sites', 'ActivityLog' );
 
 		return;
 	}

@@ -139,7 +139,7 @@ class Settings {
 	 */
 	public function get_mwp_child_sites() {
 		$activity_log = \WSAL\MainWPExtension\mwpal_extension();
-		return apply_filters( 'mainwp-getsites', $activity_log->get_child_file(), $activity_log->get_child_key(), null );
+		return apply_filters( 'mainwp_getsites', $activity_log->get_child_file(), $activity_log->get_child_key(), null );
 	}
 
 	/**

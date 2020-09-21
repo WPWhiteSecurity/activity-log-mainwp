@@ -48,7 +48,7 @@ class Sensor_MainWP extends Abstract_Sensor {
 		add_action( 'mainwp_added_new_site', array( $this, 'site_added' ), 10, 1 ); // Site added.
 		add_action( 'mainwp_delete_site', array( $this, 'site_removed' ), 10, 1 ); // Site removed.
 		add_action( 'mainwp_update_site', array( $this, 'site_edited' ), 10, 1 ); // Site edited.
-		add_action( 'mainwp-site-synced', array( $this, 'site_synced' ), 10, 1 ); // Site synced.
+		add_action( 'mainwp_site_synced', array( $this, 'site_synced' ), 10, 1 ); // Site synced.
 		add_action( 'mainwp_synced_all_sites', array( $this, 'synced_all_sites' ) ); // All sites synced.
 		add_action( 'mainwp_added_extension_menu', array( $this, 'added_extension_menu' ), 10, 1 ); // Extension added to MainWP menu.
 		add_action( 'mainwp_removed_extension_menu', array( $this, 'removed_extension_menu' ), 10, 1 ); // Extension removed from MainWP menu.

@@ -5,8 +5,8 @@ License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.html
 Tags: activity log, mainwp, mainwp extension, wordpress security, wordpress security audit log, audit log, mainwp user tracking, wordpress activity log, security activity log, wordpress admin, mainwp admin, user tracking
 Requires at least: 3.6
-Tested up to: 5.4.1
-Stable tag: 1.5.1
+Tested up to: 5.5
+Stable tag: 1.5.2
 Requires PHP: 5.5
 
 See the activity logs of all child sites & MainWP in one central location - the MainWP dashboard.
@@ -88,8 +88,8 @@ Follow the [Activity Logs for MainWP getting started guide](https://www.wpactivi
 
 * [What is a WordPress Activity Log?](https://wpactivitylog.com/wordpress-activity-log/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description)
 * [List of WordPress Activity Log events](https://wpactivitylog.com/support/kb/what-are-activity-log-events-ids/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description)
-* [Activity Log for MainWP Extension Page](https://www.wpactivitylog.com/activity-log-mainwp-extension/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=AL4MWP&utm_content=plugin+repos+description)
-* [Official WP Activity Log Plugin Website](https://wpactivitylog.com/extensions/mainwp-activity-log/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description)
+* [Activity Log for MainWP Extension Page](https://wpactivitylog.com/extensions/mainwp-activity-log/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=AL4MWP&utm_content=plugin+repos+description)
+* [Official WP Activity Log Plugin Website](https://wpactivitylog.com/?utm_source=wordpress.org&utm_medium=referral&utm_campaign=WSAL&utm_content=plugin+repos+description)
 
 == Installation ==
 
@@ -129,6 +129,11 @@ Please refer to our [Support & Documentation pages](https://wpactivitylog.com/su
 
 == Changelog ==
 
+= 1.5.2 (2020-09-21) =
+
+* **Improvement**
+	* Renamed all filters / hooks. Now using the new naming convention used in MainWP 4.1.
+	
 = 1.5.1 (2020-05-20) =
 
 * **Improvement**
