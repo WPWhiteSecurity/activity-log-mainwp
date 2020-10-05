@@ -1601,11 +1601,6 @@ class View extends Abstract_View {
 			return;
 		}
 
-		// if this is the premium plugin then bail early to stop the button for
-		// 'Upgrade to Premium' showing on the extensiton.
-		if ( function_exists( 'almainwp_fs' ) && almainwp_fs()->is__premium_only() ) {
-			return;
-		}
 		?>
 		<script>
 			jQuery( document ).ready( function( $ ) {
