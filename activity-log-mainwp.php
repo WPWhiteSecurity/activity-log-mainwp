@@ -266,11 +266,12 @@ if ( function_exists( 'almainwp_fs' ) ) {
 		public function init_freemius() {
 			if ( is_admin() && file_exists( trailingslashit( MWPAL_BASE_DIR ) . 'sdk/freemius-init.php' ) ) {
 				require_once trailingslashit( MWPAL_BASE_DIR ) . 'sdk/freemius-init.php';
-
+                //@premium:start
 				if ( almainwp_fs()->is_plan__premium_only( 'premium' ) && almainwp_fs()->has_active_valid_license() ) {
 					// Include premium extensions.
 					require_once MWPAL_BASE_DIR . 'extensions/class-extensions.php';
 				}
+				//@premium:end
 			}
 		}
 
@@ -762,11 +763,12 @@ if ( function_exists( 'almainwp_fs' ) ) {
 
 		function custom_page_title( $title ) {
 			if ( isset( $_REQUEST['page'] ) && 'Extensions-Activity-Log-Mainwp-Premium' === $_REQUEST['page'] || isset( $_REQUEST['page'] ) && 'Extensions-Activity-Log-Mainwp' === $_REQUEST['page'] ) {
+				$title = esc_html__( 'Activity Log for MainWP', 'mwp-al-ext' );
+				//@premium:start
 				if ( almainwp_fs()->is_plan__premium_only( 'premium' ) && almainwp_fs()->has_active_valid_license() ) {
 					$title = esc_html__( 'Activity Log for MainWP (Premium)', 'mwp-al-ext' );
-				} else {
-					$title = esc_html__( 'Activity Log for MainWP', 'mwp-al-ext' );
 				}
+				//@premium:end
 			}
 
 			return $title;
