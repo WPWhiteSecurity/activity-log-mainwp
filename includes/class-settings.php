@@ -143,6 +143,27 @@ class Settings {
 	}
 
 	/**
+	 * Get MainWP child site by site ID.
+	 *
+	 * @param int $site_id Site ID.
+	 *
+	 * @return array|null
+	 */
+	public function get_mwp_child_site_by_id( $site_id ) {
+		// Get MainWP child sites.
+		$mwp_sites = $this->get_mwp_child_sites();
+
+		// Search for the site data.
+		$key = array_search( $site_id, array_column( $mwp_sites, 'id' ), false );
+
+		if ( false !== $key && isset( $mwp_sites[ $key ] ) ) {
+			return $mwp_sites[ $key ];
+		}
+
+		return null;
+	}
+
+	/**
 	 * Set Alert Views Per Page.
 	 *
 	 * @param int $newvalue – New value.
@@ -871,5 +892,40 @@ class Settings {
 		$default->date = false;
 		$default->unit = false;
 		return $this->get_option( 'pruning-date', $default );
+	}
+
+	public function get_enforce_settings_on_subsites() {
+		return $this->get_option( 'enforce_settings_on_subsites', 'none' );
+	}
+
+	public function set_enforce_settings_on_subsites( $value ) {
+		return $this->update_option( 'enforce_settings_on_subsites', $value );
+	}
+
+	public function get_sites_with_enforced_settings() {
+		$result = [];
+		$sites = $this->get_option( 'subsites_with_enforced_settings' );
+		if ( ! empty( $sites ) ) {
+			if ( is_string( $sites ) ) {
+				$result = array_map( 'intval', explode( ',', $sites ) );
+			}
+		}
+
+		return $result;
+	}
+
+	public function set_sites_with_enforced_settings( $site_ids ) {
+		if ( empty($site_ids) ) {
+			return $this->delete_option( 'subsites_with_enforced_settings' );
+		}
+		return $this->update_option( 'subsites_with_enforced_settings', implode( ',', $site_ids ) );
+	}
+
+	public function get_enforced_child_sites_settings() {
+		return $this->get_option( 'enforced_settings_data', [] );
+	}
+
+	public function set_enforced_child_sites_settings( $value ) {
+		return $this->update_option( 'enforced_settings_data', $value );
 	}
 }
