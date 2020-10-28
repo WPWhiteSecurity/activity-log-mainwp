@@ -401,14 +401,15 @@ class View extends Abstract_View {
 			return;
 		}
 
-		if ( 'activity-log' === $this->current_tab ) {
-			// Select2 styles.
+		if ( in_array( $this->current_tab, [ 'activity-log', Enforce_Settings_View::$tab_id ] ) ) {
+		    // Select2 styles.
 			wp_enqueue_style(
 				'mwpal-select2-css',
 				trailingslashit( MWPAL_BASE_URL ) . 'assets/js/dist/select2/select2.css',
 				array(),
 				'3.5.1'
 			);
+
 			wp_enqueue_style(
 				'mwpal-select2-bootstrap-css',
 				trailingslashit( MWPAL_BASE_URL ) . 'assets/js/dist/select2/select2-bootstrap.css',
@@ -446,7 +447,7 @@ class View extends Abstract_View {
 		// Enqueue jQuery.
 		wp_enqueue_script( 'jquery' );
 
-		if ( 'activity-log' === $this->current_tab ) {
+		if ( in_array( $this->current_tab, [ 'activity-log', Enforce_Settings_View::$tab_id] ) ) {
 			// Select2 script.
 			wp_enqueue_script(
 				'mwpal-select2-js',
@@ -457,7 +458,7 @@ class View extends Abstract_View {
 			);
 		}
 
-		if ( in_array( $this->current_tab, array( 'activity-log', 'settings' ), true ) ) {
+		if ( in_array( $this->current_tab, array( 'activity-log', 'settings', Enforce_Settings_View::$tab_id ), true ) ) {
 			wp_register_script(
 				'mwpal-view-script',
 				trailingslashit( MWPAL_BASE_URL ) . 'assets/js/dist/index.js',
@@ -621,7 +622,7 @@ class View extends Abstract_View {
 
 		if ( MWPAL_Extension\mwpal_extension()->is_child_enabled() ) :
 			?>
-			<div class="mwpal-content-wrapper">
+			<div class="mwpal-content-wrapper" style="padding: 20px;">
 				<?php
 				if ( ! empty( $this->current_tab ) && ! empty( $this->mwpal_extension_tabs[ $this->current_tab ]['render'] ) ) {
 					call_user_func( $this->mwpal_extension_tabs[ $this->current_tab ]['render'] );
@@ -953,64 +954,17 @@ class View extends Abstract_View {
 								<tbody>
 									<tr>
 										<td>
-											<div class="mwpal-wcs-container">
-												<div id="mwpal-wcs">
-													<p><?php esc_html_e( 'Child sites with WP Activity Log installed but not in the MainWP Activity Log', 'mwp-al-ext' ); ?></p>
-													<div class="sites-container">
-														<?php
-														$disabled_sites = MWPAL_Extension\mwpal_extension()->settings->get_option( 'disabled-wsal-sites', array() );
-														foreach ( $this->mwp_child_sites as $site ) :
-															if ( isset( $disabled_sites[ $site['id'] ] ) ) :
-																?>
-																<span>
-																	<input id="mwpal-wcs-site-<?php echo esc_attr( $site['id'] ); ?>" name="mwpal-wcs[]" value="<?php echo esc_attr( $site['id'] ); ?>" type="checkbox">
-																	<label for="mwpal-wcs-site-<?php echo esc_attr( $site['id'] ); ?>"><?php echo esc_html( $site['name'] ); ?></label>
-																</span>
-																<?php
-															endif;
-														endforeach;
-														?>
-													</div>
-												</div>
-												<div id="mwpal-wcs-btns">
-													<a href="javascript:;" class="button-primary" id="mwpal-wcs-add-btn"><?php esc_html_e( 'Add to Activity Log', 'mwp-al-ext' ); ?> <span class="dashicons dashicons-arrow-right-alt2"></span></a>
-													<br>
-													<a href="javascript:;" class="button-secondary" id="mwpal-wcs-remove-btn"><span class="dashicons dashicons-arrow-left-alt2"></span> <?php esc_html_e( 'Remove', 'mwp-al-ext' ); ?></a>
-												</div>
-												<div id="mwpal-wcs-al">
-													<p><?php esc_html_e( 'Child sites which have their activity log in the central MainWP activity logs', 'mwp-al-ext' ); ?></p>
-													<div class="sites-container">
-														<?php
-														$selected_sites = array();
-														foreach ( $this->mwp_child_sites as $site ) :
-															if ( isset( $this->wsal_child_sites[ $site['id'] ] ) ) :
-																$selected_sites[] = $site['id'];
-																?>
-																<span>
-																	<input id="mwpal-wcs-al-site-<?php echo esc_attr( $site['id'] ); ?>" name="mwpal-wcs-al[]" value="<?php echo esc_attr( $site['id'] ); ?>" type="checkbox">
-																	<label for="mwpal-wcs-al-site-<?php echo esc_attr( $site['id'] ); ?>"><?php echo esc_html( $site['name'] ); ?></label>
-																</span>
-																<?php
-															endif;
-														endforeach;
-														$selected_sites = is_array( $selected_sites ) ? implode( ',', $selected_sites ) : false;
-														?>
-													</div>
-													<input type="hidden" id="mwpal-wsal-child-sites" name="mwpal-wsal-child-sites" value="<?php echo esc_attr( $selected_sites ); ?>">
-												</div>
-											</div>
-											<input type="button" class="button-primary" id="mwpal-wsal-sites-refresh" value="<?php esc_html_e( 'Refresh list of child sites', 'mwp-al-ext' ); ?>" />
-											<div id="mwpal-wcs-refresh-message"  style="display:none;"  class="notice notice-info">
-												<p><?php esc_html_e( 'Updating sites in the background. This can take a while, please do not navigate away from this page.', 'mwp-al-ext' ); ?> <span class="spinner is-active"></span></p>
-												<?php
-												printf(
-													'<p>%1$s<span class="last-message-time">%2$s</span>%3$s</p>',
-													esc_html( 'Last message recieved from backend at: ', 'mw-al-ext' ),
-													esc_html( 'Just starting...', 'mw-al-ext' ),
-													'<span class="spinner is-visible" style="float: none; margin:0 10px 0;"></span>'
-												);
-												?>
-											</div>
+                                            <?php
+                                            View::render_sites_selection_ui(
+	                                            $this->mwp_child_sites,
+                                                esc_html__( 'Child sites with WP Activity Log installed but not in the MainWP Activity Log', 'mwp-al-ext' ),
+                                                MWPAL_Extension\mwpal_extension()->settings->get_option( 'disabled-wsal-sites', array() ),
+                                                esc_html__( 'Child sites which have their activity log in the central MainWP activity logs', 'mwp-al-ext' ),
+                                                $this->wsal_child_sites,
+                                                false,
+	                                            esc_html__( 'Add to Activity Log', 'mwp-al-ext' )
+                                            );
+                                            ?>
 										</td>
 									</tr>
 								</tbody>
@@ -1298,116 +1252,121 @@ class View extends Abstract_View {
 	 */
 	public function refresh_child_sites() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			die( esc_html__( 'Access denied.', 'mwp-al-ext' ) );
+			wp_send_json_error( esc_html__( 'Access denied.', 'mwp-al-ext' ) );
 		}
 
-		if ( isset( $_POST['nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'mwp-activitylog-nonce' ) ) {
-
-			// get a passed run ID or get a new one.
-			$run_id = ( isset( $_POST['mwpal_run_id'] ) ) ? filter_var( wp_unslash( $_POST['mwpal_run_id'] ), FILTER_SANITIZE_STRING ) : uniqid();
-			$forced = ( isset( $_POST['mwpal_forced'] ) ) ? filter_var( wp_unslash( $_POST['mwpal_forced'] ), FILTER_VALIDATE_BOOLEAN ) : false;
-
-			// Clear list of disabled sites.
-			MWPAL_Extension\mwpal_extension()->settings->update_option( 'disabled-wsal-sites', '' );
-
-			/*
-			 * Check transient to see if we are in the middle of a run.
-			 */
-			$running_flag = get_transient( self::MWPAL_REFRESH_KEY );
-			if ( false !== $running_flag && is_array( $running_flag ) ) {
-				// verify this id matches the one we got passed.
-				if ( isset( $running_flag['run_id'] ) && $running_flag['run_id'] !== $run_id ) {
-					// didn't match id. Error if this is not 'forced'.
-					if ( ! $forced ) {
-						$error = new \WP_Error(
-							'run_in_progress',
-							esc_html__( 'There is a run in progress and the ID does not match the previously stored run ID: ', 'mwp-al-ext' ) . $running_flag['run_id'],
-							$running_flag
-						);
-						wp_send_json_error( $error );
-					}
-				}
-			} else {
-				// since we don't have a workable array start a fresh one.
-				$running_flag = array(
-					'run_id'         => $run_id,
-					'site_ids'       => array(),
-					'disabled_sites' => array(),
-				);
-			}
-
-			/*
-			 * Get a list of site IDs that we will start working with.
-			 */
-			if ( ! empty( $running_flag['site_ids'] ) ) {
-				$next_batch = array_slice( $running_flag['site_ids'], 0, 5 );
-			} else {
-				$mwp_child_sites  = MWPAL_Extension\mwpal_extension()->settings->get_mwp_child_sites(); // Get MainWP child sites.
-				$wsal_child_sites = MWPAL_Extension\mwpal_extension()->settings->get_option( 'wsal-child-sites', array() ); // Get activity log sites.
-				$disabled_sites   = (array) MWPAL_Extension\mwpal_extension()->settings->get_option( 'disabled-wsal-sites', array() ); // Get disabled WSAL sites.
-				$wsal_site_ids    = array_merge( array_keys( $wsal_child_sites ), array_keys( $disabled_sites ) ); // Merge arrays active & disabled WSAL child sites.
-				$mwp_site_ids     = array_column( $mwp_child_sites, 'id' ); // Get MainWP child site ids.
-				$diff             = array_diff( $mwp_site_ids, $wsal_site_ids ); // Compute the difference.
-
-				$running_flag['site_ids']       = $diff;
-				$running_flag['disabled_sites'] = $disabled_sites;
-				$next_batch                     = array_slice( $diff, 0, 5 );
-			}
-
-			if ( ! empty( $next_batch ) ) {
-				foreach ( $next_batch as $index => $site_id ) {
-					// Post data for child site.
-					$post_data = array( 'action' => 'check_wsal' );
-
-					// Call to child sites to check if WSAL is installed on them or not.
-					$response = apply_filters(
-						'mainwp_fetchurlauthed',
-						MWPAL_Extension\mwpal_extension()->get_child_file(),
-						MWPAL_Extension\mwpal_extension()->get_child_key(),
-						$site_id,
-						'extra_excution',
-						$post_data
-					);
-
-					if ( is_array( $response ) && isset( $response['error'] ) ) {
-						// Some error occurred. This might be connectivity
-						// problem or it could be sites added/removed from
-						// MainWP. Skip this itteration early.
-						MWPAL_Extension\mwpal_extension()->log( esc_html__( 'Error when refreshing child sites: ', 'mwp-al-ext' ) . $response['error'] );
-						continue;
-					} elseif ( is_array( $response ) && isset( $response['wsal_installed'] ) ) {
-						// wsal is installed, for back compat reasons cast the
-						// array to an object before storing.
-						$response = (object) $response;
-					}
-
-					// Cast reponse to an araay to avoid incomplete object PHP error.
-					$response = (array) $response;
-
-					// Check if WSAL is installed on the child site.
-					if ( isset( $response['wsal_installed'] ) && true === $response['wsal_installed'] ) {
-						$disabled_sites[ $site_id ]                 = $response;
-						$running_flag['disabled_sites'][ $site_id ] = $response;
-					}
-				}
-			}
-			// Update disabled sites.
-			MWPAL_Extension\mwpal_extension()->settings->update_option( 'disabled-wsal-sites', ( isset( $running_flag['disabled_sites'] ) ) ? $running_flag['disabled_sites'] : array() );
-			$running_flag['site_ids'] = array_diff( $running_flag['site_ids'], $next_batch );
-
-			// Send a response message. The JS frontend should know how to deal
-			// with the reply.
-			if ( ! empty( $running_flag['site_ids'] ) ) {
-				// cache the current progress in a transient.
-				set_transient( self::MWPAL_REFRESH_KEY, $running_flag, HOUR_IN_SECONDS );
-			} else {
-				// set the flag as complete to pass back and delete the cache.
-				$running_flag['complete'] = true;
-				delete_transient( self::MWPAL_REFRESH_KEY );
-			}
-			wp_send_json_success( $running_flag );
+		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'mwp-activitylog-nonce' ) ) {
+			wp_send_json_error( esc_html__( 'Nonce verification failed.', 'mwp-al-ext' ) );
 		}
-		die( esc_html__( 'Nonce verification failed.', 'mwp-al-ext' ) );
+
+        // get a passed run ID or get a new one.
+        $run_id = ( isset( $_POST['mwpal_run_id'] ) ) ? filter_var( wp_unslash( $_POST['mwpal_run_id'] ), FILTER_SANITIZE_STRING ) : uniqid();
+        $forced = ( isset( $_POST['mwpal_forced'] ) ) ? filter_var( wp_unslash( $_POST['mwpal_forced'] ), FILTER_VALIDATE_BOOLEAN ) : false;
+
+        /*
+         * Check transient to see if we are in the middle of a run.
+         */
+        $running_flag = get_transient( self::MWPAL_REFRESH_KEY );
+        if ( false !== $running_flag && is_array( $running_flag ) ) {
+            // verify this id matches the one we got passed.
+            if ( isset( $running_flag['run_id'] ) && $running_flag['run_id'] !== $run_id ) {
+                // didn't match id. Error if this is not 'forced'.
+                if ( ! $forced ) {
+                    $error = new \WP_Error(
+                        'run_in_progress',
+                        esc_html__( 'There is a run in progress and the ID does not match the previously stored run ID: ', 'mwp-al-ext' ) . $running_flag['run_id'],
+                        $running_flag
+                    );
+                    wp_send_json_error( $error );
+                }
+            }
+        } else {
+            // since we don't have a workable array start a fresh one.
+            $running_flag = array(
+                'run_id'         => $run_id,
+                'site_ids'       => array()
+            );
+        }
+
+        /*
+         * Get a list of site IDs that we will start working with.
+         */
+        if ( ! empty( $running_flag['site_ids'] ) ) {
+            $next_batch = array_slice( $running_flag['site_ids'], 0, 5 );
+        } else {
+            $mwp_child_sites  = MWPAL_Extension\mwpal_extension()->settings->get_mwp_child_sites(); // Get MainWP child sites.
+            $wsal_child_sites = MWPAL_Extension\mwpal_extension()->settings->get_option( 'wsal-child-sites', array() ); // Get activity log sites.
+            $wsal_site_ids    = array_keys( $wsal_child_sites );
+            $mwp_site_ids     = array_column( $mwp_child_sites, 'id' ); // Get MainWP child site ids.
+            $diff             = array_diff( $mwp_site_ids, $wsal_site_ids ); // Compute the difference.
+
+            $running_flag['site_ids']       = $mwp_site_ids;
+            $next_batch                     = array_slice( $diff, 0, 5 );
+        }
+
+        if ( ! empty( $next_batch ) ) {
+            foreach ( $next_batch as $index => $site_id ) {
+                // Post data for child site.
+                $post_data = array( 'action' => 'check_wsal' );
+
+                // Call to child sites to check if WSAL is installed on them or not.
+                $response = apply_filters(
+                    'mainwp_fetchurlauthed',
+                    MWPAL_Extension\mwpal_extension()->get_child_file(),
+                    MWPAL_Extension\mwpal_extension()->get_child_key(),
+                    $site_id,
+                    'extra_excution',
+                    $post_data
+                );
+
+                if ( is_array( $response ) && isset( $response['error'] ) ) {
+                    // Some error occurred. This might be connectivity
+                    // problem or it could be sites added/removed from
+                    // MainWP. Skip this iteration early.
+                    MWPAL_Extension\mwpal_extension()->log( esc_html__( 'Error when refreshing child sites: ', 'mwp-al-ext' ) . $response['error'] );
+                    continue;
+                } elseif ( is_array( $response ) && isset( $response['wsal_installed'] ) ) {
+                    // wsal is installed, for back compat reasons cast the
+                    // array to an object before storing.
+                    $response = (object) $response;
+                }
+
+                // Cast response to an array to avoid incomplete object PHP error.
+                $response = (array) $response;
+
+                // Check if WSAL is installed on the child site.
+                if ( isset( $response['wsal_installed'] ) && true === $response['wsal_installed'] ) {
+
+                }
+            }
+        }
+
+        $result_sites_ids = $running_flag['site_ids'];
+        $running_flag['site_ids'] = array_diff( $running_flag['site_ids'], $next_batch );
+
+        // Send a response message. The JS frontend should know how to deal
+        // with the reply.
+        if ( ! empty( $running_flag['site_ids'] ) ) {
+            // cache the current progress in a transient.
+            set_transient( self::MWPAL_REFRESH_KEY, $running_flag, HOUR_IN_SECONDS );
+        } else {
+            // set the flag as complete to pass back and delete the cache.
+            $running_flag['complete'] = true;
+            delete_transient( self::MWPAL_REFRESH_KEY );
+        }
+
+        if ( ! empty( $running_flag[ 'site_ids' ] ) ) {
+	        $running_flag[ 'sites' ] = array_values(
+	                array_map( function( $site_id ) use ( $mwp_child_sites ) {
+                    foreach ( $mwp_child_sites as $child_site ) {
+                        if ( $site_id == $child_site['id'] ) {
+                            return $child_site;
+                        }
+                    }
+                }, $result_sites_ids )
+            );
+        }
+        wp_send_json_success( $running_flag );
 	}
 
 	/**
@@ -1706,5 +1665,76 @@ class View extends Abstract_View {
 			$post_data
 		);
 		return $response;
+	}
+
+	public static function render_sites_selection_ui( $all_sites, $left_pane_text, $left_pane_sites, $right_pane_text, $right_pane_sites, $wrap = false, $add_button_text = '', $show_refresh_button = true, $disable_ajax = false, $init_hidden = false ) {
+	    if ( empty( $add_button_text ) ) {
+	        $add_button_text = esc_html__( 'Add', 'mwp-al-ext' );
+	    }
+        ?>
+            <?php if ( $wrap ): ?>
+            <div class="postbox"<?php if ($init_hidden): ?> style="display: none;"<?php endif; ?>>
+            <div class="inside">
+            <?php endif; ?>
+        <div class="mwpal-wcs-container">
+            <div id="mwpal-wcs">
+                <p><?php echo $left_pane_text; ?></p>
+                <div class="sites-container js-sites-container-left">
+					<?php foreach ( $all_sites as $site ) : ?>
+						<?php if ( isset( $left_pane_sites[ $site['id'] ] ) && ! array_key_exists( $site[ 'id' ], $right_pane_sites ) ) : ?>
+                            <span>
+                                <input id="mwpal-wcs-site-<?php echo esc_attr( $site['id'] ); ?>" name="mwpal-wcs[]" value="<?php echo esc_attr( $site['id'] ); ?>" type="checkbox">
+                                <label for="mwpal-wcs-site-<?php echo esc_attr( $site['id'] ); ?>"><?php echo esc_html( $site['name'] ); ?></label>
+                            </span>
+						<?php endif; ?>
+					<?php endforeach; ?>
+                </div>
+            </div>
+            <div id="mwpal-wcs-btns"<?php if ( ! empty( $disable_ajax ) ): ?> data-disable-ajax="yes"<?php endif; ?>>
+                <a href="javascript:;" class="button-primary" id="mwpal-wcs-add-btn"><?php echo  $add_button_text; ?> <span class="dashicons dashicons-arrow-right-alt2"></span></a>
+                <br>
+                <a href="javascript:;" class="button-secondary" id="mwpal-wcs-remove-btn"><span class="dashicons dashicons-arrow-left-alt2"></span> <?php esc_html_e( 'Remove', 'mwp-al-ext' ); ?></a>
+            </div>
+            <div id="mwpal-wcs-al">
+                <p><?php echo $right_pane_text; ?></p>
+                <div class="sites-container js-sites-container-right">
+					<?php
+					$selected_sites = array();
+					foreach ( $all_sites as $site ) :
+						if ( isset( $right_pane_sites[ $site['id'] ] ) ) :
+							$selected_sites[] = $site['id'];
+							?>
+                            <span>
+                                <input id="mwpal-wcs-al-site-<?php echo esc_attr( $site['id'] ); ?>" name="mwpal-wcs-al[]" value="<?php echo esc_attr( $site['id'] ); ?>" type="checkbox">
+                                <label for="mwpal-wcs-al-site-<?php echo esc_attr( $site['id'] ); ?>"><?php echo esc_html( $site['name'] ); ?></label>
+                            </span>
+						<?php
+						endif;
+					endforeach;
+					$selected_sites = is_array( $selected_sites ) ? implode( ',', $selected_sites ) : false;
+					?>
+                </div>
+                <input type="hidden" id="mwpal-wsal-child-sites" name="mwpal-wsal-child-sites" value="<?php echo esc_attr( $selected_sites ); ?>">
+            </div>
+        </div>
+        <?php if ( $show_refresh_button ): ?>
+        <input type="button" class="button-primary" id="mwpal-wsal-sites-refresh" value="<?php esc_html_e( 'Refresh list of child sites', 'mwp-al-ext' ); ?>" data-title="<?php esc_html_e( 'Refresh list of child sites', 'mwp-al-ext' ); ?>" />
+        <div id="mwpal-wcs-refresh-message"  style="display:none; margin-left: 0;" class="notice notice-info">
+            <p><?php esc_html_e( 'Updating sites in the background. This can take a while, please do not navigate away from this page.', 'mwp-al-ext' ); ?> <span class="spinner is-active" style="float: left; margin: 0px 10px 0 0;"></span></p>
+			<?php
+			printf(
+				'<p>%1$s<span class="last-message-time">%2$s</span></p>',
+				esc_html( 'Last message received from backend at: ', 'mw-al-ext' ),
+				esc_html( 'Just starting...', 'mw-al-ext' )
+			);
+			?>
+        </div>
+        <?php endif; ?>
+
+		<?php if ( $wrap ): ?>
+            </div><!-- /.inside -->
+            </div><!-- /.postbox -->
+		<?php endif; ?>
+        <?php
 	}
 }

@@ -42,13 +42,33 @@ jQuery( document ).ready( function() {
 		});
 	});
 
+	const append_site_to_the_list = function ( site, targetElm, excludedSitesElm) {
+		if ( excludedSitesElm.find( 'input[value="' + site.id + '"]').length > 0) {
+			//	the site is in the list of excluded sites, no need to add it
+			return;
+		}
+
+		targetElm.append('<span>' +
+			'<input id="mwpal-wcs-site-' + site.id + '" name="mwpal-wcs[]" value="' + site.id + '" type="checkbox">\n' +
+			'<label for="mwpal-wcs-site-' + site.id + '">' + site.name + '</label>\n' +
+			'</span>');
+	};
+
 	/**
 	 * Refresh WSAL Child Sites.
 	 */
 	jQuery( '#mwpal-wsal-sites-refresh' ).click( function() {
+		const leftPane = jQuery( '.js-sites-container-left' );
+		const rightPane = jQuery( '.js-sites-container-right' );
+
+		if ( leftPane.attr('data-list-cleared') != 'yes') {
+			leftPane.empty();
+			leftPane.attr('data-list-cleared', 'yes');
+		}
+
 		const refreshBtn = jQuery( this );
 		const refreshMsg = jQuery( '#mwpal-wcs-refresh-message' );
-		refreshBtn.attr( 'disabled', true );
+		refreshBtn.attr( 'disabled', 'disabled' );
 		refreshBtn.val( scriptData.refreshing );
 		jQuery( refreshMsg ).show();
 
@@ -59,23 +79,32 @@ jQuery( document ).ready( function() {
 			mwpal_run_id: scriptData.runId
 		}, function( response ) {
 			console.log( response );
-			scriptData.runId = response.data.run_id;
-			// if we are complete then reload the page.
-			if ( response.data.complete === true ) {
-				location.reload();
-			} else {
-				// indicate progress by showing a date of last message.
-				let d = new Date();
-				jQuery( refreshMsg ).find( '.last-message-time' ).html( d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() );
-				refreshBtn.attr( 'disabled', false );
-				refreshBtn.removeAttr( 'disabled' );
-				jQuery( refreshBtn ).trigger( 'click' );
+			if ( response.success ) {
+				scriptData.runId = response.data.run_id;
+				// if we are complete then reload the page.
+				if (response.data.complete === true) {
+					//	re-enable the button
+					refreshBtn.removeAttr('disabled');
+					refreshBtn.val( refreshBtn.attr( 'data-title' ) );
+					leftPane.removeAttr('data-list-cleared', 'yes');
+					refreshMsg.hide();
+
+				} else {
+					// indicate progress by showing a date of last message.
+					let d = new Date();
+					jQuery(refreshMsg).find('.last-message-time').html(d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds());
+					jQuery(refreshBtn).trigger('click');
+					//	update the sites lists
+					response.data.sites.forEach(function(element) {
+						append_site_to_the_list( element, leftPane, rightPane );
+					});
+				}
 			}
 		});
 	});
 
 	/**
-	 * Retrive Logs Manually
+	 * Retrieve Logs Manually
 	 */
 	jQuery( '#mwpal-wsal-manual-retrieve' ).click( function() {
 		const retrieveBtn = jQuery( this );
@@ -108,6 +137,35 @@ jQuery( document ).ready( function() {
 		transferSites( 'mwpal-wcs-al', 'mwpal-wcs', removeSites, 'remove-sites' );
 	});
 
+	function moveSelectedSites( fromClass, toClass, container, selectedSites, activeWSALSitesElm, activeSites ) {
+		for ( let index = 0; index < selectedSites.length; index++ ) {
+			let spanElement = jQuery( '<span></span>' );
+			let inputElement = jQuery( '<input />' );
+			inputElement.attr( 'type', 'checkbox' );
+			let labelElement = jQuery( '<label></label>' );
+			let tempElement = jQuery( `#${fromClass}-site-${selectedSites[index]}` );
+
+			// Prepare input element.
+			inputElement.attr( 'name', `${toClass}[]` );
+			inputElement.attr( 'id', `${toClass}-site-${selectedSites[index]}` );
+			inputElement.attr( 'value', tempElement.val() );
+
+			// Prepare label element.
+			labelElement.attr( 'for', `${toClass}-site-${selectedSites[index]}` );
+			labelElement.html( tempElement.parent().find( 'label' ).text() );
+
+			// Append the elements together.
+			spanElement.append( inputElement );
+			spanElement.append( labelElement );
+			container.append( spanElement );
+
+			// Remove the temp element.
+			tempElement.parent().remove();
+		}
+
+		activeWSALSitesElm.val( activeSites );
+	}
+
 	/**
 	 * Transfer sites in and out of active activity log.
 	 *
@@ -127,6 +185,22 @@ jQuery( document ).ready( function() {
 			}
 		}
 
+		//	skip AJAX if disabled
+		const ajaxDisabledAttr = jQuery( '#mwpal-wcs-btns' ).attr( 'data-disable-ajax');
+		const ajaxDisabled = ( 'yes' == ajaxDisabledAttr );
+		if ( ajaxDisabled ) {
+			const activeSitesVal = activeWSALSites.val();
+			let activeSites = activeSitesVal.length == 0 ? [] : activeSitesVal.split(',');
+			if (action === 'add-sites') {
+				activeSites = activeSites.concat( selectedSites );
+			} else {
+				activeSites = activeSites.filter(x => !selectedSites.includes(x));
+			}
+			moveSelectedSites( fromClass, toClass, container, selectedSites, activeWSALSites, activeSites );
+			return;
+		}
+
+		//	carry on with AJAX if not disabled
 		jQuery.ajax({
 			type: 'POST',
 			url: scriptData.ajaxURL,
@@ -141,31 +215,7 @@ jQuery( document ).ready( function() {
 			},
 			success: function( data ) {
 				if ( data.success && selectedSites.length ) {
-					for ( let index = 0; index < selectedSites.length; index++ ) {
-						let spanElement = jQuery( '<span></span>' );
-						let inputElement = jQuery( '<input />' );
-						inputElement.attr( 'type', 'checkbox' );
-						let labelElement = jQuery( '<label></label>' );
-						let tempElement = jQuery( `#${fromClass}-site-${selectedSites[index]}` );
-
-						// Prepare input element.
-						inputElement.attr( 'name', `${toClass}[]` );
-						inputElement.attr( 'id', `${toClass}-site-${selectedSites[index]}` );
-						inputElement.attr( 'value', tempElement.val() );
-
-						// Prepare label element.
-						labelElement.attr( 'for', `${toClass}-site-${selectedSites[index]}` );
-						labelElement.html( tempElement.parent().find( 'label' ).text() );
-
-						// Append the elements together.
-						spanElement.append( inputElement );
-						spanElement.append( labelElement );
-						container.append( spanElement );
-
-						// Remove the temp element.
-						tempElement.parent().remove();
-					}
-					activeWSALSites.val( data.activeSites );
+					moveSelectedSites( fromClass, toClass, container, selectedSites, activeWSALSites, data.activeSites );
 				} else {
 					console.log( data.message );
 				}
@@ -238,7 +288,7 @@ jQuery( document ).ready( function() {
 	 *
 	 * @since 1.0.3
 	 */
-	if ( scriptData.infiniteScroll ) {
+	if ( jQuery( '#audit-log-viewer' ).length > 0 && scriptData.infiniteScroll ) {
 		let count = 2;
 		jQuery( window ).scroll( function() {
 			if ( jQuery( window ).scrollTop() === jQuery( document ).height() - jQuery( window ).height() ) {
@@ -319,5 +369,4 @@ jQuery( document ).ready( function() {
 	jQuery( '.close-log-purged-popup' ).on( 'click', {}, function() {
 		jQuery("#log-purged-popup").modal( 'hide' );
 	} );
-
 });

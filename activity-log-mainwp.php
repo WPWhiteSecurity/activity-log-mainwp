@@ -40,6 +40,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$composer_autoloader_file = __DIR__ . '/vendor/autoload.php';
+if ( file_exists( $composer_autoloader_file ) ) {
+    require_once $composer_autoloader_file;
+}
+
 if ( function_exists( 'almainwp_fs' ) ) {
 	almainwp_fs()->set_basename( true, __FILE__ );
 } else {
@@ -200,6 +205,7 @@ if ( function_exists( 'almainwp_fs' ) ) {
 			require_once MWPAL_BASE_DIR . 'includes/models/class-activerecord.php';
 			require_once MWPAL_BASE_DIR . 'includes/models/class-query.php';
 			require_once MWPAL_BASE_DIR . 'includes/models/class-occurrencequery.php';
+			require_once MWPAL_BASE_DIR . 'includes/views/class-auditlogview.php';
 			require_once MWPAL_BASE_DIR . 'includes/vendors/autoload.php';
 
 			// Autoload files.
@@ -303,7 +309,11 @@ if ( function_exists( 'almainwp_fs' ) ) {
 		/**
 		 * Load extension on `plugins_loaded` action.
 		 */
-		public function load_mwpal_extension() {}
+		public function load_mwpal_extension() {
+		    //  create background processes in order to register their hooks
+            new Enforce_Settings_Update_Process();
+			new Enforce_Settings_Removal_Process();
+        }
 
 		/**
 		 * DB connection.

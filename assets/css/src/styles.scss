@@ -96,14 +96,6 @@ td.column-user {
 		width: 100px;
 	}
 
-	.column-type {
-		width: 50px;
-	}
-
-	.column-code {
-		width: 70px;
-	}
-
 	.column-crtd {
 		width: 150px;
 	}
@@ -300,6 +292,7 @@ td.column-user {
 }
 
 #mwpal-wcs-btns a {
+
 	display: block;
 
 	.dashicons {
@@ -308,6 +301,10 @@ td.column-user {
 		vertical-align: middle;
 		margin-top: 3px;
 	}
+}
+
+#mwpal-wcs-add-btn {
+	text-align: right;
 }
 
 .sites-container {
@@ -549,4 +546,15 @@ td.column-user {
 
 #log-purged-popup {
 	max-width: 300px;
+}
+
+.postbox h2 {
+	font-size: 14px;
+	padding: 8px 12px;
+	margin: 0;
+	line-height: 1.4;
+}
+
+.js-mwpal-disabled-events {
+	width: 100%;
 }

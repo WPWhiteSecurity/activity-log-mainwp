@@ -17,28 +17,28 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. translators: %s: Getting started guide hyperlink.
-#: activity-log-mainwp.php:337
+#: activity-log-mainwp.php:347
 msgid "This extension should be installed on the MainWP dashboard site. On the child sites please install the WP Activity Log plugin. Refer to the %s for more information."
 msgstr ""
 
-#: activity-log-mainwp.php:338, includes/views/class-setup-wizard.php:286
+#: activity-log-mainwp.php:348, includes/views/class-setup-wizard.php:286
 msgid "Getting Started Guide"
 msgstr ""
 
 #. translators: MainWP website hyperlink
-#: activity-log-mainwp.php:510
+#: activity-log-mainwp.php:520
 msgid "Activity Log for MainWP Extension requires %1$s plugin to be activated in order to work. Please install and activate %2$s first."
 msgstr ""
 
-#: activity-log-mainwp.php:715
+#: activity-log-mainwp.php:725
 msgid "View Activity Log"
 msgstr ""
 
-#: activity-log-mainwp.php:716
+#: activity-log-mainwp.php:726
 msgid "Settings"
 msgstr ""
 
-#: activity-log-mainwp.php:760
+#: activity-log-mainwp.php:770
 msgid "Activity Log for MainWP"
 msgstr ""
 
@@ -2934,99 +2934,139 @@ msgstr ""
 msgid "Extension finished retrieving activity logs from the child sites."
 msgstr ""
 
-#: default-events.php:666
+#: default-events.php:669
+msgid "The status of the Child sites activity log settings"
+msgstr ""
+
+#: default-events.php:670
+msgid "The status of the Child sites activity log settings %LineBreak% OldStatus: %old_status% %LineBreak% NewStatus: %new_status%"
+msgstr ""
+
+#: default-events.php:677
+msgid "A child site to / from the Child sites activity log settings"
+msgstr ""
+
+#: default-events.php:678
+msgid "A child site to / from the Child sites activity log settings %LineBreak% Site name: %friendly_name% %LineBreak% URL: %site_url%"
+msgstr ""
+
+#: default-events.php:685
+msgid "The child sites activity log settings that are propagated to the child sites"
+msgstr ""
+
+#: default-events.php:686
+msgid "The child sites activity log settings that are propagated to the child sites."
+msgstr ""
+
+#: default-events.php:693
+msgid "Propagating the configured Child sites activity log settings"
+msgstr ""
+
+#: default-events.php:694
+msgid "Propagating the configured Child sites activity log settings."
+msgstr ""
+
+#: default-events.php:701
+msgid "The propagation of the Child sites activity log settings failed on this site"
+msgstr ""
+
+#: default-events.php:702
+msgid "The propagation of the Child sites activity log settings failed on this site  %LineBreak% Site name: %friendly_name% %LineBreak% URL: %site_url% %LineBreak% Error message: %message%"
+msgstr ""
+
+#: default-events.php:707
 msgid "User added a monitor for site"
 msgstr ""
 
-#: default-events.php:666
+#: default-events.php:707
 msgid "Added monitor for site child site: %LineBreak% %friendly_name% %LineBreak% %site_url%"
 msgstr ""
 
-#: default-events.php:667
+#: default-events.php:708
 msgid "User deleted a monitor for site"
 msgstr ""
 
-#: default-events.php:667
+#: default-events.php:708
 msgid "Deleted monitor for site child site: %LineBreak% %friendly_name% %LineBreak% %site_url%"
 msgstr ""
 
-#: default-events.php:668
+#: default-events.php:709
 msgid "User started the monitor for the site"
 msgstr ""
 
-#: default-events.php:668
+#: default-events.php:709
 msgid "Started monitor for site child site: %LineBreak% %friendly_name% %LineBreak% %site_url%"
 msgstr ""
 
-#: default-events.php:669
+#: default-events.php:710
 msgid "User stopped the monitor for the site"
 msgstr ""
 
-#: default-events.php:669
+#: default-events.php:710
 msgid "Stopped monitor for site child site: %LineBreak% %friendly_name% %LineBreak% %site_url%"
 msgstr ""
 
-#: default-events.php:670
+#: default-events.php:711
 msgid "User created monitors for all child sites"
 msgstr ""
 
-#: default-events.php:670
+#: default-events.php:711
 msgid "Created monitors for all child sites."
 msgstr ""
 
-#: default-events.php:679
+#: default-events.php:720
 msgid "A form was created, modified or deleted"
 msgstr ""
 
-#: default-events.php:680
+#: default-events.php:721
 msgid "Form name %PostTitle% %LineBreak% ID: %PostID% %LineBreak% %EditorLinkForm%"
 msgstr ""
 
-#: default-events.php:687
+#: default-events.php:728
 msgid "A field was created, deleted or modified"
 msgstr ""
 
-#: default-events.php:688
+#: default-events.php:729
 msgid "Field name %field_name% %LineBreak% Form name %form_name% %LineBreak% Form ID: %PostID% %LineBreak% %EditorLinkForm%"
 msgstr ""
 
-#: default-events.php:695
+#: default-events.php:736
 msgid "A form was duplicated"
 msgstr ""
 
-#: default-events.php:696
+#: default-events.php:737
 msgid "Source form %OldPostTitle% %LineBreak% New form name %PostTitle% %LineBreak% Source form ID %SourceID% %LineBreak% New form ID: %PostID% %LineBreak% %EditorLinkForm%"
 msgstr ""
 
-#: default-events.php:703
+#: default-events.php:744
 msgid "A notification was added to a form, enabled or modified"
 msgstr ""
 
-#: default-events.php:704
+#: default-events.php:745
 msgid "Notification name %notifiation_name% %LineBreak% Form name %form_name% %LineBreak% Form ID %PostID% %LineBreak% %EditorLinkForm%"
 msgstr ""
 
-#: default-events.php:711
+#: default-events.php:752
 msgid "An entry was deleted"
 msgstr ""
 
-#: default-events.php:712
+#: default-events.php:753
 msgid "Entry email address: %entry_email% %LineBreak% Entry ID: %entry_id% %LineBreak% Form name: %form_name% %LineBreak% Form ID: %form_id% %LineBreak% %EditorLinkForm%"
 msgstr ""
 
-#: default-events.php:719
+#: default-events.php:760
 msgid "Notifications were disabled for a form"
 msgstr ""
 
-#: default-events.php:720
+#: default-events.php:761
 msgid "All the notifications in the form. %LineBreak% Form name %form_name% %LineBreak% Form ID %PostID% %LineBreak% %EditorLinkForm%"
 msgstr ""
 
-#: default-events.php:727
+#: default-events.php:768
 msgid "A form was renamed"
 msgstr ""
 
-#: default-events.php:728
+#: default-events.php:769
 msgid "New form name %new_form_name% %LineBreak% Old form name %old_form_name% %LineBreak% Form ID %PostID% %LineBreak% %EditorLinkForm%"
 msgstr ""
 
@@ -3057,15 +3097,15 @@ msgstr ""
 msgid "Event with code %d has not be registered."
 msgstr ""
 
-#: includes/class-alertmanager.php:595, includes/class-alertmanager.php:635, includes/class-alertmanager.php:661, includes/class-alertmanager.php:754, includes/views/class-auditloglistview.php:516, includes/views/class-auditloglistview.php:546, includes/views/class-view.php:785
+#: includes/class-alertmanager.php:595, includes/class-alertmanager.php:635, includes/class-alertmanager.php:661, includes/class-alertmanager.php:754, includes/views/class-auditloglistview.php:330, includes/views/class-auditloglistview.php:360, includes/views/class-view.php:786
 msgid "User"
 msgstr ""
 
-#: includes/class-alertmanager.php:596, includes/class-alertmanager.php:664, includes/views/class-auditloggridview.php:435, includes/views/class-auditloggridview.php:389, includes/views/class-auditloglistview.php:419, includes/views/class-auditloglistview.php:373
+#: includes/class-alertmanager.php:596, includes/class-alertmanager.php:664, includes/views/class-auditloggridview.php:255, includes/views/class-auditloggridview.php:203, includes/views/class-auditloglistview.php:233, includes/views/class-auditloglistview.php:181
 msgid "System"
 msgstr ""
 
-#: includes/class-alertmanager.php:597, includes/class-alertmanager.php:667, includes/views/class-auditloggridview.php:377, includes/views/class-auditloglistview.php:361
+#: includes/class-alertmanager.php:597, includes/class-alertmanager.php:667, includes/views/class-auditloggridview.php:191, includes/views/class-auditloglistview.php:169
 msgid "Plugin"
 msgstr ""
 
@@ -3125,7 +3165,7 @@ msgstr ""
 msgid "MainWP Network"
 msgstr ""
 
-#: includes/class-alertmanager.php:613, includes/class-alertmanager.php:640, includes/class-alertmanager.php:721, includes/class-alertmanager.php:769, includes/views/class-view.php:582, includes/views/class-view.php:694
+#: includes/class-alertmanager.php:613, includes/class-alertmanager.php:640, includes/class-alertmanager.php:721, includes/class-alertmanager.php:769, includes/views/class-view.php:583, includes/views/class-view.php:695
 msgid "MainWP"
 msgstr ""
 
@@ -3157,7 +3197,7 @@ msgstr ""
 msgid "Theme"
 msgstr ""
 
-#: includes/class-alertmanager.php:621, includes/class-alertmanager.php:638, includes/class-alertmanager.php:745, includes/class-alertmanager.php:763, includes/views/class-view.php:1547
+#: includes/class-alertmanager.php:621, includes/class-alertmanager.php:638, includes/class-alertmanager.php:745, includes/class-alertmanager.php:763, includes/views/class-view.php:1506
 msgid "Activity Logs"
 msgstr ""
 
@@ -3337,197 +3377,290 @@ msgstr ""
 msgid "Failed"
 msgstr ""
 
-#: includes/class-settings.php:721, includes/class-settings.php:721, includes/views/class-auditloggridview.php:816, includes/views/class-auditloggridview.php:816, includes/views/class-auditloglistview.php:775, includes/views/class-auditloglistview.php:775
+#: includes/class-settings.php:742, includes/class-settings.php:742, includes/views/class-auditloggridview.php:519, includes/views/class-auditloggridview.php:519, includes/views/class-auditloglistview.php:472, includes/views/class-auditloglistview.php:472
 msgid "Download the log file"
 msgstr ""
 
-#: includes/class-settings.php:741, includes/class-settings.php:741, includes/views/class-auditloggridview.php:836, includes/views/class-auditloggridview.php:836, includes/views/class-auditloglistview.php:795, includes/views/class-auditloglistview.php:795
+#: includes/class-settings.php:762, includes/class-settings.php:762, includes/views/class-auditloggridview.php:539, includes/views/class-auditloggridview.php:539, includes/views/class-auditloglistview.php:492, includes/views/class-auditloglistview.php:492
 msgid "Download the log file."
 msgstr ""
 
-#: includes/class-settings.php:749, includes/views/class-auditloggridview.php:844, includes/views/class-auditloglistview.php:803
+#: includes/class-settings.php:770, includes/views/class-auditloggridview.php:547, includes/views/class-auditloglistview.php:500
 msgid "published"
 msgstr ""
 
-#: includes/class-settings.php:777, includes/views/class-auditloggridview.php:553, includes/views/class-auditloggridview.php:864, includes/views/class-auditloglistview.php:489, includes/views/class-auditloglistview.php:823
+#: includes/class-settings.php:798, includes/views/class-auditloggridview.php:373, includes/views/class-auditloggridview.php:567, includes/views/class-auditloglistview.php:303, includes/views/class-auditloglistview.php:520
 msgid "Alert Data Inspector"
 msgstr ""
 
 #. translators: Mailto link for support.
 #. translators: Mailto link for support.
 #. translators: Mailto link for support.
-#: includes/class-settings.php:788, includes/views/class-auditloggridview.php:872, includes/views/class-auditloglistview.php:831
+#: includes/class-settings.php:809, includes/views/class-auditloggridview.php:575, includes/views/class-auditloglistview.php:528
 msgid "Contact us on %s for assistance"
 msgstr ""
 
-#: includes/class-settings.php:800, includes/views/class-auditloggridview.php:884, includes/views/class-auditloglistview.php:843
+#: includes/class-settings.php:821, includes/views/class-auditloggridview.php:587, includes/views/class-auditloglistview.php:540
 msgid "plugin settings"
 msgstr ""
 
-#: includes/class-settings.php:803, includes/views/class-auditloggridview.php:887, includes/views/class-auditloglistview.php:846
+#: includes/class-settings.php:824, includes/views/class-auditloggridview.php:590, includes/views/class-auditloglistview.php:543
 msgid "contact our support"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:122, includes/views/class-auditloglistview.php:122
-msgid "No events so far."
+#: includes/processes/class-enforce-settings-background-process.php:64
+msgid "No error message returned from the child site."
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:164, includes/views/class-auditloglistview.php:164
+#: includes/views/class-auditloggridview.php:66, includes/views/class-auditloglistview.php:61
 msgid "Upgrade to premium to add search & filters and reports."
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:165, includes/views/class-auditloglistview.php:165
+#: includes/views/class-auditloggridview.php:67, includes/views/class-auditloglistview.php:62
 msgid "Use the search to also search in the child sites'activity log and the filters to fine-tune the results."
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:166, includes/views/class-auditloglistview.php:166
+#: includes/views/class-auditloggridview.php:68, includes/views/class-auditloglistview.php:63
 msgid "Generate and schedule automated weekly and monthly reports from the child site's activity logs."
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:172, includes/views/class-auditloglistview.php:172
+#: includes/views/class-auditloggridview.php:74, includes/views/class-auditloglistview.php:69
 msgid "Upgrade Now"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:173, includes/views/class-auditloglistview.php:173
+#: includes/views/class-auditloggridview.php:75, includes/views/class-auditloglistview.php:70
 msgid "Tell Me More"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:176, includes/views/class-auditloglistview.php:176
+#: includes/views/class-auditloggridview.php:78, includes/views/class-auditloglistview.php:73
 msgid "Close"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:201, includes/views/class-auditloglistview.php:201
-msgid "Show "
-msgstr ""
-
-#: includes/views/class-auditloggridview.php:212, includes/views/class-auditloglistview.php:212
-msgid " Items"
-msgstr ""
-
-#: includes/views/class-auditloggridview.php:219, includes/views/class-auditloglistview.php:219
-msgid "— End of Activity Log —"
-msgstr ""
-
-#: includes/views/class-auditloggridview.php:233, includes/views/class-auditloglistview.php:233
-msgid "All Sites"
-msgstr ""
-
-#: includes/views/class-auditloggridview.php:234, includes/views/class-auditloggridview.php:301, includes/views/class-auditloglistview.php:234, includes/views/class-auditloglistview.php:302
+#: includes/views/class-auditloggridview.php:115, includes/views/class-auditloglistview.php:110, includes/views/class-auditlogview.php:312
 msgid "MainWP Dashboard"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:252, includes/views/class-auditloglistview.php:252
-msgid "Retrieve Activity Logs Now"
-msgstr ""
-
-#: includes/views/class-auditloggridview.php:258, includes/views/class-auditloglistview.php:259
-msgid "List View"
-msgstr ""
-
-#: includes/views/class-auditloggridview.php:259, includes/views/class-auditloglistview.php:260
-msgid "Grid View"
-msgstr ""
-
-#: includes/views/class-auditloggridview.php:315, includes/views/class-auditloglistview.php:316
+#: includes/views/class-auditloggridview.php:129, includes/views/class-auditloglistview.php:124
 msgid "Unknown error code."
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:333, includes/views/class-auditloggridview.php:579, includes/views/class-auditloggridview.php:603, includes/views/class-auditloglistview.php:334
+#: includes/views/class-auditloggridview.php:147, includes/views/class-auditloggridview.php:399, includes/views/class-auditloggridview.php:423, includes/views/class-auditloglistview.php:142
 msgid "Info"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:331, includes/views/class-auditloglistview.php:332
+#: includes/views/class-auditloggridview.php:145, includes/views/class-auditloglistview.php:140
 msgid "Low"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:329, includes/views/class-auditloglistview.php:330
+#: includes/views/class-auditloggridview.php:143, includes/views/class-auditloglistview.php:138
 msgid "Medium"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:327, includes/views/class-auditloglistview.php:328
+#: includes/views/class-auditloggridview.php:141, includes/views/class-auditloglistview.php:136
 msgid "High"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:325, includes/views/class-auditloggridview.php:319, includes/views/class-auditloglistview.php:326, includes/views/class-auditloglistview.php:320, includes/views/class-view.php:830
+#: includes/views/class-auditloggridview.php:139, includes/views/class-auditloggridview.php:133, includes/views/class-auditloglistview.php:134, includes/views/class-auditloglistview.php:128, includes/views/class-view.php:831
 msgid "Critical"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:323, includes/views/class-auditloglistview.php:324, includes/views/class-view.php:836, includes/views/class-view.php:834
+#: includes/views/class-auditloggridview.php:137, includes/views/class-auditloglistview.php:132, includes/views/class-view.php:837, includes/views/class-view.php:835
 msgid "Notification"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:321, includes/views/class-auditloglistview.php:322, includes/views/class-view.php:832
+#: includes/views/class-auditloggridview.php:135, includes/views/class-auditloglistview.php:130, includes/views/class-view.php:833
 msgid "Warning"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:355, includes/views/class-auditloggridview.php:362, includes/views/class-auditloggridview.php:431, includes/views/class-auditloglistview.php:345, includes/views/class-auditloglistview.php:415
+#: includes/views/class-auditloggridview.php:169, includes/views/class-auditloggridview.php:176, includes/views/class-auditloggridview.php:251, includes/views/class-auditloglistview.php:153, includes/views/class-auditloglistview.php:229
 msgid "Unknown"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:385, includes/views/class-auditloglistview.php:369
+#: includes/views/class-auditloggridview.php:199, includes/views/class-auditloglistview.php:177
 msgid "Website Visitor"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:381, includes/views/class-auditloglistview.php:365
+#: includes/views/class-auditloggridview.php:195, includes/views/class-auditloglistview.php:173
 msgid "Plugins"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:469, includes/views/class-auditloggridview.php:482, includes/views/class-auditloglistview.php:440, includes/views/class-auditloglistview.php:453
+#: includes/views/class-auditloggridview.php:289, includes/views/class-auditloggridview.php:302, includes/views/class-auditloglistview.php:254, includes/views/class-auditloglistview.php:267
 msgid "Show me all activity originating from this IP Address"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:552, includes/views/class-auditloglistview.php:488
+#: includes/views/class-auditloggridview.php:372, includes/views/class-auditloglistview.php:302
 msgid "View all details of this change"
 msgstr ""
 
 #. translators: Column Name
 #. translators: Column Name
-#: includes/views/class-auditloggridview.php:564, includes/views/class-auditloglistview.php:500
+#: includes/views/class-auditloggridview.php:384, includes/views/class-auditloglistview.php:314
 msgid "Column \"%s\" not found"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:576, includes/views/class-auditloggridview.php:594, includes/views/class-auditloglistview.php:512, includes/views/class-auditloglistview.php:534
+#: includes/views/class-auditloggridview.php:396, includes/views/class-auditloggridview.php:414, includes/views/class-auditloglistview.php:326, includes/views/class-auditloglistview.php:348
 msgid "Site"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:577, includes/views/class-auditloggridview.php:597, includes/views/class-auditloglistview.php:513, includes/views/class-auditloglistview.php:537, includes/views/class-view.php:779
+#: includes/views/class-auditloggridview.php:397, includes/views/class-auditloggridview.php:417, includes/views/class-auditloglistview.php:327, includes/views/class-auditloglistview.php:351, includes/views/class-view.php:780
 msgid "Event ID"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:578, includes/views/class-auditloggridview.php:600, includes/views/class-auditloglistview.php:514, includes/views/class-auditloglistview.php:540, includes/views/class-view.php:781, includes/views/class-view.php:816
+#: includes/views/class-auditloggridview.php:398, includes/views/class-auditloggridview.php:420, includes/views/class-auditloglistview.php:328, includes/views/class-auditloglistview.php:354, includes/views/class-view.php:782, includes/views/class-view.php:817
 msgid "Severity"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:580, includes/views/class-auditloglistview.php:520, includes/views/class-auditloglistview.php:552
+#: includes/views/class-auditloggridview.php:400, includes/views/class-auditloglistview.php:334, includes/views/class-auditloglistview.php:366
 msgid "Message"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:917, includes/views/class-auditloglistview.php:879
+#: includes/views/class-auditloggridview.php:620, includes/views/class-auditloglistview.php:576
 msgid "Search events"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:919, includes/views/class-auditloglistview.php:881
+#: includes/views/class-auditloggridview.php:622, includes/views/class-auditloglistview.php:578
 msgid "Clear Search Results"
 msgstr ""
 
-#: includes/views/class-auditloglistview.php:515, includes/views/class-auditloglistview.php:543
+#: includes/views/class-auditloglistview.php:329, includes/views/class-auditloglistview.php:357
 msgid "Date"
 msgstr ""
 
-#: includes/views/class-auditloglistview.php:517, includes/views/class-auditloglistview.php:549
+#: includes/views/class-auditloglistview.php:331, includes/views/class-auditloglistview.php:363
 msgid "Source IP"
 msgstr ""
 
-#: includes/views/class-auditloglistview.php:518, includes/views/class-auditloglistview.php:558
+#: includes/views/class-auditloglistview.php:332, includes/views/class-auditloglistview.php:372
 msgid "Object"
 msgstr ""
 
-#: includes/views/class-auditloglistview.php:519, includes/views/class-auditloglistview.php:555
+#: includes/views/class-auditloglistview.php:333, includes/views/class-auditloglistview.php:369
 msgid "Event Type"
 msgstr ""
 
-#: includes/views/class-auditloglistview.php:852
+#: includes/views/class-auditloglistview.php:549
 msgid "View form in the editor"
+msgstr ""
+
+#: includes/views/class-auditlogview.php:88
+msgid "List View"
+msgstr ""
+
+#: includes/views/class-auditlogview.php:89
+msgid "Grid View"
+msgstr ""
+
+#: includes/views/class-auditlogview.php:110
+msgid "No events so far."
+msgstr ""
+
+#: includes/views/class-auditlogview.php:279
+msgid "Show "
+msgstr ""
+
+#: includes/views/class-auditlogview.php:290
+msgid " Items"
+msgstr ""
+
+#: includes/views/class-auditlogview.php:297
+msgid "— End of Activity Log —"
+msgstr ""
+
+#: includes/views/class-auditlogview.php:311
+msgid "All Sites"
+msgstr ""
+
+#: includes/views/class-auditlogview.php:330
+msgid "Retrieve Activity Logs Now"
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:55, includes/views/class-enforce-settings-view.php:78
+msgid "Child Sites Activity Log Settings"
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:114
+msgid "Enforce settings on child sites"
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:115
+msgid "Use the below setting to specify on which of this child sites you’d like to enforce the configured activity log settings."
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:123
+msgid "Enforce these settings on"
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:131
+msgid "Do not enforce any settings"
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:138
+msgid "All child sites connected to the central activity log"
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:145
+msgid "Only the following child sites"
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:157, includes/views/class-view.php:962
+msgid "Child sites which have their activity log in the central MainWP activity logs"
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:159
+msgid "Child sites which have enforced the configured activity log settings."
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:177
+msgid "For how long do you want to keep the activity log events (Retention settings) ?"
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:180
+msgid "The plugin uses an efficient way to store the activity log data in the WordPress database, though the more data you keep the more disk space will be required. "
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:187
+msgid "Activity log retention"
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:194
+msgid "Keep all data"
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:202
+msgid "Delete events older than"
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:209, includes/views/class-view.php:912
+msgid "Months"
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:210, includes/views/class-view.php:913
+msgid "Years"
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:224
+msgid "Disable events"
+msgstr ""
+
+#. translators: %s is replaced with the hyperlink to the list of activity IDs
+#: includes/views/class-enforce-settings-view.php:231
+msgid "Specify the ID of the events you want to disable in the child sites’ activity logs. When an ID is disabled, the plugin won’t keep a record of that particular change in the activity log. Refer to the %s to find out what change every event ID represents."
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:232
+msgid "list of activity log event IDs"
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:241
+msgid "Disable the following event IDs:"
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:256, includes/views/class-view.php:977
+msgid "Save Settings"
+msgstr ""
+
+#: includes/views/class-enforce-settings-view.php:493
+msgid "Select event code(s)"
 msgstr ""
 
 #: includes/views/class-setup-wizard.php:83
@@ -3595,242 +3728,230 @@ msgstr ""
 msgid "Extension Settings"
 msgstr ""
 
-#: includes/views/class-view.php:475
+#: includes/views/class-view.php:476
 msgid "Select Child Site(s)"
 msgstr ""
 
-#: includes/views/class-view.php:476
+#: includes/views/class-view.php:477
 msgid "Refreshing Child Sites..."
 msgstr ""
 
-#: includes/views/class-view.php:477
+#: includes/views/class-view.php:478
 msgid "Retrieving Logs..."
 msgstr ""
 
-#: includes/views/class-view.php:636
+#: includes/views/class-view.php:637
 msgid "The Extension has to be enabled to change the settings."
 msgstr ""
 
-#: includes/views/class-view.php:703
+#: includes/views/class-view.php:704
 msgid "Activity Log Settings"
 msgstr ""
 
-#: includes/views/class-view.php:708
+#: includes/views/class-view.php:709
 msgid "Event Viewer View Type"
 msgstr ""
 
-#: includes/views/class-view.php:714
+#: includes/views/class-view.php:715
 msgid "Infinite Scroll"
 msgstr ""
 
-#: includes/views/class-view.php:719
+#: includes/views/class-view.php:720
 msgid "Pagination"
 msgstr ""
 
-#: includes/views/class-view.php:727
+#: includes/views/class-view.php:728
 msgid "Events Timestamp"
 msgstr ""
 
-#: includes/views/class-view.php:733
+#: includes/views/class-view.php:734
 msgid "UTC"
 msgstr ""
 
-#: includes/views/class-view.php:738
+#: includes/views/class-view.php:739
 msgid "Timezone configured on this WordPress website"
 msgstr ""
 
-#: includes/views/class-view.php:746
+#: includes/views/class-view.php:747
 msgid "Display this user information in activity log"
 msgstr ""
 
-#: includes/views/class-view.php:752
+#: includes/views/class-view.php:753
 msgid "WordPress Username"
 msgstr ""
 
-#: includes/views/class-view.php:757
+#: includes/views/class-view.php:758
 msgid "First Name & Last Name"
 msgstr ""
 
-#: includes/views/class-view.php:762
+#: includes/views/class-view.php:763
 msgid "Configured Public Display Name"
 msgstr ""
 
-#: includes/views/class-view.php:770
+#: includes/views/class-view.php:771
 msgid "Activity Log Columns Selection"
 msgstr ""
 
-#: includes/views/class-view.php:789
+#: includes/views/class-view.php:790
 msgid "Info (used in Grid view mode only)"
 msgstr ""
 
-#: includes/views/class-view.php:787
+#: includes/views/class-view.php:788
 msgid "Source IP Address"
 msgstr ""
 
-#: includes/views/class-view.php:783
+#: includes/views/class-view.php:784
 msgid "Date & Time"
 msgstr ""
 
-#: includes/views/class-view.php:807
+#: includes/views/class-view.php:808
 msgid "MainWP Network Activity Logs"
 msgstr ""
 
-#: includes/views/class-view.php:808
+#: includes/views/class-view.php:809
 msgid "Use the below settings to disable / re-enable activity log events that are specific to the MainWP network and to also configure the pruning of such events."
 msgstr ""
 
-#: includes/views/class-view.php:810
+#: includes/views/class-view.php:811
 msgid "Enable / Disable MainWP Network Activity Log Events"
 msgstr ""
 
-#: includes/views/class-view.php:815
+#: includes/views/class-view.php:816
 msgid "Code"
 msgstr ""
 
-#: includes/views/class-view.php:817
+#: includes/views/class-view.php:818
 msgid "Description"
 msgstr ""
 
-#: includes/views/class-view.php:850
+#: includes/views/class-view.php:851
 msgid "Activity Log Retrieval Settings"
 msgstr ""
 
-#: includes/views/class-view.php:851
+#: includes/views/class-view.php:852
 msgid "The Activity Log for MainWP extension retrieves events directly from the child sites' activity logs. Use the below settings to specify how many events the extension should retrieve and store from a child site, and how often it should do it."
 msgstr ""
 
-#: includes/views/class-view.php:856
+#: includes/views/class-view.php:857
 msgid "Number of Events to Retrieve from Child Sites"
 msgstr ""
 
-#: includes/views/class-view.php:866
+#: includes/views/class-view.php:867
 msgid "Events Retrieval Frequency"
 msgstr ""
 
-#: includes/views/class-view.php:871
+#: includes/views/class-view.php:872
 msgid "hours"
 msgstr ""
 
-#: includes/views/class-view.php:877
+#: includes/views/class-view.php:878
 msgid "Sync Events"
 msgstr ""
 
-#: includes/views/class-view.php:882
+#: includes/views/class-view.php:883
 msgid "Retrieve activity logs from child sites when I sync data with child sites."
 msgstr ""
 
-#: includes/views/class-view.php:893
+#: includes/views/class-view.php:894
 msgid "MainWP database activity logs management"
 msgstr ""
 
-#: includes/views/class-view.php:894
+#: includes/views/class-view.php:895
 msgid "Use the settings below to manage the activity log data stored in the MainWP dashboard site database. Note that these settings do not apply to the activity logs of the child sites."
 msgstr ""
 
-#: includes/views/class-view.php:898
+#: includes/views/class-view.php:899
 msgid "MainWP network activity logs retention policy"
 msgstr ""
 
-#: includes/views/class-view.php:908
+#: includes/views/class-view.php:909
 msgid "Delete events older than:"
 msgstr ""
 
-#: includes/views/class-view.php:911
-msgid "Months"
-msgstr ""
-
-#: includes/views/class-view.php:912
-msgid "Years"
-msgstr ""
-
-#: includes/views/class-view.php:919
+#: includes/views/class-view.php:920
 msgid "Do not delete any events."
 msgstr ""
 
-#: includes/views/class-view.php:925
+#: includes/views/class-view.php:926
 msgid "Delete the activity log data stored in the MainWP database"
 msgstr ""
 
-#: includes/views/class-view.php:929
+#: includes/views/class-view.php:930
 msgid "Delete activity log"
 msgstr ""
 
-#: includes/views/class-view.php:937
+#: includes/views/class-view.php:938
 msgid "Activity log data has been purged."
 msgstr ""
 
-#: includes/views/class-view.php:940
+#: includes/views/class-view.php:941
 msgid "OK"
 msgstr ""
 
-#: includes/views/class-view.php:949
+#: includes/views/class-view.php:950
 msgid "List of Child Sites in the Activity Log for MainWP"
 msgstr ""
 
-#: includes/views/class-view.php:950
+#: includes/views/class-view.php:951
 msgid "Use the below settings to add or remove child sites' activity logs from the central activity log in the MainWP dashboard. The column on the left is a list of MainWP child sites that have the WP Activity Log plugin installed but their logs are not shown in the MainWP dashboard."
 msgstr ""
 
-#: includes/views/class-view.php:958
+#: includes/views/class-view.php:960
 msgid "Child sites with WP Activity Log installed but not in the MainWP Activity Log"
 msgstr ""
 
-#: includes/views/class-view.php:976
+#: includes/views/class-view.php:965
 msgid "Add to Activity Log"
 msgstr ""
 
-#: includes/views/class-view.php:978
-msgid "Remove"
-msgstr ""
-
-#: includes/views/class-view.php:981
-msgid "Child sites which have their activity log in the central MainWP activity logs"
-msgstr ""
-
-#: includes/views/class-view.php:1002
-msgid "Refresh list of child sites"
-msgstr ""
-
-#: includes/views/class-view.php:1004
-msgid "Updating sites in the background. This can take a while, please do not navigate away from this page."
-msgstr ""
-
-#: includes/views/class-view.php:1023
-msgid "Save Settings"
-msgstr ""
-
-#: includes/views/class-view.php:1239, includes/views/class-view.php:1262, includes/views/class-view.php:1301, includes/views/class-view.php:1421, includes/views/class-view.php:1487, includes/views/class-view.php:1502
+#: includes/views/class-view.php:1193, includes/views/class-view.php:1216, includes/views/class-view.php:1255, includes/views/class-view.php:1380, includes/views/class-view.php:1446, includes/views/class-view.php:1461
 msgid "Access denied."
 msgstr ""
 
-#: includes/views/class-view.php:1249
+#: includes/views/class-view.php:1203
 msgid "Count parameter expected."
 msgstr ""
 
-#: includes/views/class-view.php:1254, includes/views/class-view.php:1293, includes/views/class-view.php:1410, includes/views/class-view.php:1509, includes/views/class-view.php:1536
+#: includes/views/class-view.php:1208, includes/views/class-view.php:1247, includes/views/class-view.php:1259, includes/views/class-view.php:1468, includes/views/class-view.php:1495
 msgid "Nonce verification failed."
 msgstr ""
 
-#: includes/views/class-view.php:1271
+#: includes/views/class-view.php:1225
 msgid "Occurrence ID parameter expected."
 msgstr ""
 
-#: includes/views/class-view.php:1324
+#: includes/views/class-view.php:1277
 msgid "There is a run in progress and the ID does not match the previously stored run ID: "
 msgstr ""
 
-#: includes/views/class-view.php:1376
+#: includes/views/class-view.php:1326
 msgid "Error when refreshing child sites: "
 msgstr ""
 
-#: includes/views/class-view.php:1479
+#: includes/views/class-view.php:1438
 msgid "Invalid action."
 msgstr ""
 
-#: includes/views/class-view.php:1518
+#: includes/views/class-view.php:1477
 msgid "Access Denied"
 msgstr ""
 
-#: includes/views/class-view.php:1608
+#: includes/views/class-view.php:1567
 msgid "Upgrade to Premium"
+msgstr ""
+
+#: includes/views/class-view.php:1672
+msgid "Add"
+msgstr ""
+
+#: includes/views/class-view.php:1696
+msgid "Remove"
+msgstr ""
+
+#: includes/views/class-view.php:1721, includes/views/class-view.php:1721
+msgid "Refresh list of child sites"
+msgstr ""
+
+#: includes/views/class-view.php:1723
+msgid "Updating sites in the background. This can take a while, please do not navigate away from this page."
 msgstr ""
