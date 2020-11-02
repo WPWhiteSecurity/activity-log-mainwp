@@ -1,0 +1,5 @@
+{
+    "require": {
+        "deliciousbrains/wp-background-processing": "^1.0"
+    }
+}
