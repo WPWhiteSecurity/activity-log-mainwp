@@ -663,6 +663,47 @@ function mwpal_defaults_init() {
 					array( 7710, WSAL_LOW, __( 'Extension failed to retrieve the activity log of a child site', 'mwp-al-ext' ), __( 'Extension failed to retrieve the activity logs of a child site. %LineBreak% Name: %friendly_name% %LineBreak% URL: %site_url%', 'mwp-al-ext' ), 'activity-logs', 'failed' ),
 					array( 7711, WSAL_INFORMATIONAL, __( 'Extension started retrieving activity logs from the child sites', 'mwp-al-ext' ), __( 'Extension started retrieving activity logs from the child sites.', 'mwp-al-ext' ), 'activity-logs', 'started' ),
 					array( 7712, WSAL_INFORMATIONAL, __( 'Extension is ready retrieving activity logs from the child sites', 'mwp-al-ext' ), __( 'Extension finished retrieving activity logs from the child sites.', 'mwp-al-ext' ), 'activity-logs', 'finished' ),
+
+					array( 7713,
+						WSAL_MEDIUM,
+						__( 'The status of the Child sites activity log settings', 'mwp-al-ext' ),
+						__( 'The status of the Child sites activity log settings %LineBreak% OldStatus: %old_status% %LineBreak% NewStatus: %new_status%', 'mwp-al-ext' ),
+						'activity-logs',
+						'modified'
+					),
+
+					array( 7714,
+						WSAL_MEDIUM,
+						__( 'A child site to / from the Child sites activity log settings', 'mwp-al-ext' ),
+						__( 'A child site to / from the Child sites activity log settings %LineBreak% Site name: %friendly_name% %LineBreak% URL: %site_url%', 'mwp-al-ext' ),
+						'activity-logs',
+						'added'
+					),
+
+					array( 7715,
+						WSAL_MEDIUM,
+						__( 'The child sites activity log settings that are propagated to the child sites', 'mwp-al-ext' ),
+						__( 'The child sites activity log settings that are propagated to the child sites.', 'mwp-al-ext' ),
+						'activity-logs',
+						'modified'
+					),
+
+					array( 7716,
+						WSAL_MEDIUM,
+						__( 'Propagating the configured Child sites activity log settings', 'mwp-al-ext' ),
+						__( 'Propagating the configured Child sites activity log settings.', 'mwp-al-ext' ),
+						'activity-logs',
+						'started'
+					),
+
+					array( 7717,
+						WSAL_HIGH,
+						__( 'The propagation of the Child sites activity log settings failed on this site', 'mwp-al-ext' ),
+						__( 'The propagation of the Child sites activity log settings failed on this site  %LineBreak% Site name: %friendly_name% %LineBreak% URL: %site_url% %LineBreak% Error message: %message%', 'mwp-al-ext' ),
+						'activity-logs',
+						'failed'
+					),
+
 					array( 7750, WSAL_INFORMATIONAL, __( 'User added a monitor for site', 'mwp-al-ext' ), __( 'Added monitor for site child site: %LineBreak% %friendly_name% %LineBreak% %site_url%', 'mwp-al-ext' ), 'uptime-monitor', 'added' ),
 					array( 7751, WSAL_MEDIUM, __( 'User deleted a monitor for site', 'mwp-al-ext' ), __( 'Deleted monitor for site child site: %LineBreak% %friendly_name% %LineBreak% %site_url%', 'mwp-al-ext' ), 'uptime-monitor', 'deleted' ),
 					array( 7752, WSAL_INFORMATIONAL, __( 'User started the monitor for the site', 'mwp-al-ext' ), __( 'Started monitor for site child site: %LineBreak% %friendly_name% %LineBreak% %site_url%', 'mwp-al-ext' ), 'uptime-monitor', 'started' ),

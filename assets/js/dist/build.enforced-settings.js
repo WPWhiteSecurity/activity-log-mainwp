@@ -81,21 +81,36 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
-/******/ ([
-/* 0 */,
-/* 1 */
+/******/ ({
+
+/***/ 2:
 /***/ (function(module, exports) {
 
 /**
- * Entry Point for Setup Wizard
- *
- * @since 0.1.0
+ * Enforced settings script.
  */
-// Import styles.
-// import '../../css/src/mwpal-setup-wizard.scss';
+jQuery(document).ready(function ($) {
+  $('input[name="enforce_settings_on_subsites"]').on('change', function () {
+    var wrapper = $(this).closest('fieldset').find('.postbox');
+    var value = $(this).val();
+
+    if ('some' === value) {
+      wrapper.slideDown();
+    } else {
+      wrapper.slideUp();
+    }
+  });
+  $('.js-mwpal-disabled-events').select2({
+    data: JSON.parse(mwpal_enforced_settings.events),
+    placeholder: mwpal_enforced_settings.selectEvents,
+    minimumResultsForSearch: 10,
+    multiple: true
+  });
+});
 
 /***/ })
-/******/ ]);
+
+/******/ });

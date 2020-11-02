@@ -59,6 +59,7 @@ module.exports = ( env, options ) => {
 		entry: {
 			'index': './assets/js/src/index.js',
 			'wizard': './assets/js/src/mwpal-setup-wizard.js',
+			'build.enforced-settings': './assets/js/src/enforced-settings.js',
 			'search/build.search': './assets/js/src/search/search.js',
 			'reports/build.reports': './assets/js/src/reports/reports.js',
 			'styles.build': './assets/css/src/styles.scss',

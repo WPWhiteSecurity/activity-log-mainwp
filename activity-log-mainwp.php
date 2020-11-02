@@ -4,7 +4,7 @@
  * Plugin URI: https://wpactivitylog.com/extensions/mainwp-activity-log/
  * Description: This extension for MainWP enables you to view the activity logs of all child sites in one central location, the MainWP dashboard.
  * Author: WP White Security
- * Version: 1.5.2
+ * Version: 1.6
  * Text Domain: mwp-al-ext
  * Domain Path: /languages
  * Author URI: http://www.wpwhitesecurity.com/
@@ -40,6 +40,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+$composer_autoloader_file = __DIR__ . '/vendor/autoload.php';
+if ( file_exists( $composer_autoloader_file ) ) {
+    require_once $composer_autoloader_file;
+}
+
 if ( function_exists( 'almainwp_fs' ) ) {
 	almainwp_fs()->set_basename( true, __FILE__ );
 } else {
@@ -56,7 +61,7 @@ if ( function_exists( 'almainwp_fs' ) ) {
 		 *
 		 * @var string
 		 */
-		public $version = '1.5.2';
+		public $version = '1.6';
 
 		/**
 		 * Single Static Instance of the plugin.
@@ -200,6 +205,7 @@ if ( function_exists( 'almainwp_fs' ) ) {
 			require_once MWPAL_BASE_DIR . 'includes/models/class-activerecord.php';
 			require_once MWPAL_BASE_DIR . 'includes/models/class-query.php';
 			require_once MWPAL_BASE_DIR . 'includes/models/class-occurrencequery.php';
+			require_once MWPAL_BASE_DIR . 'includes/views/class-auditlogview.php';
 			require_once MWPAL_BASE_DIR . 'includes/vendors/autoload.php';
 
 			// Autoload files.
@@ -266,11 +272,6 @@ if ( function_exists( 'almainwp_fs' ) ) {
 		public function init_freemius() {
 			if ( is_admin() && file_exists( trailingslashit( MWPAL_BASE_DIR ) . 'sdk/freemius-init.php' ) ) {
 				require_once trailingslashit( MWPAL_BASE_DIR ) . 'sdk/freemius-init.php';
-
-				if ( almainwp_fs()->is_plan__premium_only( 'premium' ) && almainwp_fs()->has_active_valid_license() ) {
-					// Include premium extensions.
-					require_once MWPAL_BASE_DIR . 'extensions/class-extensions.php';
-				}
 			}
 		}
 
@@ -308,7 +309,11 @@ if ( function_exists( 'almainwp_fs' ) ) {
 		/**
 		 * Load extension on `plugins_loaded` action.
 		 */
-		public function load_mwpal_extension() {}
+		public function load_mwpal_extension() {
+		    //  create background processes in order to register their hooks
+            new Enforce_Settings_Update_Process();
+			new Enforce_Settings_Removal_Process();
+        }
 
 		/**
 		 * DB connection.
@@ -762,11 +767,7 @@ if ( function_exists( 'almainwp_fs' ) ) {
 
 		function custom_page_title( $title ) {
 			if ( isset( $_REQUEST['page'] ) && 'Extensions-Activity-Log-Mainwp-Premium' === $_REQUEST['page'] || isset( $_REQUEST['page'] ) && 'Extensions-Activity-Log-Mainwp' === $_REQUEST['page'] ) {
-				if ( almainwp_fs()->is_plan__premium_only( 'premium' ) && almainwp_fs()->has_active_valid_license() ) {
-					$title = esc_html__( 'Activity Log for MainWP (Premium)', 'mwp-al-ext' );
-				} else {
-					$title = esc_html__( 'Activity Log for MainWP', 'mwp-al-ext' );
-				}
+				$title = esc_html__( 'Activity Log for MainWP', 'mwp-al-ext' );
 			}
 
 			return $title;

@@ -140,19 +140,14 @@ class Sensor_MainWP extends Abstract_Sensor {
 			return;
 		}
 
-		// Get MainWP child sites.
-		$mwp_sites = MWPAL_Extension\mwpal_extension()->settings->get_mwp_child_sites();
-
-		// Search for the site data.
-		$key = array_search( $new_site_id, array_column( $mwp_sites, 'id' ), false );
-
-		if ( false !== $key && isset( $mwp_sites[ $key ] ) ) {
+		$new_site = MWPAL_Extension\mwpal_extension()->settings->get_mwp_child_site_by_id( $new_site_id );
+		if ( $new_site != null ) {
 			MWPAL_Extension\mwpal_extension()->alerts->trigger(
 				7700,
 				array(
-					'friendly_name' => $mwp_sites[ $key ]['name'],
-					'site_url'      => $mwp_sites[ $key ]['url'],
-					'site_id'       => $mwp_sites[ $key ]['id'],
+					'friendly_name' => $new_site['name'],
+					'site_url'      => $new_site['url'],
+					'site_id'       => $new_site['id'],
 					'mainwp_dash'   => true,
 				)
 			);
