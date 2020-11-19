@@ -339,7 +339,6 @@ class ActiveRecord implements ActiveRecordInterface {
 	 */
 	public function Count( $cond = '%d', $args = array( 1 ) ) {
 		$_wpdb = $this->connection;
-		$class = get_called_class();
 		$sql   = $_wpdb->prepare( 'SELECT COUNT(*) FROM ' . $this->GetTable() . ' WHERE ' . $cond, $args );
 		return (int) $_wpdb->get_var( $sql );
 	}
@@ -366,7 +365,6 @@ class ActiveRecord implements ActiveRecordInterface {
 	 */
 	public function LoadMultiQuery( $query, $args = array() ) {
 		$_wpdb  = $this->connection;
-		$class  = get_called_class();
 		$result = array();
 		$sql    = count( $args ) ? $_wpdb->prepare( $query, $args ) : $query;
 		foreach ( $_wpdb->get_results( $sql, ARRAY_A ) as $data ) {

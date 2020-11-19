@@ -97,6 +97,10 @@ class Occurrence extends ActiveRecord {
 	public function GetMetaValue( $name, $default = array() ) {
 		// Get meta adapter.
 		$meta = $this->getAdapter()->GetNamedMeta( $this, $name );
+		if ( empty( $meta ) ) {
+			return $default;
+		}
+
 		return maybe_unserialize( $meta['value'] );
 	}
 
@@ -295,7 +299,7 @@ class Occurrence extends ActiveRecord {
 	 * @todo This needs some caching.
 	 */
 	protected function GetMicrotime() {
-		return microtime( true );// + get_option('gmt_offset') * HOUR_IN_SECONDS;
+		return microtime( true );
 	}
 
 	/**

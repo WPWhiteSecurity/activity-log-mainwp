@@ -42,15 +42,6 @@ class TmpUser extends ActiveRecord {
 	}
 
 	/**
-	 * Constructor.
-	 *
-	 * @param array $conn - Connection array.
-	 */
-	public function __construct( $conn ) {
-		parent::__construct( $conn );
-	}
-
-	/**
 	 * Must return SQL for creating table.
 	 *
 	 * @param mixed $prefix - Prefix.
