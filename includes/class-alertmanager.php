@@ -317,12 +317,6 @@ final class AlertManager {
 			$data['Username'] = wp_get_current_user()->user_login;
 		}
 
-		// Get current user roles.
-		$roles = MWPAL_Extension\mwpal_extension()->settings->get_current_user_roles();
-		if ( empty( $roles ) && ! empty( $data['CurrentUserRoles'] ) ) {
-			$roles = $data['CurrentUserRoles'];
-		}
-
 		// Trigger event.
 		$this->commit_event( $type, $data, null );
 	}
@@ -339,7 +333,7 @@ final class AlertManager {
 	 * @throws Exception - Error if alert is not registered.
 	 */
 	protected function commit_event( $type, $data, $cond, $retry = true ) {
-		if ( ! $cond || ! ! call_user_func( $cond, $this ) ) {
+		if ( ! $cond || call_user_func( $cond, $this ) ) {
 			if ( $this->is_enabled( $type ) ) {
 				if ( isset( $this->alerts[ $type ] ) ) {
 					// Ok, convert alert to a log entry.
@@ -629,7 +623,7 @@ final class AlertManager {
 			'bbpress-forum'         => __( 'BBPress Forum', 'mwp-al-ext' ),
 		);
 		// add the MainWP items.
-		array_merge(
+		$objects = array_merge(
 			$objects,
 			array(
 				'user'           => __( 'User', 'mwp-al-ext' ),
@@ -683,9 +677,6 @@ final class AlertManager {
 				break;
 			case 'setting':
 				$display = __( 'Setting', 'mwp-al-ext' );
-				break;
-			case 'file':
-				$display = __( 'File', 'mwp-al-ext' );
 				break;
 			case 'system-setting':
 				$display = __( 'System Setting', 'mwp-al-ext' );
@@ -750,42 +741,27 @@ final class AlertManager {
 			case 'ip-address':
 				$display = __( 'IP Address', 'mwp-al-ext' );
 				break;
-			case 'user':
-				$display = __( 'User', 'mwp-al-ext' );
-				break;
 			case 'child-site':
 				$display = __( 'Child Site', 'mwp-al-ext' );
 				break;
 			case 'extension':
 				$display = __( 'Extension', 'mwp-al-ext' );
 				break;
-			case 'activity-logs':
-				$display = __( 'Activity Logs', 'mwp-al-ext' );
-				break;
 			case 'uptime-monitor':
 				$display = __( 'Uptime Monitor', 'mwp-al-ext' );
-				break;
-			case 'mainwp':
-				$display = __( 'MainWP', 'mwp-al-ext' );
 				break;
 			case 'wpforms':
 				$display = esc_html__( 'Forms in WPForms', 'mwp-al-ext' );
 				break;
 			case 'wpforms-notifications':
-				$display = esc_html__( 'Notifications in WPForms', 'mwp-al-ext' );
-				break;
 			case 'wpforms_notifications':
 				$display = esc_html__( 'Notifications in WPForms', 'mwp-al-ext' );
 				break;
 			case 'wpforms-entries':
-				$display = esc_html__( 'Entries in WPForms', 'mwp-al-ext' );
-				break;
 			case 'wpforms_entries':
 				$display = esc_html__( 'Entries in WPForms', 'mwp-al-ext' );
 				break;
 			case 'wpforms-fields':
-				$display = esc_html__( 'Fields in WPForms', 'mwp-al-ext' );
-				break;
 			case 'wpforms_fields':
 				$display = esc_html__( 'Fields in WPForms', 'mwp-al-ext' );
 				break;
@@ -942,20 +918,11 @@ final class AlertManager {
 			case 'synced':
 				$display = __( 'Synced', 'mwp-al-ext' );
 				break;
-			case 'started':
-				$display = __( 'Started', 'mwp-al-ext' );
-				break;
 			case 'finished':
 				$display = __( 'Finished', 'mwp-al-ext' );
 				break;
 			case 'failed':
 				$display = __( 'Failed', 'mwp-al-ext' );
-				break;
-			case 'stopped':
-				$display = __( 'Stopped', 'mwp-al-ext' );
-				break;
-			case 'unblocked':
-				$display = __( 'Unblocked', 'mwp-al-ext' );
 				break;
 			default:
 				break;

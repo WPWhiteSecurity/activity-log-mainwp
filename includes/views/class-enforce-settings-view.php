@@ -31,7 +31,7 @@ class Enforce_Settings_View {
 		add_filter( 'mwpal_page_navigation', array( $this, 'add_tab_v4plus' ), 10, 1 );
 
 		add_action( 'mainwp_pageheader_extensions', array( $this, 'enqueue_styles' ), 20 );
-		add_action( 'mainwp_pagefooter_extensions', array( $this, 'enqueue_scripts' ), 20 );;
+		add_action( 'mainwp_pagefooter_extensions', array( $this, 'enqueue_scripts' ), 20 );
 
 		if ( \version_compare( MWPAL_Extension\get_mainwp_version(), '4.0-beta', '<' ) ) {
 			add_action( 'admin_notices', array( $this, 'display_admin_notices' ) );

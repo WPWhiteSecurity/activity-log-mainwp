@@ -77,7 +77,6 @@ function mwpal_r() {
 function mwpal_rt() {
 	$args        = func_get_args();
 	$options     = array();
-	$output      = '';
 	$expressions = Event_Ref::getInputExpressions( $options );
 	$capture     = in_array( '@', $options, true );
 	$ref         = new Event_Ref( (php_sapi_name() !== 'cli') || $capture ? 'text' : 'cliText' );
@@ -429,7 +428,6 @@ class Event_Ref {
 		$description = '';
 		$tags        = array();
 		$tag         = null;
-		$pointer     = '';
 		$padding     = 0;
 		$comment     = preg_split( '/\r\n|\r|\n/', '* ' . trim( $comment, "/* \t\n\r\0\x0B" ) );
 
@@ -457,7 +455,6 @@ class Event_Ref {
 						$padding = static::strLen( $line ) - static::strLen( $trimmed );
 					}
 
-					$pointer .= "\n{$trimmed}";
 					continue;
 				}
 
@@ -483,7 +480,6 @@ class Event_Ref {
 			if ( ! in_array( $tag, array( 'global', 'param', 'return', 'var' ) ) ) {
 				$tags[ $tag ][] = $line;
 				end( $tags[ $tag ] );
-				$pointer = &$tags[ $tag ][ key( $tags[ $tag ] ) ];
 				continue;
 			}
 
@@ -507,7 +503,6 @@ class Event_Ref {
 
 			$tags[ $tag ][] = $parts;
 			end( $tags[ $tag ] );
-			$pointer = &$tags[ $tag ][ key( $tags[ $tag ] ) ][ $lastIdx ];
 		}
 
 		// split title from the description texts at the nearest 2x new-line combination
@@ -1081,7 +1076,6 @@ class Event_Ref {
 
 		// @todo: test this
 		$hash = var_export( func_get_args(), true );
-		// $hash = $reflector->getName() . ';' . $single . ';' . ($context ? $context->getName() : '');
 		if ( $this->fmt->didCache( $hash ) ) {
 			static::$debug['cacheHits']++;
 			return;
@@ -1378,6 +1372,7 @@ class Event_Ref {
 					// restoring original value
 					$value = $buffer;
 				}
+				unset( $value );
 
 				$this->fmt->text( 'array' );
 				$count = count( $subject );
@@ -1417,6 +1412,7 @@ class Event_Ref {
 					$this->evaluate( $value, $specialStr );
 					$this->fmt->endRow();
 				}
+				unset( $value );
 
 				unset( $subject[ static::MARKER_KEY ] );
 
@@ -1748,8 +1744,6 @@ class Event_Ref {
 							try {
 								$components = $this->splitRegex( $subject );
 								if ( $components ) {
-									$regex = '';
-
 									$this->fmt->startContain( 'regex', true );
 									foreach ( $components as $component ) {
 										$this->fmt->text( 'regex-' . key( $component ), reset( $component ) );
@@ -1872,14 +1866,12 @@ class Event_Ref {
 				$this->fmt->sep( '=>' );
 				$this->fmt->colDiv();
 				$this->evaluate( $value );
-				// $this->evaluate($value instanceof \Traversable ? ((count($value) > 0) ? $value : (string)$value) : $value);
 				$this->fmt->endRow();
 			}
 		}
 
 		// display the interfaces this objects' class implements
 		if ( $interfaces ) {
-			$items = array();
 			$this->fmt->sectionTitle( 'Implements' );
 			$this->fmt->startRow();
 			$this->fmt->startContain( 'interfaces' );
@@ -2695,7 +2687,6 @@ class RHtmlFormatter extends RFormatter {
 			}
 
 			$tip = " {$this->def['tipRef']}=\"{$tipIdx}\"";
-			// $tip = sprintf('%s="%d"', $this->def['tipRef'], $tipIdx);
 		}
 
 		// wrap text in a link?
@@ -2709,7 +2700,6 @@ class RHtmlFormatter extends RFormatter {
 		}
 
 		$this->out .= "<{$this->def['base']}{$typeStr}{$tip}>{$text}</{$this->def['base']}>";
-		// $this->out .= sprintf('<%1$s%2$s %3$s>%4$s</%1$s>', $this->def['base'], $typeStr, $tip, $text);
 	}
 
 	public function startContain( $type, $label = false ) {
@@ -2801,7 +2791,7 @@ class RHtmlFormatter extends RFormatter {
 		$this->out .= "<{$this->def['base']} data-mod>";
 
 		foreach ( $items as $info ) {
-			$this->out .= $this->text( 'mod-' . strtolower( $info[1] ), $info[0], $info[1] );
+			$this->text( 'mod-' . strtolower( $info[1] ), $info[0], $info[1] );
 		}
 
 		$this->out .= "</{$this->def['base']}>";
@@ -2814,8 +2804,6 @@ class RHtmlFormatter extends RFormatter {
 	public function endExp() {
 		if ( Event_Ref::config( 'showBacktrace' ) && ($trace = Event_Ref::getBacktrace()) ) {
 			$docRoot = isset( $_SERVER['DOCUMENT_ROOT'] ) ? $_SERVER['DOCUMENT_ROOT'] : '';
-			$path = strpos( $trace['file'], $docRoot ) !== 0 ? $trace['file'] : ltrim( str_replace( $docRoot, '', $trace['file'] ), '/' );
-			// $this->out .= "<{$this->def['base']} data-backtrace>{$path}:{$trace['line']}</{$this->def['base']}>";
 		}
 
 		$this->out .= "</{$this->def['base']}><{$this->def['base']} data-output>";
@@ -2829,7 +2817,6 @@ class RHtmlFormatter extends RFormatter {
 		$this->out .= "</{$this->def['base']}>";
 
 		// process tooltips
-		$tipHtml = '';
 		foreach ( $this->tips as $idx => $meta ) {
 
 			$tip = '';

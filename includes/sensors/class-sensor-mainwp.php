@@ -334,7 +334,7 @@ class Sensor_MainWP extends Abstract_Sensor {
 	 * @param string $event     – Event ID.
 	 * @param string $extension – Name of extension.
 	 */
-	private function extension_log_event( $event = 0, $extension ) {
+	private function extension_log_event( $event, $extension ) {
 		$extension_dir = explode( '/', $extension );
 		$extension_dir = isset( $extension_dir[0] ) ? $extension_dir[0] : false;
 
@@ -410,7 +410,7 @@ class Sensor_MainWP extends Abstract_Sensor {
 			$wp_plugins = get_plugins();
 			$plugin     = array_values( array_diff( array_keys( $wp_plugins ), array_keys( $this->old_plugins ) ) );
 			if ( count( $plugin ) !== 1 ) {
-				return $this->log_error(
+				$this->log_error(
 					'Expected exactly one new plugin but found ' . count( $plugin ),
 					array(
 						'NewPlugin'  => $plugin,
@@ -418,6 +418,7 @@ class Sensor_MainWP extends Abstract_Sensor {
 						'NewPlugins' => $wp_plugins,
 					)
 				);
+				return;
 			}
 			$this->extension_log_event( 7705, $plugin[0] );
 		}
@@ -495,7 +496,7 @@ class Sensor_MainWP extends Abstract_Sensor {
 	public function report_aum_monitor_event( $event_id, $site_url ) {
 		if ( ! empty( $event_id ) && ! empty( $site_url ) ) {
 			// Search for site in MainWP sites.
-			$site = MWPAL_Extension\mwpal_extension()->settings->get_mwp_site_by( 'url', $site_url );
+			$site = MWPAL_Extension\mwpal_extension()->settings->get_mwp_site_by( $site_url, 'url' );
 
 			// If site is found then report it as MainWP child site.
 			if ( false !== $site ) {
