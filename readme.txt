@@ -6,7 +6,7 @@ License URI: https://www.gnu.org/licenses/gpl.html
 Tags: activity log, mainwp, mainwp extension, wordpress security, wordpress security audit log, audit log, mainwp user tracking, wordpress activity log, security activity log, wordpress admin, mainwp admin, user tracking
 Requires at least: 3.6
 Tested up to: 5.5
-Stable tag: 1.6
+Stable tag: 1.6.1
 Requires PHP: 5.5
 
 See the activity logs of all child sites & MainWP in one central location - the MainWP dashboard.
@@ -132,6 +132,11 @@ Please refer to our [Support & Documentation pages](https://wpactivitylog.com/su
 8. By default the extension retrieves the child sites' logs every three hours, though you can configure this schedule from the extension settings.
 
 == Changelog ==
+
+= 1.6.1 (2020-11-24) =
+
+* **Improvements**
+	* Updated the Freemius SDK to the latest version.
 
 = 1.6 (2020-11-02) =
 

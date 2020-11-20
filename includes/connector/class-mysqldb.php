@@ -157,8 +157,6 @@ class MySQLDB extends AbstractConnector implements ConnectorInterface {
 	 * @param bool $exclude_options - True if excluding.
 	 */
 	public function installAll( $exclude_options = false ) {
-		$plugin = \WSAL\MainWPExtension\mwpal_extension();
-
 		foreach ( glob( $this->getAdaptersDirectory() . DIRECTORY_SEPARATOR . '*.php' ) as $file ) {
 			$file_path  = explode( DIRECTORY_SEPARATOR, $file );
 			$file_name  = $file_path[ count( $file_path ) - 1 ];
@@ -184,8 +182,6 @@ class MySQLDB extends AbstractConnector implements ConnectorInterface {
 	 * Uninstall all DB tables.
 	 */
 	public function uninstallAll() {
-		$plugin = \WSAL\MainWPExtension\mwpal_extension();
-
 		foreach ( glob( $this->getAdaptersDirectory() . DIRECTORY_SEPARATOR . '*.php' ) as $file ) {
 			$file_path  = explode( DIRECTORY_SEPARATOR, $file );
 			$file_name  = $file_path[ count( $file_path ) - 1 ];
@@ -548,8 +544,6 @@ class MySQLDB extends AbstractConnector implements ConnectorInterface {
 	 */
 	public function DeleteAfterArchive( $args ) {
 		$_wpdb      = $this->getConnection();
-		$archive_db = $args['archive_db'];
-
 		$s_occurence_ids = implode( ', ', $args['occurence_ids'] );
 
 		$occurrence = new \WSAL\MainWPExtension\Adapters\MySQL\Occurrence( $_wpdb );
@@ -559,39 +553,6 @@ class MySQLDB extends AbstractConnector implements ConnectorInterface {
 		$meta = new \WSAL\MainWPExtension\Adapters\MySQL\Meta( $_wpdb );
 		$sql  = 'DELETE FROM ' . $meta->GetTable() . ' WHERE occurrence_id IN (' . $s_occurence_ids . ')';
 		$_wpdb->query( $sql );
-	}
-
-	/**
-	 * Truncate string longer than 32 characters.
-	 * Authentication Unique Key @see wp-config.php
-	 *
-	 * @return string AUTH_KEY
-	 */
-	private function truncateKey() {
-		if ( ! defined( 'AUTH_KEY' ) ) {
-			return 'x4>Tg@G-Kr6a]o-eJeP^?UO)KW;LbV)I';
-		}
-		$key_size = strlen( AUTH_KEY );
-		if ( $key_size > 32 ) {
-			return substr( AUTH_KEY, 0, 32 );
-		} else {
-			return AUTH_KEY;
-		}
-	}
-
-	/**
-	 * Get OpenSSL IV for DB.
-	 *
-	 * @since 2.6.3
-	 */
-	private function get_openssl_iv() {
-		$secret_openssl_iv = 'і-(аэ┤#≥и┴зейН';
-		$key_size          = strlen( $secret_openssl_iv );
-		if ( $key_size > 32 ) {
-			return substr( $secret_openssl_iv, 0, 32 );
-		} else {
-			return $secret_openssl_iv;
-		}
 	}
 
 	/**

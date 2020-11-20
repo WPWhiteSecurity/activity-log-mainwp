@@ -112,7 +112,6 @@ class AuditLogListView extends AuditLogView {
 				return $html;
 
 			case 'type':
-				$code = MWPAL_Extension\mwpal_extension()->alerts->GetAlert( $item->alert_id );
 				return '<span class="log-disable">' . str_pad( $item->alert_id, 4, '0', STR_PAD_LEFT ) . ' </span>';
 
 			case 'code':
@@ -208,8 +207,6 @@ class AuditLogListView extends AuditLogView {
 					}
 
 					$site_index = array_search( $site_id, array_column( $mwp_child_sites, 'id' ), true );
-					$site_url   = '#';
-
 					if ( false !== $site_index && isset( $mwp_child_sites[ $site_index ] ) ) {
 						$site_url = $mwp_child_sites[ $site_index ]['url'];
 						$user_url = add_query_arg( 'user_id', $user_data['user_id'], trailingslashit( $site_url ) . 'wp-admin/user-edit.php' );
@@ -241,7 +238,7 @@ class AuditLogListView extends AuditLogView {
 					$scip = str_replace( array( '"', '[', ']' ), '', $scip );
 				}
 
-				$oips = array(); // $item->GetOtherIPs();
+				$oips = array();
 
 				// If there's no IP...
 				if ( is_null( $scip ) || '' == $scip ) {

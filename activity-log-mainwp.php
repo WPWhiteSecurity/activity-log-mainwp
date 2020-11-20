@@ -4,7 +4,7 @@
  * Plugin URI: https://wpactivitylog.com/extensions/mainwp-activity-log/
  * Description: This extension for MainWP enables you to view the activity logs of all child sites in one central location, the MainWP dashboard.
  * Author: WP White Security
- * Version: 1.6
+ * Version: 1.6.1
  * Text Domain: mwp-al-ext
  * Domain Path: /languages
  * Author URI: http://www.wpwhitesecurity.com/
@@ -61,7 +61,7 @@ if ( function_exists( 'almainwp_fs' ) ) {
 		 *
 		 * @var string
 		 */
-		public $version = '1.6';
+		public $version = '1.6.1';
 
 		/**
 		 * Single Static Instance of the plugin.
@@ -230,9 +230,9 @@ if ( function_exists( 'almainwp_fs' ) ) {
 		 * @since 1.1
 		 */
 		public function init_hooks() {
+			register_activation_hook( __FILE__, array( $this, 'install_extension' ) ); // Installation routine.
 			add_action( 'init', array( $this, 'mwpal_init' ) ); // Start listening to events.
 			add_action( 'init', array( $this, 'load_mwpal_text_domain' ) );
-			register_activation_hook( __FILE__, array( $this, 'install_extension' ) ); // Installation routine.
 			add_action( 'mwp_events_cleanup', array( $this, 'events_cleanup' ) ); // Schedule hook for refreshing events.
 			add_filter( 'mainwp_getextensions', array( &$this, 'get_this_extension' ) );
 			add_action( 'admin_init', array( &$this, 'redirect_on_activate' ) );
@@ -256,12 +256,15 @@ if ( function_exists( 'almainwp_fs' ) ) {
 			// Initialize freemius.
 			$this->init_freemius();
 			/*
-			Hook to freemus account connection hook that fires after a user
+			Hook to freemius account connection hook that fires after a user
 			activates we can rerun the plugin activation redirects again
 			without freemius intercepting.
 			 */
 			if ( function_exists( 'almainwp_fs' ) ) {
-				\almainwp_fs()->add_action( 'after_account_connection', array( $this, 'account_connection_set' ) );
+				almainwp_fs()->add_action( 'after_account_connection', array( $this, 'account_connection_set' ) );
+				almainwp_fs()->add_filter( 'plugin_icon', function( $plugin_icon) {
+					return MWPAL_BASE_DIR . 'img/activity-log-mainwp-freemius.jpg';
+				} );
 			}
 
 		}
@@ -310,10 +313,10 @@ if ( function_exists( 'almainwp_fs' ) ) {
 		 * Load extension on `plugins_loaded` action.
 		 */
 		public function load_mwpal_extension() {
-		    //  create background processes in order to register their hooks
-            new Enforce_Settings_Update_Process();
+			//  create background processes in order to register their hooks
+			new Enforce_Settings_Update_Process();
 			new Enforce_Settings_Removal_Process();
-        }
+		}
 
 		/**
 		 * DB connection.
@@ -669,7 +672,7 @@ if ( function_exists( 'almainwp_fs' ) ) {
 
 				if ( ! $last_checked ) {
 					$next_update = time() + ( $this->settings->get_events_frequency() * 60 * 60 ) + 1;
-					$this->settings->set_last_checked_by_siteid( $site_id, $next_update );
+					$this->settings->set_last_checked_by_siteid( $next_update, $site_id );
 				} else {
 					$last_event             = new \stdClass();
 					$last_event->created_on = $last_checked;

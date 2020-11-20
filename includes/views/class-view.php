@@ -225,7 +225,6 @@ class View extends Abstract_View {
 			// Set the menu name.
 			$mwp_sub_menu['Extensions'][ $activity_log_key ][0] = __( 'Activity Log', 'mwp-al-ext' );
 
-			$sub_menu_before = array_slice( $mwp_sub_menu['mainwp_tab'], 0, 2 );
 			$sub_menu_after  = array_splice( $mwp_sub_menu['mainwp_tab'], 2 );
 			$activity_log    = $mwp_sub_menu['Extensions'][ $activity_log_key ];
 			$activity_log[3] = '<i class="fa fa-globe"></i>';
@@ -268,7 +267,6 @@ class View extends Abstract_View {
 	 * @return array
 	 */
 	public function mwpal_main_menu( $mwpal_left_menu ) {
-		$sub_menu_before = array_slice( $mwpal_left_menu['mainwp_tab'], 0, 2 );
 		$sub_menu_after  = array_splice( $mwpal_left_menu['mainwp_tab'], 2 );
 
 		$activity_log   = array();
@@ -989,110 +987,6 @@ class View extends Abstract_View {
 	}
 
 	/**
-	 * Query events from all the child sites.
-	 *
-	 * @return void
-	 */
-	private function query_child_site_events() {
-		// Check if the WSAL child sites option exists.
-		$child_sites = MWPAL_Extension\mwpal_extension()->settings->get_wsal_child_sites();
-		$server_ip   = MWPAL_Extension\mwpal_extension()->settings->get_server_ip(); // Get server IP.
-
-		if ( ! empty( $child_sites ) && is_array( $child_sites ) ) {
-			$sites_data        = array();
-			$logged_retrieving = false; // Event 7711.
-			$logged_ready      = false; // Event 7712.
-
-			foreach ( $child_sites as $site_id => $child_site ) {
-				// Get events count from native events DB.
-				$occ_query = new \WSAL\MainWPExtension\Models\OccurrenceQuery();
-				$occ_query->addCondition( 'site_id = %s ', $site_id ); // Set site id.
-				$occ_count = (int) $occ_query->getAdapter()->Count( $occ_query );
-
-				// If events are already present in the DB of a site, then no need to query from child site.
-				if ( 0 !== $occ_count ) {
-					continue;
-				}
-
-				if ( ! $logged_retrieving ) {
-					// Extension has started retrieving.
-					MWPAL_Extension\mwpal_extension()->alerts->trigger(
-						7711,
-						array(
-							'mainwp_dash' => true,
-							'Username'    => 'System',
-							'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
-						)
-					);
-					$logged_retrieving = true;
-				}
-
-				// Post data for child sites.
-				$post_data = array(
-					'action'       => 'get_events',
-					'events_count' => MWPAL_Extension\mwpal_extension()->settings->get_child_site_events(),
-				);
-
-				// Call to child sites to fetch WSAL events.
-				$sites_data[ $site_id ] = apply_filters(
-					'mainwp_fetchurlauthed',
-					MWPAL_Extension\mwpal_extension()->get_child_file(),
-					MWPAL_Extension\mwpal_extension()->get_child_key(),
-					$site_id,
-					'extra_excution',
-					$post_data
-				);
-
-				if ( ! $logged_ready && isset( $sites_data[ $site_id ]->events ) ) {
-					// Extension is ready after retrieving.
-					MWPAL_Extension\mwpal_extension()->alerts->trigger(
-						7712,
-						array(
-							'mainwp_dash' => true,
-							'Username'    => 'System',
-							'ClientIP'    => ! empty( $server_ip ) ? $server_ip : false,
-						)
-					);
-					$logged_ready = true;
-				}
-			}
-
-			if ( ! empty( $sites_data ) && is_array( $sites_data ) ) {
-				// Get MainWP child sites.
-				$mwp_sites = MWPAL_Extension\mwpal_extension()->settings->get_mwp_child_sites();
-
-				foreach ( $sites_data as $site_id => $site_data ) {
-					// If $site_data is array, then MainWP failed to fetch logs from the child site.
-					if ( ! empty( $site_data ) && is_array( $site_data ) ) {
-						// Search for the site data.
-						$key = array_search( $site_id, array_column( $mwp_sites, 'id' ), false );
-
-						if ( false !== $key && isset( $mwp_sites[ $key ] ) ) {
-							// Extension is unable to retrieve events.
-							MWPAL_Extension\mwpal_extension()->alerts->trigger(
-								7710,
-								array(
-									'friendly_name' => $mwp_sites[ $key ]['name'],
-									'site_url'      => $mwp_sites[ $key ]['url'],
-									'site_id'       => $mwp_sites[ $key ]['id'],
-									'mainwp_dash'   => true,
-									'Username'      => 'System',
-									'ClientIP'      => ! empty( $server_ip ) ? $server_ip : false,
-								)
-							);
-						}
-					} elseif ( empty( $site_data ) || ! isset( $site_data->events ) ) {
-						continue;
-					}
-
-					MWPAL_Extension\mwpal_extension()->alerts->log_events( $site_data->events, $site_id );
-					\WSAL\MainWPExtension\save_child_site_users( $site_id, $site_data->users );
-				}
-			}
-		}
-	}
-
-	/**
 	 * Get Extension's List Table Instance.
 	 *
 	 * @return AuditLogListView
@@ -1336,7 +1230,8 @@ class View extends Abstract_View {
 
                 // Check if WSAL is installed on the child site.
                 if ( isset( $response['wsal_installed'] ) && true === $response['wsal_installed'] ) {
-
+	                $disabled_sites[ $site_id ]                 = $response;
+	                $running_flag['disabled_sites'][ $site_id ] = $response;
                 }
             }
         }

@@ -117,7 +117,6 @@ class AuditLogGridView extends AuditLogView {
 				return $html;
 
 			case 'type':
-				$code = MWPAL_Extension\mwpal_extension()->alerts->GetAlert( $item->alert_id );
 				return '<span class="log-disable">' . str_pad( $item->alert_id, 4, '0', STR_PAD_LEFT ) . ' </span>';
 
 			case 'code':
@@ -149,11 +148,6 @@ class AuditLogGridView extends AuditLogView {
 				return '<a class="tooltip" href="#" data-tooltip="' . esc_html( $const->name ) . '"><span class="log-type log-type-' . $const->value . '"></span></a>';
 
 			case 'info':
-				$code                = MWPAL_Extension\mwpal_extension()->alerts->GetAlert( $item->alert_id );
-				$extra_msg           = '';
-				$data_link           = '';
-				$modification_alerts = array( 1002, 1003, 6007, 6023 );
-
 				$date_format       = MWPAL_Extension\mwpal_extension()->settings->get_date_format();
 				$show_microseconds = MWPAL_Extension\mwpal_extension()->settings->get_time_format();
 				if ( 'no' === $show_microseconds ) {
@@ -187,24 +181,18 @@ class AuditLogGridView extends AuditLogView {
 
 				// Check if the usernames exists & matches pre-defined cases.
 				if ( 'Plugin' === $username ) {
-					$image = '<img src="' . trailingslashit( MWPAL_BASE_URL ) . 'assets/img/wsal-logo.png" width="32" alt="WSAL Logo"/>';
 					$uhtml = '<i>' . __( 'Plugin', 'mwp-al-ext' ) . '</i>';
 					$roles = '';
 				} elseif ( 'Plugins' === $username ) {
-					$image = '<span class="dashicons dashicons-wordpress wsal-system-icon"></span>';
 					$uhtml = '<i>' . __( 'Plugins', 'mwp-al-ext' ) . '</i>';
 					$roles = '';
 				} elseif ( 'Website Visitor' === $username ) {
-					$image = '<span class="dashicons dashicons-wordpress wsal-system-icon"></span>';
 					$uhtml = '<i>' . __( 'Website Visitor', 'mwp-al-ext' ) . '</i>';
 					$roles = '';
 				} elseif ( 'System' === $username ) {
-					$image = '<span class="dashicons dashicons-wordpress wsal-system-icon"></span>';
 					$uhtml = '<i>' . __( 'System', 'mwp-al-ext' ) . '</i>';
 					$roles = '';
 				} elseif ( $user_data && 'System' !== $username ) {
-					$image = get_avatar( $user_data['user_email'], 32 ); // Avatar.
-
 					// Checks for display name.
 					$user_meta = ( isset( $user_data['ID'] ) ) ? get_user_meta( $user_data['ID'] ) : get_user_meta( $user_data['user_id'] ) ;
 					if ( 'display_name' === $type_username && ! empty( $user_data['display_name'] ) ) {
@@ -230,8 +218,6 @@ class AuditLogGridView extends AuditLogView {
 					}
 
 					$site_index = array_search( $site_id, array_column( $mwp_child_sites, 'id' ), true );
-					$site_url   = '#';
-
 					if ( false !== $site_index && isset( $mwp_child_sites[ $site_index ] ) ) {
 						$site_url = $mwp_child_sites[ $site_index ]['url'];
 						$user_url = add_query_arg( 'user_id', $user_data['user_id'], trailingslashit( $site_url ) . 'wp-admin/user-edit.php' );
@@ -276,7 +262,7 @@ class AuditLogGridView extends AuditLogView {
 					$scip = str_replace( array( '"', '[', ']' ), '', $scip );
 				}
 
-				$oips = array(); // $item->GetOtherIPs();
+				$oips = array();
 
 				// If there's no IP...
 				if ( is_null( $scip ) || '' == $scip ) {
