@@ -40,11 +40,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$composer_autoloader_file = __DIR__ . '/vendor/autoload.php';
-if ( file_exists( $composer_autoloader_file ) ) {
-    require_once $composer_autoloader_file;
-}
-
 if ( function_exists( 'almainwp_fs' ) ) {
 	almainwp_fs()->set_basename( true, __FILE__ );
 } else {
@@ -201,6 +196,11 @@ if ( function_exists( 'almainwp_fs' ) ) {
 		 * @since 1.1
 		 */
 		public function includes() {
+			$composer_autoloader_file = __DIR__ . '/vendor/autoload.php';
+			if ( file_exists( $composer_autoloader_file ) ) {
+			    require_once $composer_autoloader_file;
+			}
+			
 			require_once MWPAL_BASE_DIR . 'includes/helpers/class-datahelper.php';
 			require_once MWPAL_BASE_DIR . 'includes/models/class-activerecord.php';
 			require_once MWPAL_BASE_DIR . 'includes/models/class-query.php';
@@ -263,7 +263,7 @@ if ( function_exists( 'almainwp_fs' ) ) {
 			if ( function_exists( 'almainwp_fs' ) ) {
 				almainwp_fs()->add_action( 'after_account_connection', array( $this, 'account_connection_set' ) );
 				almainwp_fs()->add_filter( 'plugin_icon', function( $plugin_icon) {
-					return MWPAL_BASE_DIR . 'img/activity-log-mainwp-freemius.jpg';
+					return MWPAL_BASE_DIR . 'assets/img/activity-log-mainwp-freemius.jpg';
 				} );
 			}
 
