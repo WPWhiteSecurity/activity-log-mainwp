@@ -75,61 +75,83 @@ class Settings {
 	}
 
 	/**
-	 * Datetime used in the Alerts.
+	 * Determines datetime format to be displayed in any UI in the plugin (logs in administration, emails, reports,
+	 * notifications etc.).
 	 *
-	 * @param bool $line_break – Line break.
+	 * Note: Format returned by this function is not compatible with JavaScript date and time picker widgets. Use
+	 * functions get_time_format and get_date_format for those.
+	 *
+	 * @param boolean $line_break - True if line break otherwise false.
+	 *
+	 * @return string
 	 */
-	public function get_date_time_format( $line_break = true ) {
-		if ( $line_break ) {
-			$date_time_format = $this->get_date_format() . '<\b\r>' . $this->get_time_format();
-		} else {
-			$date_time_format = $this->get_date_format() . ' ' . $this->get_time_format();
-		}
+	public function get_date_time_format( $line_break = true, $use_nb_space_for_am_pm = true ) {
+		$result = $this->get_date_format();
 
-		$wp_time_format = get_option( 'time_format' ); // WP Time format.
+		$result .= $line_break ? '<\b\r>' : ' ';
+
+		$time_format    = $this->get_time_format();
+		$has_am_pm      = false;
+		$am_pm_fraction = false;
+		$am_pm_pattern  = '/(?i)(\s+A)/';
+		if ( preg_match( $am_pm_pattern, $time_format, $am_pm_matches ) ) {
+			$has_am_pm      = true;
+			$am_pm_fraction = $am_pm_matches[0];
+			$time_format    = preg_replace( $am_pm_pattern, '', $time_format );
+		}
 
 		// Check if the time format does not have seconds.
-		if ( stripos( $wp_time_format, 's' ) === false ) {
-			if ( stripos( $wp_time_format, '.v' ) !== false ) {
-				$date_time_format = str_replace( '.v', '', $date_time_format );
-			}
-			$date_time_format .= ':s'; // Add seconds to time format.
-			$date_time_format .= '.$$$'; // Add milliseconds to time format.
-		} else {
-			// Check if the time format does have milliseconds.
-			if ( stripos( $wp_time_format, '.v' ) !== false ) {
-				$date_time_format = str_replace( '.v', '.$$$', $date_time_format );
-			} else {
-				$date_time_format .= '.$$$';
-			}
+		if ( stripos( $time_format, 's' ) === false ) {
+			$time_format .= ':s'; // Add seconds to time format.
 		}
 
-		if ( stripos( $wp_time_format, 'A' ) !== false ) {
-			$date_time_format .= '&\n\b\s\p;A';
+		$time_format .= '.$$$'; // Add milliseconds to time format.
+
+		if ( $has_am_pm ) {
+			$time_format .= preg_replace( '/\s/', $use_nb_space_for_am_pm ? '&\n\b\s\p;' : ' ', $am_pm_fraction );
 		}
-		return $date_time_format;
+
+		$result .= $time_format;
+
+		return $result;
 	}
 
 	/**
-	 * Date Format from WordPress General Settings.
+	 * Date format based on WordPress date settings. It can be optionally sanitized to get format compatible with
+	 * JavaScript date and time picker widgets.
+	 *
+	 * Note: This function must not be used to display actual date and time values anywhere. For that use function get_date_time_format.
+	 *
+	 * @param bool $sanitized If true, the format is sanitized for use with JavaScript date and time picker widgets.
+	 *
+	 * @return string
 	 */
-	public function get_date_format() {
-		$wp_date_format = get_option( 'date_format' );
-		$search         = array( 'F', 'M', 'n', 'j', ' ', '/', 'y', 'S', ',', 'l', 'D' );
-		$replace        = array( 'm', 'm', 'm', 'd', '-', '-', 'Y', '', '', '', '' );
-		$date_format    = str_replace( $search, $replace, $wp_date_format );
-		return $date_format;
+	public function get_date_format( $sanitized = false ) {
+		if ( $sanitized ) {
+			return 'Y-m-d';
+		}
+
+		return get_option( 'date_format' );
 	}
 
 	/**
-	 * Time Format from WordPress General Settings.
+	 * Time format based on WordPress date settings. It can be optionally sanitized to get format compatible with
+	 * JavaScript date and time picker widgets.
+	 *
+	 * Note: This function must not be used to display actual date and time values anywhere. For that use function get_date_time_format.
+	 *
+	 * @param bool $sanitize If true, the format is sanitized for use with JavaScript date and time picker widgets.
+	 *
+	 * @return string
 	 */
-	public function get_time_format() {
-		$wp_time_format = get_option( 'time_format' );
-		$search         = array( 'a', 'A', 'T', ' ' );
-		$replace        = array( '', '', '', '' );
-		$time_format    = str_replace( $search, $replace, $wp_time_format );
-		return $time_format;
+	public function get_time_format( $sanitize = false ) {
+		$result = get_option( 'time_format' );
+		if ( $sanitize ) {
+			$search  = array( 'a', 'A', 'T', ' ' );
+			$replace = array( '', '', '', '' );
+			$result  = str_replace( $search, $replace, $result );
+		}
+		return $result;
 	}
 
 	/**

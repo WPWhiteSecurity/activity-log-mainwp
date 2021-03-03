@@ -19,4 +19,14 @@ jQuery(document).ready(function ($) {
     minimumResultsForSearch: 10,
     multiple: true
   })
+
+  $('input[name="login-page-notification"]').on('change', function () {
+    const value = $(this).val()
+    const textarea = $('textarea[name="login-page-notification-text"]')
+    if (value === 'yes') {
+      textarea.removeAttr('disabled')
+    } else {
+      textarea.attr('disabled', true)
+    }
+  })
 })
