@@ -93,7 +93,6 @@ class AuditLogGridView extends AuditLogView {
 	 * @return false|string|void
 	 */
 	public function column_default( $item, $column_name ) {
-		$datetime_format = MWPAL_Extension\mwpal_extension()->settings->get_date_time_format(); // Get date time format.
 		$type_username   = MWPAL_Extension\mwpal_extension()->settings->get_type_username(); // Get username type to display.
 		$mwp_child_sites = $this->mwp_child_sites; // Get MainWP child sites.
 
@@ -148,26 +147,13 @@ class AuditLogGridView extends AuditLogView {
 				return '<a class="tooltip" href="#" data-tooltip="' . esc_html( $const->name ) . '"><span class="log-type log-type-' . $const->value . '"></span></a>';
 
 			case 'info':
-				$date_format       = MWPAL_Extension\mwpal_extension()->settings->get_date_format();
-				$show_microseconds = MWPAL_Extension\mwpal_extension()->settings->get_time_format();
-				if ( 'no' === $show_microseconds ) {
-					// remove the microseconds placeholder from format string.
-					$datetime_format = str_replace( '.$$$', '', $datetime_format );
-				}
-				$eventdate = $item->created_on ? (
-						str_replace(
-							'$$$',
-							substr( number_format( fmod( $item->created_on + $this->_gmt_offset_sec, 1 ), 3 ), 2 ),
-							date( $date_format, $item->created_on + $this->_gmt_offset_sec )
-						)
-					) : '<i>' . __( 'Unknown', 'mwp-al-ext' ) . '</i>';
-				$eventtime = $item->created_on ? (
-						str_replace(
-							'$$$',
-							substr( number_format( fmod( $item->created_on + $this->_gmt_offset_sec, 1 ), 3 ), 2 ),
-							date( get_option( 'time_format' ), $item->created_on + $this->_gmt_offset_sec )
-						)
-					) : '<i>' . __( 'Unknown', 'mwp-al-ext' ) . '</i>';
+				$eventdate = $item->created_on ? MWPAL_Extension\Utilities\DateTimeFormatter::instance()->getFormattedDateTime(
+					$item->created_on, 'date'
+				) : '<i>' . __( 'Unknown', 'mwp-al-ext' ) . '</i>';
+
+				$eventtime = $item->created_on ? MWPAL_Extension\Utilities\DateTimeFormatter::instance()->getFormattedDateTime(
+					$item->created_on, 'time'
+				) : '<i>' . __( 'Unknown', 'mwp-al-ext' ) . '</i>';
 
 				$username  = $item->GetUsername( $this->item_meta[ $item->getId() ] ); // Get username.
 				$user_data = $item->get_user_data( $this->item_meta[ $item->getId() ] ); // Get user data.

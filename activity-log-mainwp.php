@@ -279,6 +279,20 @@ if ( function_exists( 'almainwp_fs' ) ) {
 		}
 
 		/**
+		 * @return Settings
+         * @since 1.7.0
+		 */
+		public function settings() {
+			if ( $this->settings instanceof Settings ) {
+				return $this->settings;
+			}
+
+			$this->settings = new \WSAL\MainWPExtension\Settings();
+
+			return $this->settings;
+		}
+
+		/**
 		 * Start listening to events.
 		 */
 		public function mwpal_init() {

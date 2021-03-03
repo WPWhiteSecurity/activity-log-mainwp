@@ -162,6 +162,12 @@ class View extends Abstract_View {
 				'render' => array( $this, 'tab_activity_log' ),
 				'save'   => array( $this, 'tab_activity_log_save' ),
 			),
+			'child_site_settings'     => array(
+				'name'   => __( 'Child Sites Activity Log Settings', 'mwp-al-ext' ),
+				'link'   => add_query_arg( 'tab', 'enforce-settings', $extension_url ),
+				'render' => array( $this, 'tab_activity_log' ),
+				'save'   => array( $this, 'tab_activity_log_save' ),
+			),
 			'settings'     => array(
 				'name'   => __( 'Extension Settings', 'mwp-al-ext' ),
 				'link'   => add_query_arg( 'tab', 'settings', $extension_url ),
@@ -290,6 +296,11 @@ class View extends Abstract_View {
 		$mwpal_sub_left_menu[ MWPAL_EXTENSION_NAME ] = apply_filters(
 			'mwpal_main_menu_submenu',
 			array(
+				array(
+					__( 'Child Sites Settings', 'mwp-al-ext' ),
+					$this->mwpal_extension_tabs['child_site_settings']['link'],
+					'manage_options',
+				),
 				array(
 					__( 'Extension Settings', 'mwp-al-ext' ),
 					$this->mwpal_extension_tabs['settings']['link'],

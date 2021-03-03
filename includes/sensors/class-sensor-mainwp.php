@@ -305,6 +305,7 @@ class Sensor_MainWP extends Abstract_Sensor {
 					'extension'   => $slug,
 					'action'      => $action,
 					'option'      => 'Added' === $action ? 'to' : 'from',
+					'EventType'   => $action,
 				)
 			);
 		}

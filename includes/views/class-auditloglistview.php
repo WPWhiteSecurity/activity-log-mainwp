@@ -88,7 +88,6 @@ class AuditLogListView extends AuditLogView {
 	 * @return false|string|string[]|void
 	 */
 	public function column_default( $item, $column_name ) {
-		$datetime_format = MWPAL_Extension\mwpal_extension()->settings->get_date_time_format(); // Get date time format.
 		$type_username   = MWPAL_Extension\mwpal_extension()->settings->get_type_username(); // Get username type to display.
 		$mwp_child_sites = $this->mwp_child_sites; // Get MainWP child sites.
 
@@ -143,12 +142,8 @@ class AuditLogListView extends AuditLogView {
 				return '<a class="tooltip" href="#" data-tooltip="' . esc_html( $const->name ) . '"><span class="log-type log-type-' . $const->value . '"></span></a>';
 
 			case 'crtd':
-				return $item->created_on ? (
-					str_replace(
-						'$$$',
-						substr( number_format( fmod( $item->created_on + $this->gmt_offset_sec, 1 ), 3 ), 2 ),
-						date( $datetime_format, $item->created_on + $this->gmt_offset_sec )
-					)
+				return $item->created_on ? MWPAL_Extension\Utilities\DateTimeFormatter::instance()->getFormattedDateTime(
+					$item->created_on
 				) : '<i>' . __( 'Unknown', 'mwp-al-ext' ) . '</i>';
 
 			case 'user':
