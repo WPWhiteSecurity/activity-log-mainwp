@@ -222,6 +222,14 @@ abstract class AuditLogView extends \WP_List_Table {
 		$events_query->setOffset( $offset );  // Set query offset.
 		$events_query->setLimit( $per_page ); // Set number of events per page.
 
+		if ( ! in_array( $bid, [ 'dashboard', 0 ] ) ) {
+			$result = apply_filters( 'mwpal_query_events', [], $this, $per_page, $offset );
+			//  if there are no events, the filter is still expected to return na array with key total_items, per_page and items
+			if ( ! empty( $result ) ) {
+				return $result;
+			}
+		}
+
 		return array(
 			'total_items' => $total_items,
 			'per_page'    => $per_page,

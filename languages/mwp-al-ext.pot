@@ -122,6 +122,14 @@ msgstr ""
 msgid "Low severity messages."
 msgstr ""
 
+#: default-events.php:128
+msgid "Users Logins & Sessions Events"
+msgstr ""
+
+#: default-events.php:129
+msgid "User Activity"
+msgstr ""
+
 #: default-events.php:130
 msgid "User logged in"
 msgstr ""
@@ -198,12 +206,20 @@ msgstr ""
 msgid "User deleted file from Uploads directory"
 msgstr ""
 
+#: default-events.php:144
+msgid "Content & Comments"
+msgstr ""
+
+#: default-events.php:145
+msgid "Content"
+msgstr ""
+
 #: default-events.php:146
 msgid "User created a new post and saved it as draft"
 msgstr ""
 
 #: default-events.php:146
-msgid "Created the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Created the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:147
@@ -211,7 +227,7 @@ msgid "User published a post"
 msgstr ""
 
 #: default-events.php:147
-msgid "Published the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Published the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:148
@@ -219,7 +235,7 @@ msgid "User modified a post"
 msgstr ""
 
 #: default-events.php:148
-msgid "Modified the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Modified the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:149
@@ -227,7 +243,7 @@ msgid "User permanently deleted a post from the trash"
 msgstr ""
 
 #: default-events.php:149
-msgid "Permanently deleted the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %PostUrlIfPlublished%"
+msgid "Permanently deleted the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% "
 msgstr ""
 
 #: default-events.php:150
@@ -235,7 +251,7 @@ msgid "User moved a post to the trash"
 msgstr ""
 
 #: default-events.php:150
-msgid "Moved the post %PostTitle% to trash %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %PostUrlIfPlublished%"
+msgid "Moved the post %PostTitle% to trash %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% "
 msgstr ""
 
 #: default-events.php:151
@@ -243,7 +259,7 @@ msgid "User restored a post from trash"
 msgstr ""
 
 #: default-events.php:151
-msgid "Restored the post %PostTitle% from trash %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Restored the post %PostTitle% from trash %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:152
@@ -259,7 +275,7 @@ msgid "User changed post author"
 msgstr ""
 
 #: default-events.php:153
-msgid "Changed the author of the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Previous author: %OldAuthor% %LineBreak% New author: %NewAuthor% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%."
+msgid "Changed the author of the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Previous author: %OldAuthor% %LineBreak% New author: %NewAuthor% %LineBreak% %EditorLinkPost%."
 msgstr ""
 
 #: default-events.php:154
@@ -267,7 +283,7 @@ msgid "User changed post status"
 msgstr ""
 
 #: default-events.php:154
-msgid "Changed the status of the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Previous status: %OldStatus% %LineBreak% New status: %NewStatus% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Changed the status of the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Previous status: %OldStatus% %LineBreak% New status: %NewStatus% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:155
@@ -275,7 +291,7 @@ msgid "User changed the visibility of a post"
 msgstr ""
 
 #: default-events.php:155
-msgid "Changed the visibility of the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Previous visibility status: %OldVisibility% %LineBreak% New visibility status: %NewVisibility% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Changed the visibility of the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Previous visibility status: %OldVisibility% %LineBreak% New visibility status: %NewVisibility% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:156
@@ -283,7 +299,7 @@ msgid "User changed the date of a post"
 msgstr ""
 
 #: default-events.php:156
-msgid "Changed the date of the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Previous date: %OldDate% %LineBreak% New date: %NewDate% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Changed the date of the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Previous date: %OldDate% %LineBreak% New date: %NewDate% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:157
@@ -291,7 +307,7 @@ msgid "User changed the parent of a page"
 msgstr ""
 
 #: default-events.php:157
-msgid "Changed the parent of the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Previous parent: %OldParentName% %LineBreak% New parent: %NewParentName% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Changed the parent of the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Previous parent: %OldParentName% %LineBreak% New parent: %NewParentName% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:158
@@ -299,7 +315,7 @@ msgid "User changed the template of a page"
 msgstr ""
 
 #: default-events.php:158
-msgid "Changed the template of the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Previous template: %OldTemplate% %LineBreak% New template: %NewTemplate% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Changed the template of the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Previous template: %OldTemplate% %LineBreak% New template: %NewTemplate% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:159
@@ -307,7 +323,7 @@ msgid "User set a post as sticky"
 msgstr ""
 
 #: default-events.php:159
-msgid "Set the post %PostTitle% as sticky %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Set the post %PostTitle% as sticky %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:160
@@ -315,7 +331,7 @@ msgid "User removed post from sticky"
 msgstr ""
 
 #: default-events.php:160
-msgid "Removed the post %PostTitle% from sticky %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Removed the post %PostTitle% from sticky %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:161
@@ -323,7 +339,7 @@ msgid "User modified the content of a post"
 msgstr ""
 
 #: default-events.php:161
-msgid "Modified the content of the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% %RevisionLink% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Modified the content of the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% %RevisionLink% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:162
@@ -331,7 +347,7 @@ msgid "User submitted a post for review"
 msgstr ""
 
 #: default-events.php:162
-msgid "Submitted the post %PostTitle% for review %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Submitted the post %PostTitle% for review %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:163
@@ -339,7 +355,7 @@ msgid "User scheduled a post"
 msgstr ""
 
 #: default-events.php:163
-msgid "Scheduled the post %PostTitle% to be published on %PublishingDate% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Scheduled the post %PostTitle% to be published on %PublishingDate% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:164, default-events.php:895
@@ -347,7 +363,7 @@ msgid "User changed title of a post"
 msgstr ""
 
 #: default-events.php:164
-msgid "Changed the title of the post %OldTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% New title: %NewTitle% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Changed the title of the post %OldTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% New title: %NewTitle% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:165
@@ -355,7 +371,7 @@ msgid "User opened a post in the editor"
 msgstr ""
 
 #: default-events.php:165
-msgid "Opened the post %PostTitle% in the editor %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Opened the post %PostTitle% in the editor %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:166
@@ -371,7 +387,7 @@ msgid "User enabled/disabled comments in a post"
 msgstr ""
 
 #: default-events.php:167
-msgid "The comments in the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "The comments in the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:168
@@ -379,7 +395,11 @@ msgid "User enabled/disabled trackbacks and pingbacks in a post"
 msgstr ""
 
 #: default-events.php:168
-msgid "Pingbacks and Trackbacks in the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Pingbacks and Trackbacks in the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% %EditorLinkPost%"
+msgstr ""
+
+#: default-events.php:171
+msgid "Tags"
 msgstr ""
 
 #: default-events.php:172
@@ -387,7 +407,7 @@ msgid "User added post tag"
 msgstr ""
 
 #: default-events.php:172
-msgid "Added tag(s) to the post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% Added tag(s): %tag% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Added tag(s) to the post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% Added tag(s): %tag% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:173
@@ -395,7 +415,7 @@ msgid "User removed post tag"
 msgstr ""
 
 #: default-events.php:173
-msgid "Removed tag(s) from the post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% Removed tag(s): %tag% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Removed tag(s) from the post %PostTitle% %LineBreak% ID: %PostID% %LineBreak% Type: %PostType% %LineBreak% Status: %PostStatus% %LineBreak% Removed tag(s): %tag% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:174
@@ -438,12 +458,16 @@ msgstr ""
 msgid "Changed the description of the tag %tag% %LineBreak% Slug: %Slug% %LineBreak% Previous description: %old_desc% %LineBreak% New description: %new_desc% %LineBreak% %TagLink%"
 msgstr ""
 
+#: default-events.php:181
+msgid "Categories"
+msgstr ""
+
 #: default-events.php:182
 msgid "User changed post category"
 msgstr ""
 
 #: default-events.php:182
-msgid "Changed the category of the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Previous category(ies): %OldCategories% %LineBreak% New category(ies): %NewCategories% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Changed the category of the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Previous category(ies): %OldCategories% %LineBreak% New category(ies): %NewCategories% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:183
@@ -486,12 +510,16 @@ msgstr ""
 msgid "Changed the slug of the category: %CategoryName% %LineBreak% Previous slug: %old_slug% %LineBreak% New slug: %new_slug% %LineBreak% %cat_link%"
 msgstr ""
 
+#: default-events.php:190
+msgid "Custom Fields"
+msgstr ""
+
 #: default-events.php:191
 msgid "User created a custom field for a post"
 msgstr ""
 
 #: default-events.php:191
-msgid "Created the new custom field %MetaKey% in the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Custom field value: %MetaValue% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost% %LineBreak% %MetaLink%"
+msgid "Created the new custom field %MetaKey% in the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Custom field value: %MetaValue% %LineBreak% %EditorLinkPost% %LineBreak% %MetaLink%"
 msgstr ""
 
 #: default-events.php:192
@@ -499,7 +527,7 @@ msgid "User updated a custom field value for a post"
 msgstr ""
 
 #: default-events.php:192
-msgid "Modified the value of the custom field %MetaKey% in the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Previous custom field value: %MetaValueOld% %LineBreak% New custom field value: %MetaValueNew% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost% %LineBreak% %MetaLink%."
+msgid "Modified the value of the custom field %MetaKey% in the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Previous custom field value: %MetaValueOld% %LineBreak% New custom field value: %MetaValueNew% %LineBreak% %EditorLinkPost% %LineBreak% %MetaLink%."
 msgstr ""
 
 #: default-events.php:193
@@ -507,7 +535,7 @@ msgid "User deleted a custom field from a post"
 msgstr ""
 
 #: default-events.php:193
-msgid "Deleted the custom field %MetaKey% from the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Deleted the custom field %MetaKey% from the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
 #: default-events.php:194
@@ -515,7 +543,11 @@ msgid "User updated a custom field name for a post"
 msgstr ""
 
 #: default-events.php:194
-msgid "Previous custom field name: %MetaKeyOld% %LineBreak% New custom field name: %MetaKeyNew% %LineBreak% Post: %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %PostUrlIfPlublished% %LineBreak% %EditorLinkPost%"
+msgid "Previous custom field name: %MetaKeyOld% %LineBreak% New custom field name: %MetaKeyNew% %LineBreak% Post: %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% %EditorLinkPost%"
+msgstr ""
+
+#: default-events.php:197
+msgid "Custom Fields (ACF)"
 msgstr ""
 
 #: default-events.php:200
@@ -534,12 +566,16 @@ msgstr ""
 msgid "Removed relationships from the custom field %MetaKey% in the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Removed relationships: %Relationships% %LineBreak% %LineBreak% %EditorLinkPost% %LineBreak% %MetaLink%."
 msgstr ""
 
+#: default-events.php:217
+msgid "Comments"
+msgstr ""
+
 #: default-events.php:218
 msgid "User approved a comment"
 msgstr ""
 
 #: default-events.php:218
-msgid "Approved the comment posted by %Author% on the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %PostUrlIfPlublished%  %LineBreak% %CommentLink%"
+msgid "Approved the comment posted by %Author% on the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %LineBreak% %CommentLink%"
 msgstr ""
 
 #: default-events.php:219
@@ -547,7 +583,7 @@ msgid "User unapproved a comment"
 msgstr ""
 
 #: default-events.php:219
-msgid "Unapproved the comment posted by %Author% on the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %PostUrlIfPlublished%  %LineBreak% %CommentLink%"
+msgid "Unapproved the comment posted by %Author% on the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %LineBreak% %CommentLink%"
 msgstr ""
 
 #: default-events.php:220
@@ -555,7 +591,7 @@ msgid "User replied to a comment"
 msgstr ""
 
 #: default-events.php:220
-msgid "Replied to the comment posted by %Author% on the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %PostUrlIfPlublished%  %LineBreak% %CommentLink%"
+msgid "Replied to the comment posted by %Author% on the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %LineBreak% %CommentLink%"
 msgstr ""
 
 #: default-events.php:221
@@ -563,7 +599,7 @@ msgid "User edited a comment"
 msgstr ""
 
 #: default-events.php:221
-msgid "Edited the comment posted by %Author% on the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %PostUrlIfPlublished%  %LineBreak% %CommentLink%"
+msgid "Edited the comment posted by %Author% on the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %LineBreak% %CommentLink%"
 msgstr ""
 
 #: default-events.php:222
@@ -571,7 +607,7 @@ msgid "User marked a comment as Spam"
 msgstr ""
 
 #: default-events.php:222
-msgid "Marked the comment posted by %Author% on the post %PostTitle% as spam %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %PostUrlIfPlublished% %LineBreak% %CommentLink%"
+msgid "Marked the comment posted by %Author% on the post %PostTitle% as spam %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %LineBreak% %CommentLink%"
 msgstr ""
 
 #: default-events.php:223
@@ -579,7 +615,7 @@ msgid "User marked a comment as Not Spam"
 msgstr ""
 
 #: default-events.php:223
-msgid "Marked the comment posted by %Author% on the post %PostTitle% as not spam %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %PostUrlIfPlublished%  %LineBreak% %CommentLink%"
+msgid "Marked the comment posted by %Author% on the post %PostTitle% as not spam %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %LineBreak% %CommentLink%"
 msgstr ""
 
 #: default-events.php:224
@@ -587,7 +623,7 @@ msgid "User moved a comment to trash"
 msgstr ""
 
 #: default-events.php:224
-msgid "Moved the comment posted by %Author% on the post %PostTitle% to trash %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %PostUrlIfPlublished%  %LineBreak% %CommentLink%"
+msgid "Moved the comment posted by %Author% on the post %PostTitle% to trash %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %LineBreak% %CommentLink%"
 msgstr ""
 
 #: default-events.php:225
@@ -595,7 +631,7 @@ msgid "User restored a comment from the trash"
 msgstr ""
 
 #: default-events.php:225
-msgid "Restored the comment posted by %Author% on the post %PostTitle% from trash %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %PostUrlIfPlublished% %LineBreak% %CommentLink%"
+msgid "Restored the comment posted by %Author% on the post %PostTitle% from trash %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %LineBreak% %CommentLink%"
 msgstr ""
 
 #: default-events.php:226
@@ -603,23 +639,23 @@ msgid "User permanently deleted a comment"
 msgstr ""
 
 #: default-events.php:226
-msgid "Permanently deleted the comment posted by %Author% on the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %PostUrlIfPlublished%"
+msgid "Permanently deleted the comment posted by %Author% on the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% "
 msgstr ""
 
 #: default-events.php:227
 msgid "User posted a comment"
 msgstr ""
 
-#: default-events.php:227
-msgid "Posted a comment on the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %PostUrlIfPlublished% %LineBreak% %CommentLink%"
+#: default-events.php:227, default-events.php:232
+msgid "Posted a comment on the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %LineBreak% %CommentLink%"
 msgstr ""
 
 #: default-events.php:232
 msgid "Visitor posted a comment"
 msgstr ""
 
-#: default-events.php:232
-msgid "Posted a comment on the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Comment ID: %CommentID% %PostUrlIfPlublished%  %LineBreak% %CommentLink%"
+#: default-events.php:238
+msgid "Widgets"
 msgstr ""
 
 #: default-events.php:239
@@ -662,12 +698,16 @@ msgstr ""
 msgid "Changed the position of the %WidgetName% widget in %Sidebar%."
 msgstr ""
 
+#: default-events.php:249
+msgid "Menus"
+msgstr ""
+
 #: default-events.php:250
 msgid "User created new menu"
 msgstr ""
 
 #: default-events.php:250
-msgid "New menu called %MenuName% %MenuUrl%"
+msgid "New menu called %MenuName%"
 msgstr ""
 
 #: default-events.php:251
@@ -675,7 +715,7 @@ msgid "User added content to a menu"
 msgstr ""
 
 #: default-events.php:251
-msgid "Added new item to the menu %MenuName% %LineBreak% Item type: %ContentType% %LineBreak% Item name: %ContentName% %MenuUrl%"
+msgid "Added new item to the menu %MenuName% %LineBreak% Item type: %ContentType% %LineBreak% Item name: %ContentName%"
 msgstr ""
 
 #: default-events.php:252
@@ -683,7 +723,7 @@ msgid "User removed content from a menu"
 msgstr ""
 
 #: default-events.php:252
-msgid "Removed item from the menu %MenuName% %LineBreak% Item type: %ContentType% %LineBreak% Item name: %ContentName% %MenuUrl%"
+msgid "Removed item from the menu %MenuName% %LineBreak% Item type: %ContentType% %LineBreak% Item name: %ContentName%"
 msgstr ""
 
 #: default-events.php:253
@@ -699,7 +739,7 @@ msgid "User changed menu setting"
 msgstr ""
 
 #: default-events.php:254
-msgid "The setting in the %MenuName% %LineBreak% Setting: %MenuSetting% %MenuUrl%"
+msgid "The setting in the %MenuName% %LineBreak% Setting: %MenuSetting%"
 msgstr ""
 
 #: default-events.php:255
@@ -707,7 +747,7 @@ msgid "User modified content in a menu"
 msgstr ""
 
 #: default-events.php:255
-msgid "Modified an item in the menu %MenuName% %LineBreak% Item type: %ContentType% %LineBreak% Item name: %ContentName% %MenuUrl%"
+msgid "Modified an item in the menu %MenuName% %LineBreak% Item type: %ContentType% %LineBreak% Item name: %ContentName%"
 msgstr ""
 
 #: default-events.php:256
@@ -715,7 +755,7 @@ msgid "User changed name of a menu"
 msgstr ""
 
 #: default-events.php:256
-msgid "Previous name: %OldMenuName% %LineBreak% New name: %MenuName% %MenuUrl%"
+msgid "Previous name: %OldMenuName% %LineBreak% New name: %MenuName%"
 msgstr ""
 
 #: default-events.php:257
@@ -723,7 +763,7 @@ msgid "User changed order of the objects in a menu"
 msgstr ""
 
 #: default-events.php:257
-msgid "Changed the order of the items in the menu %MenuName% %MenuUrl%"
+msgid "Changed the order of the items in the menu %MenuName%"
 msgstr ""
 
 #: default-events.php:258
@@ -731,7 +771,11 @@ msgid "User moved objects as a sub-item"
 msgstr ""
 
 #: default-events.php:258
-msgid "Menu name: %MenuName% %LineBreak% Moved item %ItemName% as a sub-item of %ParentName% %MenuUrl%"
+msgid "Menu name: %MenuName% %LineBreak% Moved item %ItemName% as a sub-item of %ParentName%"
+msgstr ""
+
+#: default-events.php:269
+msgid "Custom Post Types"
 msgstr ""
 
 #: default-events.php:270
@@ -932,6 +976,10 @@ msgstr ""
 
 #: default-events.php:298
 msgid "Plugin modified the custom post %PostTitle%. View the post: %EditorLinkPost%."
+msgstr ""
+
+#: default-events.php:309
+msgid "Pages"
 msgstr ""
 
 #: default-events.php:310
@@ -1154,6 +1202,14 @@ msgstr ""
 msgid "Plugin modified the page %PostTitle%. View the page: %EditorLinkPage%."
 msgstr ""
 
+#: default-events.php:344
+msgid "User Accounts"
+msgstr ""
+
+#: default-events.php:345
+msgid "User Profiles"
+msgstr ""
+
 #: default-events.php:346
 msgid "New user was created on WordPress"
 msgstr ""
@@ -1274,6 +1330,10 @@ msgstr ""
 msgid "Changed the display name of the user %TargetUsername% %LineBreak% Role: %Roles% %LineBreak% First name: %FirstName% %LineBreak% Last name: %LastName% %LineBreak% Previous display name: %old_displayname% %LineBreak% New display name: %new_displayname% %LineBreak% %EditUserLink%"
 msgstr ""
 
+#: default-events.php:363
+msgid "Multisite User Profiles"
+msgstr ""
+
 #: default-events.php:364
 msgid "User granted Super Admin privileges"
 msgstr ""
@@ -1312,6 +1372,14 @@ msgstr ""
 
 #: default-events.php:368
 msgid "Created a new network user %NewUserData->Username% %LineBreak% First name: %NewUserData->FirstName% %LineBreak% Last name: %NewUserData->LastName% %LineBreak% %EditUserLink%"
+msgstr ""
+
+#: default-events.php:372
+msgid "Plugins & Themes"
+msgstr ""
+
+#: default-events.php:373, includes/views/class-auditloggridview.php:173, includes/views/class-auditloglistview.php:167
+msgid "Plugins"
 msgstr ""
 
 #: default-events.php:374
@@ -1394,6 +1462,10 @@ msgstr ""
 msgid "Modified a file with the plugin editor %LineBreak% File: %File%"
 msgstr ""
 
+#: default-events.php:387
+msgid "Themes"
+msgstr ""
+
 #: default-events.php:388
 msgid "User installed a theme"
 msgstr ""
@@ -1450,6 +1522,10 @@ msgstr ""
 msgid "Modified a file with the theme editor %LineBreak% File: %Theme%/%File%"
 msgstr ""
 
+#: default-events.php:398
+msgid "Themes on Multisite"
+msgstr ""
+
 #: default-events.php:399
 msgid "Activated theme on network"
 msgstr ""
@@ -1464,6 +1540,10 @@ msgstr ""
 
 #: default-events.php:400
 msgid "Network deactivated the theme %Theme->Name% %LineBreak% Version: %Theme->Version% %LineBreak% Install location: %Theme->get_template_directory%"
+msgstr ""
+
+#: default-events.php:403
+msgid "Database Events"
 msgstr ""
 
 #: default-events.php:404
@@ -1514,6 +1594,14 @@ msgstr ""
 msgid "WordPress deleted these tables from the database %LineBreak% Tables: %TableNames%"
 msgstr ""
 
+#: default-events.php:413
+msgid "WordPress & System"
+msgstr ""
+
+#: default-events.php:414, includes/class-alertmanager.php:590, includes/class-alertmanager.php:658, includes/views/class-auditloggridview.php:227, includes/views/class-auditloggridview.php:179, includes/views/class-auditloglistview.php:225, includes/views/class-auditloglistview.php:175
+msgid "System"
+msgstr ""
+
 #: default-events.php:415
 msgid "Unknown Error"
 msgstr ""
@@ -1562,6 +1650,10 @@ msgstr ""
 msgid "%PromoName% %PromoMessage%"
 msgstr ""
 
+#: default-events.php:425
+msgid "Activity log plugin"
+msgstr ""
+
 #: default-events.php:426
 msgid "Events automatically pruned by system"
 msgstr ""
@@ -1588,6 +1680,10 @@ msgstr ""
 
 #: default-events.php:429
 msgid "Some WP Activity Log plugin settings on this site were propagated and overridden from the MainWP dashboard."
+msgstr ""
+
+#: default-events.php:432
+msgid "WordPress Site Settings"
 msgstr ""
 
 #: default-events.php:433
@@ -1726,6 +1822,14 @@ msgstr ""
 msgid "Changed the <strong>Site address (URL)</strong> %LineBreak% Previous URL: %old_url% %LineBreak% New URL: %new_url%"
 msgstr ""
 
+#: default-events.php:453
+msgid "Multisite Network Sites"
+msgstr ""
+
+#: default-events.php:454
+msgid "MultiSite"
+msgstr ""
+
 #: default-events.php:455
 msgid "New site added on the network"
 msgstr ""
@@ -1780,6 +1884,14 @@ msgstr ""
 
 #: default-events.php:461
 msgid "Changed the <strong>Allow new registrations</strong> settings %LineBreak% Previous setting: %previous_setting% %LineBreak% New setting: %new_setting%"
+msgstr ""
+
+#: default-events.php:468
+msgid "WooCommerce"
+msgstr ""
+
+#: default-events.php:469
+msgid "Products"
 msgstr ""
 
 #: default-events.php:470
@@ -2150,6 +2262,10 @@ msgstr ""
 msgid "Changed the visibility of an attribute in the product %ProductTitle% %LineBreak% Product ID: %ProductID% %LineBreak% Product status: %ProductStatus% %LineBreak% Attribute name: %AttributeName% %LineBreak% New attribute visibility: %AttributeVisiblilty% %LineBreak% %EditorLinkProduct%"
 msgstr ""
 
+#: default-events.php:522
+msgid "Store"
+msgstr ""
+
 #: default-events.php:523
 msgid "User changed the Weight Unit"
 msgstr ""
@@ -2294,6 +2410,10 @@ msgstr ""
 msgid "Changed the store's <strongTerms and conditions page</strong %LineBreak% Previous page: %old% %LineBreak% New page: %new%"
 msgstr ""
 
+#: default-events.php:543
+msgid "Payment Gateways"
+msgstr ""
+
 #: default-events.php:544
 msgid "User enabled/disabled a payment gateway"
 msgstr ""
@@ -2308,6 +2428,10 @@ msgstr ""
 
 #: default-events.php:546
 msgid "User modified a payment gateway"
+msgstr ""
+
+#: default-events.php:549
+msgid "Tax Settings"
 msgstr ""
 
 #: default-events.php:550
@@ -2348,6 +2472,10 @@ msgstr ""
 
 #: default-events.php:554
 msgid "The shipping zone %ShippingZoneName% on the WooCommerce store"
+msgstr ""
+
+#: default-events.php:557
+msgid "WC Categories"
 msgstr ""
 
 #: default-events.php:558
@@ -2398,6 +2526,10 @@ msgstr ""
 msgid "Previous category name: %OldName% %LineBreak% New category name: %NewName% %LineBreak% Category slug: %CategorySlug% %LineBreak% %ProductCatLink%"
 msgstr ""
 
+#: default-events.php:566
+msgid "WC Tags"
+msgstr ""
+
 #: default-events.php:567
 msgid "User created a new product tag"
 msgstr ""
@@ -2428,6 +2560,10 @@ msgstr ""
 
 #: default-events.php:570
 msgid "Changed the slug of the tag: %TagName% %LineBreak% Previous slug: %OldSlug% %LineBreak% New slug: %NewSlug% %LineBreak% %ProductTagLink%"
+msgstr ""
+
+#: default-events.php:573
+msgid "Attributes"
 msgstr ""
 
 #: default-events.php:574
@@ -2476,6 +2612,10 @@ msgstr ""
 
 #: default-events.php:579
 msgid "The option <strong>Enable Archives</strong> in WooCommerce attribute %AttributeName% %LineBreak% Attribute slug: %Slug%"
+msgstr ""
+
+#: default-events.php:582
+msgid "Coupons"
 msgstr ""
 
 #: default-events.php:583
@@ -2550,6 +2690,10 @@ msgstr ""
 msgid "Previous coupon name: %OldName% %LineBreak% New coupon name: %NewName% %LineBreak% %EditorLinkCoupon%"
 msgstr ""
 
+#: default-events.php:594
+msgid "Orders"
+msgstr ""
+
 #: default-events.php:595
 msgid "A WooCommerce order has been placed"
 msgstr ""
@@ -2606,6 +2750,10 @@ msgstr ""
 msgid "Refunded the order %OrderTitle% %LineBreak% %EditorLinkOrder%"
 msgstr ""
 
+#: default-events.php:604
+msgid "User Profile"
+msgstr ""
+
 #: default-events.php:605
 msgid "User changed the billing address details"
 msgstr ""
@@ -2620,6 +2768,14 @@ msgstr ""
 
 #: default-events.php:606
 msgid "The <strong>shipping address</strong> details of the user %TargetUsername% / Own <strong>shipping address<strong> %LineBreak% Role: %Roles% %LineBreak% New Shipping address: %NewValue% %LineBreak% %EditUserLink%"
+msgstr ""
+
+#: default-events.php:610
+msgid "Gravity Forms"
+msgstr ""
+
+#: default-events.php:611
+msgid "Monitor Gravity Forms"
 msgstr ""
 
 #: default-events.php:616
@@ -2750,6 +2906,14 @@ msgstr ""
 msgid "The plugin setting %setting_name% %LineBreak% Previous value %old_value% %LineBreak% New value: %new_value% %LineBreak%"
 msgstr ""
 
+#: default-events.php:780, includes/class-alertmanager.php:618
+msgid "WPForms"
+msgstr ""
+
+#: default-events.php:781
+msgid "Form Content"
+msgstr ""
+
 #: default-events.php:786
 msgid "A form was created, modified or deleted"
 msgstr ""
@@ -2842,6 +3006,14 @@ msgstr ""
 msgid "The addon %addon_name%"
 msgstr ""
 
+#: default-events.php:893, includes/class-alertmanager.php:608, includes/class-alertmanager.php:715
+msgid "Yoast SEO"
+msgstr ""
+
+#: default-events.php:894
+msgid "Post Changes"
+msgstr ""
+
 #: default-events.php:895
 msgid "The <strong>SEO title</strong> of the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% Previous title: %OldSEOTitle% %LineBreak% New title: %NewSEOTitle% %LineBreak% %EditorLinkPost%"
 msgstr ""
@@ -2902,6 +3074,10 @@ msgstr ""
 msgid "The setting <strong>Cornerstone content</strong> in the post %PostTitle% %LineBreak% Post ID: %PostID% %LineBreak% Post type: %PostType% %LineBreak% Post status: %PostStatus% %LineBreak% %EditorLinkPost%"
 msgstr ""
 
+#: default-events.php:905
+msgid "Website Changes"
+msgstr ""
+
 #: default-events.php:906
 msgid "User changed the Title Separator"
 msgstr ""
@@ -2932,6 +3108,10 @@ msgstr ""
 
 #: default-events.php:909
 msgid "Changed the <strong>Knowledge Graph & Schema.org</strong> in the plugin settings %LineBreak% Previous setting: %old% %LineBreak% New setting: %new%"
+msgstr ""
+
+#: default-events.php:912
+msgid "Plugin Settings Changes"
 msgstr ""
 
 #: default-events.php:913
@@ -3126,6 +3306,14 @@ msgstr ""
 msgid "The setting to show SEO settings for the %SEOPostType% taxonomy"
 msgstr ""
 
+#: default-events.php:943
+msgid "File Changes"
+msgstr ""
+
+#: default-events.php:944
+msgid "Monitor File Changes"
+msgstr ""
+
 #: default-events.php:948
 msgid "File content has been modified"
 msgstr ""
@@ -3172,6 +3360,14 @@ msgstr ""
 
 #: default-events.php:993
 msgid "The file integrity scan has %ScanStatus%."
+msgstr ""
+
+#: default-events.php:1000
+msgid "bbPress Forums"
+msgstr ""
+
+#: default-events.php:1001
+msgid "Forums"
 msgstr ""
 
 #: default-events.php:1002
@@ -3254,6 +3450,10 @@ msgstr ""
 msgid "Changed the type of the forum %ForumName% %LineBreak% Previous type: %OldType% %LineBreak% New type: %NewType% %LineBreak% %EditorLinkForum%"
 msgstr ""
 
+#: default-events.php:1014
+msgid "bbPress Forum Topics"
+msgstr ""
+
 #: default-events.php:1015
 msgid "User created new topic"
 msgstr ""
@@ -3326,6 +3526,10 @@ msgstr ""
 msgid "Changed the visibility of the topic %TopicName% %LineBreak% Previous visibility: %OldVisibility% %LineBreak% New visibility: %NewVisibility% %LineBreak% %EditorLinkTopic%"
 msgstr ""
 
+#: default-events.php:1026
+msgid "bbPress Settings"
+msgstr ""
+
 #: default-events.php:1027
 msgid "User changed forum's role"
 msgstr ""
@@ -3358,12 +3562,20 @@ msgstr ""
 msgid "Changed the time of the bbPress setting <strong>Flooding</strong> (throttling users setting) %LineBreak% Previous time: %OldTime% %LineBreak% New time: %NewTime%"
 msgstr ""
 
+#: default-events.php:1033
+msgid "bbPress User Profiles"
+msgstr ""
+
 #: default-events.php:1034
 msgid "The forum role of a user was changed by another WordPress user"
 msgstr ""
 
 #: default-events.php:1034
 msgid "Change the role of user %TargetUsername% %LineBreak% Previous role: %OldRole% %LineBreak% New role: %NewRole% %LineBreak% First name: %FirstName% %LineBreak% Last name: %LastName% %LineBreak% %EditUserLink%"
+msgstr ""
+
+#: default-events.php:1041, default-events.php:1042, includes/class-alertmanager.php:607, includes/class-alertmanager.php:634, includes/class-alertmanager.php:712, includes/views/class-view.php:592, includes/views/class-view.php:704
+msgid "MainWP"
 msgstr ""
 
 #: default-events.php:1043
@@ -3557,10 +3769,6 @@ msgstr ""
 msgid "User"
 msgstr ""
 
-#: includes/class-alertmanager.php:590, includes/class-alertmanager.php:658, includes/views/class-auditloggridview.php:227, includes/views/class-auditloggridview.php:179, includes/views/class-auditloglistview.php:225, includes/views/class-auditloglistview.php:175
-msgid "System"
-msgstr ""
-
 #: includes/class-alertmanager.php:591, includes/class-alertmanager.php:661, includes/views/class-auditloggridview.php:170, includes/views/class-auditloglistview.php:163
 msgid "Plugin"
 msgstr ""
@@ -3621,14 +3829,6 @@ msgstr ""
 msgid "MainWP Network"
 msgstr ""
 
-#: includes/class-alertmanager.php:607, includes/class-alertmanager.php:634, includes/class-alertmanager.php:712, includes/views/class-view.php:592, includes/views/class-view.php:704
-msgid "MainWP"
-msgstr ""
-
-#: includes/class-alertmanager.php:608, includes/class-alertmanager.php:715
-msgid "Yoast SEO"
-msgstr ""
-
 #: includes/class-alertmanager.php:609
 msgid "Yoast SEO Meta Box"
 msgstr ""
@@ -3663,10 +3863,6 @@ msgstr ""
 
 #: includes/class-alertmanager.php:617, includes/class-alertmanager.php:742
 msgid "IP Address"
-msgstr ""
-
-#: includes/class-alertmanager.php:618
-msgid "WPForms"
 msgstr ""
 
 #: includes/class-alertmanager.php:619, includes/class-alertmanager.php:758
@@ -3892,7 +4088,7 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: includes/views/class-auditloggridview.php:114, includes/views/class-auditloglistview.php:109, includes/views/class-auditlogview.php:311
+#: includes/views/class-auditloggridview.php:114, includes/views/class-auditloglistview.php:109, includes/views/class-auditlogview.php:319
 msgid "MainWP Dashboard"
 msgstr ""
 
@@ -3934,10 +4130,6 @@ msgstr ""
 
 #: includes/views/class-auditloggridview.php:176, includes/views/class-auditloglistview.php:171
 msgid "Website Visitor"
-msgstr ""
-
-#: includes/views/class-auditloggridview.php:173, includes/views/class-auditloglistview.php:167
-msgid "Plugins"
 msgstr ""
 
 #: includes/views/class-auditloggridview.php:261, includes/views/class-auditloggridview.php:274, includes/views/class-auditloglistview.php:246, includes/views/class-auditloglistview.php:259
@@ -4010,23 +4202,23 @@ msgstr ""
 msgid "No events so far."
 msgstr ""
 
-#: includes/views/class-auditlogview.php:279
+#: includes/views/class-auditlogview.php:287
 msgid "Show "
 msgstr ""
 
-#: includes/views/class-auditlogview.php:290
+#: includes/views/class-auditlogview.php:298
 msgid " Items"
 msgstr ""
 
-#: includes/views/class-auditlogview.php:297
+#: includes/views/class-auditlogview.php:305
 msgid "— End of Activity Log —"
 msgstr ""
 
-#: includes/views/class-auditlogview.php:310
+#: includes/views/class-auditlogview.php:318
 msgid "All Sites"
 msgstr ""
 
-#: includes/views/class-auditlogview.php:328
+#: includes/views/class-auditlogview.php:336
 msgid "Retrieve Activity Logs Now"
 msgstr ""
 
