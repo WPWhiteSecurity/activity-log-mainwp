@@ -109,6 +109,16 @@ jQuery(document).ready(function ($) {
     minimumResultsForSearch: 10,
     multiple: true
   });
+  $('input[name="login-page-notification"]').on('change', function () {
+    var value = $(this).val();
+    var textarea = $('textarea[name="login-page-notification-text"]');
+
+    if (value === 'yes') {
+      textarea.removeAttr('disabled');
+    } else {
+      textarea.attr('disabled', true);
+    }
+  });
 });
 
 /***/ })

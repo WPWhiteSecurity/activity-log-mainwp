@@ -166,12 +166,6 @@ class MySQLDB extends AbstractConnector implements ConnectorInterface {
 			if ( $exclude_options && $class instanceof \WSAL\MainWPExtension\Adapters\MySQL\Option ) {
 				continue;
 			}
-
-			// Exclude the tmp_users table.
-			if ( ! $exclude_options && $class instanceof \WSAL\MainWPExtension\Adapters\MySQL\TmpUser ) {
-				continue;
-			}
-
 			if ( is_subclass_of( $class, '\WSAL\MainWPExtension\Adapters\MySQL\ActiveRecord' ) ) {
 				$class->Install();
 			}

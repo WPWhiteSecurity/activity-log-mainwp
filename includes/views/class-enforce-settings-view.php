@@ -22,6 +22,19 @@ class Enforce_Settings_View {
 	public static $tab_id = 'enforce-settings';
 
 	/**
+	 * Allowed HTML tags for the login page notification text.
+	 *
+	 * @var \array[][]
+	 */
+	private $allowed_tags = array(
+		'a' => array(
+			'href'   => array(),
+			'title'  => array(),
+			'target' => array(),
+		),
+	);
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -110,6 +123,15 @@ class Enforce_Settings_View {
 		}
 
 		$selected_events = ( array_key_exists( 'disabled_events', $enforced_settings ) && ! empty( $enforced_settings['disabled_events'] ) ) ? array_map( 'intval', explode( ',', $enforced_settings['disabled_events'] ) ) : [];
+
+		$incognito_mode_enabled = array_key_exists( 'incognito_mode_enabled', $enforced_settings ) ? $enforced_settings['incognito_mode_enabled'] : 'no';
+
+		$login_page_notification_enabled = array_key_exists( 'login_notification_enabled', $enforced_settings ) ? $enforced_settings['login_notification_enabled'] : 'no';
+
+		// login page notification text
+		$default_login_text           = __( 'For security and auditing purposes, a record of all of your logged-in actions and changes within the WordPress dashboard will be recorded in an activity log with the <a href="https://wpactivitylog.com/?utm_source=plugin&utm_medium=referral&utm_campaign=WSAL&utm_content=settings+pages" target="_blank">WP Activity Log plugin</a>. The audit log also includes the IP address where you accessed this site from.', 'mwp-al-text' );
+		$login_page_notification_text = array_key_exists( 'login_notification_text', $enforced_settings ) ? $enforced_settings['login_notification_text'] : $default_login_text;
+
 		?>
         <h2><?php esc_html_e( 'Enforce settings on child sites', 'mwp-al-ext' ); ?></h2>
         <p><?php esc_html_e( 'Use the below setting to specify on which of this child sites you’d like to enforce the configured activity log settings.', 'mwp-al-ext' ); ?></p>
@@ -251,6 +273,91 @@ class Enforce_Settings_View {
             </div><!-- /.postbox -->
             <!-- END: Disabled events -->
 
+            <!-- Hide Plugin in Plugins Page -->
+            <div id="mwpal-setting-contentbox-3" class="postbox">
+                <h2 class="hndle ui-sortable-handle">
+                    <span><i class="fa fa-cog"></i> <?php esc_html_e( 'Do you want to hide the plugin from the list of installed plugins?', 'mwp-al-ext' ); ?></span>
+                </h2>
+                <div class="mainwp-postbox-actions-top">
+                    <p class="description"><?php esc_html_e( 'By default all installed plugins are listed in the plugins page. Set this option to Yes remove WP Activity Log from the list of installed plugins for users who are unable to access the WP Activity Log settings.', 'mwp-al-ext' ); ?></p>
+                </div>
+                <div class="inside">
+                    <table class="form-table wsal-tab">
+                        <tbody>
+                        <tr>
+                            <th>
+                                <label for="incognito_yes"><?php esc_html_e( 'Hide Plugin in Plugins Page', 'mwp-al-ext' ); ?></label>
+                            </th>
+                            <td>
+                                <fieldset>
+                                    <label for="incognito_yes">
+                                        <input type="radio" name="incognito-enabled" value="yes"
+                                               id="incognito_yes" <?php checked( $incognito_mode_enabled, 'yes' ); ?> />
+										<?php esc_html_e( 'Yes, hide the plugin from the list of installed plugins', 'mwp-al-ext' ); ?>
+                                    </label>
+                                    <br/>
+                                    <label for="incognito_no">
+                                        <input type="radio" name="incognito-enabled" value="no"
+                                               id="incognito_no" <?php checked( $incognito_mode_enabled, 'no' ); ?> />
+										<?php esc_html_e( 'No, do not hide the plugin', 'mwp-al-ext' ); ?>
+                                    </label>
+                                </fieldset>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div><!-- /.inside -->
+            </div><!-- /.postbox -->
+            <!-- END: Hide Plugin in Plugins Page -->
+
+            <!-- Login Page Notification -->
+            <div id="mwpal-setting-contentbox-3" class="postbox">
+                <h2 class="hndle ui-sortable-handle">
+                    <span><i class="fa fa-cog"></i> <?php esc_html_e( 'Add user notification on the WordPress login page', 'mwp-al-ext' ); ?></span>
+                </h2>
+                <div class="mainwp-postbox-actions-top">
+                    <p class="description"><?php esc_html_e( 'Many compliance regulations (such as the GDPR) require website administrators to tell the users of their website that all the changes they do when logged in are being logged.', 'mwp-al-ext' ); ?></p>
+                </div>
+                <div class="inside">
+                    <table class="form-table wsal-tab">
+                        <tbody>
+
+                        <tr>
+                            <th>
+                                <label for="login_page_notification"><?php esc_html_e( 'Login Page Notification', 'mwp-al-text' ); ?></label>
+                            </th>
+                            <td>
+                                <fieldset>
+                                    <label for="wsal_lpn_yes">
+                                        <input type="radio" name="login-page-notification"
+                                               id="wsal_lpn_yes" <?php checked( $login_page_notification_enabled, 'yes' ); ?>
+                                               value="yes"/>
+										<?php esc_html_e( 'Yes', 'mwp-al-text' ); ?>
+                                    </label>
+                                    <br/>
+                                    <textarea name="login-page-notification-text" id="login_page_notification_text"
+                                              cols="60"
+                                              rows="6" <?php echo disabled( $login_page_notification_enabled, 'no' ) ?>><?php echo wp_kses( $login_page_notification_text, $this->allowed_tags ); ?></textarea>
+                                    <br/>
+                                    <p class="description">
+										<?php echo wp_kses( __( '<strong>Note: </strong>', 'mwp-al-text' ), $this->allowed_tags ) . esc_html__( 'The only HTML code allowed in the login page notification is for links ( < a href >< /a > ).', 'mwp-al-text' ); ?>
+                                    </p>
+                                    <br/>
+                                    <label for="wsal_lpn_no">
+                                        <input type="radio" name="login-page-notification"
+                                               id="wsal_lpn_no" <?php checked( $login_page_notification_enabled, 'no' ); ?>
+                                               value="no"/>
+										<?php esc_html_e( 'No', 'mwp-al-text' ); ?>
+                                    </label>
+                                </fieldset>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div><!-- /.inside -->
+            </div><!-- /.postbox -->
+            <!-- END: Login Page Notification -->
+
             <p class="submit">
                 <input type="submit" name="submit" id="submit" class="button-primary button button-hero"
                        value="<?php esc_attr_e( 'Save Settings', 'mwp-al-ext' ); ?>">
@@ -294,6 +401,20 @@ class Enforce_Settings_View {
 			$previous_where_to_enforce_settings = $settings->get_enforce_settings_on_subsites();
 			$previously_enforced_settings       = $settings->get_enforced_child_sites_settings();
 			$previous_list_of_subsites          = $settings->get_sites_with_enforced_settings();
+
+			//  incognito setting
+			$incognito_enabled                             = filter_input( INPUT_POST, 'incognito-enabled', FILTER_SANITIZE_STRING );
+			$incognito_enabled                             = ( 'yes' === $incognito_enabled ) ? 'yes' : 'no';
+			$settings_to_enforce['incognito_mode_enabled'] = $incognito_enabled;
+
+			//  login page notification
+			$login_page_notification_enabled = filter_input( INPUT_POST, 'login-page-notification', FILTER_SANITIZE_STRING );
+			if ( $login_page_notification_enabled === 'yes' ) {
+				$settings_to_enforce['login_notification_enabled'] = 'yes';
+				$settings_to_enforce['login_notification_text']    = wp_kses( trim( $_POST['login-page-notification-text'] ), $this->allowed_tags );
+			} else {
+				$settings_to_enforce['login_notification_enabled'] = 'no';
+			}
 
 			//  save settings to be enforced
 			$settings->set_enforced_child_sites_settings( $settings_to_enforce );

@@ -222,6 +222,14 @@ abstract class AuditLogView extends \WP_List_Table {
 		$events_query->setOffset( $offset );  // Set query offset.
 		$events_query->setLimit( $per_page ); // Set number of events per page.
 
+		if ( ! in_array( $bid, [ 'dashboard', 0 ] ) ) {
+			$result = apply_filters( 'mwpal_query_events', [], $this, $per_page, $offset );
+			//  if there are no events, the filter is still expected to return na array with key total_items, per_page and items
+			if ( ! empty( $result ) ) {
+				return $result;
+			}
+		}
+
 		return array(
 			'total_items' => $total_items,
 			'per_page'    => $per_page,
@@ -306,27 +314,25 @@ abstract class AuditLogView extends \WP_List_Table {
 				$current_site = mwpal_extension()->settings->get_view_site_id();
 				?>
 				<div class="mwp-ssa mwp-ssa-<?php echo esc_attr( $which ); ?>">
-					<?php if ( ! isset( $_REQUEST['mwpal_search_widget_ip'] ) ) : ?>
-						<select class="mwp-ssas">
-							<option value="0"><?php esc_html_e( 'All Sites', 'mwp-al-ext' ); ?></option>
-							<option value="dashboard" <?php selected( $current_site, 'dashboard' ); ?>><?php esc_html_e( 'MainWP Dashboard', 'mwp-al-ext' ); ?></option>
-							<?php
-							if ( is_array( $wsal_child_sites ) ) {
-								foreach ( $wsal_child_sites as $site_id => $site_data ) {
-									$key = array_search( $site_id, array_column( $this->mwp_child_sites, 'id' ), false );
-									if ( false !== $key ) {
-										?>
-										<option value="<?php echo esc_attr( $this->mwp_child_sites[ $key ]['id'] ); ?>"
-											<?php selected( (int) $this->mwp_child_sites[ $key ]['id'], $current_site ); ?>>
-											<?php echo esc_html( $this->mwp_child_sites[ $key ]['name'] ) . ' (' . esc_html( $this->mwp_child_sites[ $key ]['url'] ) . ')'; ?>
-										</option>
-										<?php
-									}
+					<select class="mwp-ssas">
+						<option value="0"><?php esc_html_e( 'All Sites', 'mwp-al-ext' ); ?></option>
+						<option value="dashboard" <?php selected( $current_site, 'dashboard' ); ?>><?php esc_html_e( 'MainWP Dashboard', 'mwp-al-ext' ); ?></option>
+						<?php
+						if ( is_array( $wsal_child_sites ) ) {
+							foreach ( $wsal_child_sites as $site_id => $site_data ) {
+								$key = array_search( $site_id, array_column( $this->mwp_child_sites, 'id' ), false );
+								if ( false !== $key ) {
+									?>
+									<option value="<?php echo esc_attr( $this->mwp_child_sites[ $key ]['id'] ); ?>"
+										<?php selected( (int) $this->mwp_child_sites[ $key ]['id'], $current_site ); ?>>
+										<?php echo esc_html( $this->mwp_child_sites[ $key ]['name'] ) . ' (' . esc_html( $this->mwp_child_sites[ $key ]['url'] ) . ')'; ?>
+									</option>
+									<?php
 								}
 							}
-							?>
-						</select>
-					<?php endif; ?>
+						}
+						?>
+					</select>
 					<input type="button" class="almwp-button" id="mwpal-wsal-manual-retrieve" value="<?php esc_html_e( 'Retrieve Activity Logs Now', 'mwp-al-ext' ); ?>" />
 				</div>
 			<?php

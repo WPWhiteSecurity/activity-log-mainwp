@@ -1,6 +1,6 @@
 <?php
 /**
- * Class: Abstract Active Record
+ * Class: Active Record base class
  *
  * Abstract ActiveRecord model is the generic model for any kind
  * of adapter.
@@ -19,12 +19,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Abstract ActiveRecord model is the generic model for any kind
+ * ActiveRecord model is a base class generic model for any kind
  * of adapter.
  *
  * @package mwp-al-ext
  */
-abstract class ActiveRecord {
+class ActiveRecord {
 
 	const STATE_UNKNOWN = 'unknown';
 	const STATE_CREATED = 'created';

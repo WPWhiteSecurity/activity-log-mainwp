@@ -4,7 +4,7 @@
  * Plugin URI: https://wpactivitylog.com/extensions/mainwp-activity-log/
  * Description: This extension for MainWP enables you to view the activity logs of all child sites in one central location, the MainWP dashboard.
  * Author: WP White Security
- * Version: 1.6.1
+ * Version: 1.7.0
  * Text Domain: mwp-al-ext
  * Domain Path: /languages
  * Author URI: http://www.wpwhitesecurity.com/
@@ -56,7 +56,7 @@ if ( function_exists( 'almainwp_fs' ) ) {
 		 *
 		 * @var string
 		 */
-		public $version = '1.6.1';
+		public $version = '1.7.0';
 
 		/**
 		 * Single Static Instance of the plugin.
@@ -276,6 +276,20 @@ if ( function_exists( 'almainwp_fs' ) ) {
 			if ( is_admin() && file_exists( trailingslashit( MWPAL_BASE_DIR ) . 'sdk/freemius-init.php' ) ) {
 				require_once trailingslashit( MWPAL_BASE_DIR ) . 'sdk/freemius-init.php';
 			}
+		}
+
+		/**
+		 * @return Settings
+         * @since 1.7.0
+		 */
+		public function settings() {
+			if ( $this->settings instanceof Settings ) {
+				return $this->settings;
+			}
+
+			$this->settings = new \WSAL\MainWPExtension\Settings();
+
+			return $this->settings;
 		}
 
 		/**
