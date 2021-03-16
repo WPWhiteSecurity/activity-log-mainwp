@@ -164,6 +164,13 @@ Release Notes: [Centrally configure activity log settings in MainWP network](htt
 
 * **New Feature**
 	* [Configure the settings of the WP Activity Log plugin installed on the child sites from the MainWP dashboard](https://wpactivitylog.com/support/kb/configure-child-sites-activity-log-settings-mainwp/).
+	
+* **New event IDs*
+	* 7713: Changed the enforcement configuration of the child sites activity log settings.
+	* 7714: Added or removed a child site from the enforced child sites activity log settings.
+	* 7715: Modified the child sites activity log settings.
+	* 7716: Started or finished propagating the child sites activity log settings.
+	* 7717: Failed to propagate the child sites activity log settings to a child site.
 
 * **Improvement**
 	* Changed the old logo with a new and more modern one.
