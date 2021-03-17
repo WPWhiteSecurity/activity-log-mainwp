@@ -4,9 +4,9 @@ Plugin URI: https://wpactivitylog.com/extensions/mainwp-activity-log/
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl.html
 Tags: activity log, mainwp, mainwp extension, wordpress security, wordpress security audit log, audit log, mainwp user tracking, wordpress activity log, security activity log, wordpress admin, mainwp admin, user tracking
-Requires at least: 3.6
+Requires at least: 4.4
 Tested up to: 5.6
-Stable tag: 1.6.1
+Stable tag: 1.7.0
 Requires PHP: 5.5
 
 See the activity logs of all child sites & MainWP in one central location - the MainWP dashboard.
@@ -132,6 +132,26 @@ Please refer to our [Support & Documentation pages](https://wpactivitylog.com/su
 8. By default the extension retrieves the child sites' logs every three hours, though you can configure this schedule from the extension settings.
 
 == Changelog ==
+
+= 1.7.0 (2021-03-17) =
+
+Release Notes: [More activity log settings can be centrally manged from the MainWP dashboard](https://wpactivitylog.com/mainwp-log-extension-1-7-0/)
+
+* **New Feature**
+	* Support for any date and time format WordPress support.
+	* "Hide plugin in plugins page" child site setting can now be centrally.
+	* "Login page notification" can now be centrally configured on all child sites.
+
+* **Improvement**
+	* Updated Freemius SDK to the latest version - 2.4.2.
+	* Updated third party libraries used in the plugin.
+	* Improved CSS of the extension's settings page.
+	* Centrally managed activity log settings for child sites moved in plugin menu.
+	* Improved the text & metadata of some of the activity log events.
+	
+* **Bug fixes**
+	* Child site selection drop down menu disappears when running a search.
+	* Event ID 1000 was reported whenever a change was pushed from MainWP to child sites.
 
 = 1.6.1 (2020-11-24) =
 
