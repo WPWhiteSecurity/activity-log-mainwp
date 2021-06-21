@@ -1193,13 +1193,14 @@ class View extends Abstract_View {
             );
         }
 
+		$mwp_child_sites  = MWPAL_Extension\mwpal_extension()->settings->get_mwp_child_sites(); // Get MainWP child sites.
+
         /*
          * Get a list of site IDs that we will start working with.
          */
         if ( ! empty( $running_flag['site_ids'] ) ) {
             $next_batch = array_slice( $running_flag['site_ids'], 0, 5 );
-        } else {
-            $mwp_child_sites  = MWPAL_Extension\mwpal_extension()->settings->get_mwp_child_sites(); // Get MainWP child sites.
+        } else {           
             $wsal_child_sites = MWPAL_Extension\mwpal_extension()->settings->get_option( 'wsal-child-sites', array() ); // Get activity log sites.
             $wsal_site_ids    = array_keys( $wsal_child_sites );
             $mwp_site_ids     = array_column( $mwp_child_sites, 'id' ); // Get MainWP child site ids.
